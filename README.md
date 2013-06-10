@@ -17,3 +17,9 @@ Vimdow is a window management application for Mac OS X
  - `<control>`-`<shift>`-hj: Change window focus to the left
  - `<control>`-`<shift>`-kl: Change window focus to the right
 
+
+# Credits 
+- [MASShortcut](https://github.com/shpakovski/MASShortcut)
+
+# Copyright 
+- Vimdow is licensed under BSD license.
