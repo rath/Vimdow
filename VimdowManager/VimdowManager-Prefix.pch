@@ -1,0 +1,8 @@
+//
+// Prefix header for all source files of the 'VimdowManager' target in the 'VimdowManager' project
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+
+#endif
