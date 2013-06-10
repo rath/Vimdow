@@ -1,6 +1,6 @@
 # About Vimdow
 
-Vimdow is a window management application. 
+Vimdow is a window management application for Mac OS X 
 
 ## Mode 
 
@@ -8,7 +8,7 @@ Vimdow is a window management application.
  - hjkl: Move current window's position 
  - `<shift>`-hjkl: Resize current window based on upper-left
  - `<option>`-hjkl: Resize current window based on bottom-right
- - q + [1-9]: Switch window by displaying shortcut numbers
+ - q + [1-9]: Switch window by displaying shortcut numbers order by x coordinates
  - x: Quit Vimdow
  - <escape>: Exit command mode
 
