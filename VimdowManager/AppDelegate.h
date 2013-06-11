@@ -39,7 +39,8 @@
     NSMutableArray* quickGo;
 
     NSInteger repeatFactor;
-
+    NSInteger quickSwitchOffset;
+    
     BOOL commandMode;
 }
 

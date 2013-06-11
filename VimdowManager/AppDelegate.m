@@ -236,10 +236,11 @@ static AXUIElementRef getFrontMostApp() {
     AXUIElementSetAttributeValue(switchWindow.app, kAXFrontmostAttribute, kCFBooleanTrue);
 }
 
-- (void)quickSwitch {
+- (void)prepareQuickSwitch {
     [self collectWindows];
     NSUInteger guideNumber = 1;
-    for(TargetWindow *window in self.windows) {
+    for(NSUInteger index = quickSwitchOffset; index < self.windows.count && guideNumber < 10; index++) {
+        TargetWindow *window = self.windows[index];
         NSWindow *guideWindow = [self drawGuideWindow:CGPointMake(window.x, window.y) guideNumber:guideNumber];
         window.guideWindow = guideWindow;
         guideNumber++;
@@ -335,6 +336,7 @@ static AXUIElementRef getFrontMostApp() {
     [self exitNumbers];
     [self.windows removeAllObjects];
     repeatFactor = -1;
+    quickSwitchOffset = -1;
     commandMode = NO;
 }
 
@@ -406,6 +408,7 @@ static AXUIElementRef getFrontMostApp() {
 //            [self exitCommandMode];
 //            return;
 //        }
+        quickSwitchOffset = -1;
         commandMode = YES;
 
         // Repeater
@@ -429,14 +432,20 @@ static AXUIElementRef getFrontMostApp() {
         }];
 
         [MASShortcut addGlobalHotkeyMonitorWithShortcut:quickSwitch handler:^{
+            if(quickSwitchOffset < 0) {
+                quickSwitchOffset = 0;
+            }
+            else {
+                quickSwitchOffset += 9;
+            }
             [self exitNumbers];
-            [self quickSwitch];
+            [self prepareQuickSwitch];
 
             int index = 1;
             for (MASShortcut *s in quickGo) {
                 const NSUInteger i = index;
                 [MASShortcut addGlobalHotkeyMonitorWithShortcut:s handler:^{
-                    NSUInteger windowIndex = i - 1;
+                    NSUInteger windowIndex = i - 1 + quickSwitchOffset;
                     if ([self.windows count] >= windowIndex + 1) {
                         TargetWindow *targetWindow = [self.windows objectAtIndex:windowIndex];
                         AXUIElementSetAttributeValue(targetWindow.window, kAXMainAttribute, kCFBooleanTrue);
