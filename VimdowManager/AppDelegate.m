@@ -91,8 +91,8 @@ static AXUIElementRef getFrontMostApp() {
 
 - (void)clearGuideWindows {
      for(TargetWindow *window in self.windows) {
-        CFRetain(window.app);
-        CFRetain(window.window);
+        CFRelease(window.app);
+        CFRelease(window.window);
     }
     [self.windows removeAllObjects];
 }
