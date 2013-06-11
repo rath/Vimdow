@@ -38,6 +38,7 @@ void callbackWindowAttribute(const NSDictionary *inputDictionary, NSMutableSet *
         scan.size = bounds.size;
 
         [data addObject:scan];
+
     }
 }
 
@@ -296,6 +297,7 @@ static AXUIElementRef getFrontMostApp() {
 - (void)exitNumbers {
     for (MASShortcut *s in quickGo) {
         [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", s.description]];
+        NSLog(@"Number description: %@", s.description);
     }
 }
 
@@ -431,16 +433,16 @@ static AXUIElementRef getFrontMostApp() {
                 const NSUInteger i = index;
                 [MASShortcut addGlobalHotkeyMonitorWithShortcut:s handler:^{
                     NSUInteger windowIndex = i - 1;
-                    TargetWindow *targetWindow = [self.windows objectAtIndex:windowIndex];
-                    AXUIElementSetAttributeValue(targetWindow.window, kAXMainAttribute, kCFBooleanTrue);
-                    AXUIElementSetAttributeValue(targetWindow.app, kAXFrontmostAttribute, kCFBooleanTrue);
-
+                    if ([self.windows count] >= windowIndex + 1) {
+                        TargetWindow *targetWindow = [self.windows objectAtIndex:windowIndex];
+                        AXUIElementSetAttributeValue(targetWindow.window, kAXMainAttribute, kCFBooleanTrue);
+                        AXUIElementSetAttributeValue(targetWindow.app, kAXFrontmostAttribute, kCFBooleanTrue);
+                    }
                     [self exitCommandMode];
                 }];
                 index++;
             }
         }];
-
 
         [MASShortcut addGlobalHotkeyMonitorWithShortcut:leftMove handler:^{
             RectDelta delta = {-UNIT, 0, 0, 0};
