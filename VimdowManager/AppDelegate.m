@@ -131,9 +131,13 @@ static AXUIElementRef getFrontMostApp() {
     ScannedWindow *testScanWindow = [[ScannedWindow alloc] init];
     for (NSNumber *pid in pidSet) {
         AXUIElementRef app;
-        CFArrayRef result;
+        CFArrayRef result = nil;
         app = AXUIElementCreateApplication([pid intValue]);
-        AXUIElementCopyAttributeValues(app, kAXWindowsAttribute, 0, 9999, &result);
+        AXError err = AXUIElementCopyAttributeValues(app, kAXWindowsAttribute, 0, 9999, &result);
+        if( err!=kAXErrorSuccess || result==nil ) {
+            CFRelease(app);
+            continue;
+        }
 
         for (CFIndex i = 0; i < CFArrayGetCount(result); i++) {
             CGPoint position;
@@ -297,7 +301,7 @@ static AXUIElementRef getFrontMostApp() {
 - (void)exitNumbers {
     for (MASShortcut *s in quickGo) {
         [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", s.description]];
-        NSLog(@"Number description: %@", s.description);
+//        NSLog(@"Number description: %@", s.description);
     }
 }
 
