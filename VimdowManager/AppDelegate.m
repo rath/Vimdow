@@ -344,13 +344,23 @@ static AXUIElementRef getFrontMostApp() {
 
     Boolean axEnabled = AXAPIEnabled();
     if( !axEnabled ) {
+        SInt32 osxVersion = 0;
         NSAlert *alert = [[NSAlert alloc] init];
         alert.alertStyle = NSCriticalAlertStyle;
         alert.messageText = @"Unabled to launch";
-        alert.informativeText = @"This program use accessibility API.\n"
-                "You can turn it on in\n"
-                "System Preferences > Accessibility > \n"
-                "[X] Enabled access for assistive devices.";
+
+        Gestalt(gestaltSystemVersion, &osxVersion);
+        if( osxVersion >= 0x1090 ) {
+            alert.informativeText = @"This program use accessibility API.\n"
+                    "You can turn it on in\n"
+                    "System Preferences > Security & Privacy > \n"
+                    "Accessibility > [X] Vimdow";
+        } else {
+            alert.informativeText = @"This program use accessibility API.\n"
+                    "You can turn it on in\n"
+                    "System Preferences > Accessibility > \n"
+                    "[X] Enabled access for assistive devices.";
+        }
         [alert runModal];
         [NSApp terminate:self];
         return;
