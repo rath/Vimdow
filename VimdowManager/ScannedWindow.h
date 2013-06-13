@@ -13,6 +13,7 @@
 @property (nonatomic, retain) NSNumber *pid;
 @property CGPoint origin;
 @property CGSize size;
+@property NSString *name;
 
 - (BOOL)isEqual:(id)other;
 - (BOOL)isEqualToWindow:(ScannedWindow *)window;
