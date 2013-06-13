@@ -300,11 +300,16 @@ static AXUIElementRef getFrontMostApp() {
 - (void)prepareQuickSwitch {
     [self collectWindows];
     NSUInteger guideNumber = 1;
-    for(NSUInteger index = quickSwitchOffset; index < self.windows.count && guideNumber < 10; index++) {
+    NSUInteger index;
+    for(index = quickSwitchOffset; index < self.windows.count && guideNumber < 10; index++) {
         TargetWindow *window = self.windows[index];
         NSWindow *guideWindow = [self drawGuideWindow:CGPointMake(window.x, window.y) guideNumber:guideNumber];
         window.guideWindow = guideWindow;
         guideNumber++;
+    }
+
+    if( index >= self.windows.count ) {
+        quickSwitchOffset = -1;
     }
 }
 
