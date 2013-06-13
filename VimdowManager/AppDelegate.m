@@ -258,7 +258,8 @@ static AXUIElementRef getFrontMostApp() {
         NSInteger newIndex = -1;
         NSInteger nextIndex = currentIndex;
         NSInteger count = 1;
-        
+        NSInteger loopCount = 0;
+
         do {
             nextIndex += step;
             if(nextIndex < 0) {
@@ -267,9 +268,8 @@ static AXUIElementRef getFrontMostApp() {
             else if(nextIndex >= self.windows.count) {
                 nextIndex = 0;
             }
-            
+
             TargetWindow *switchWindow = self.windows[nextIndex];
-            
             if([switchWindow.name rangeOfString: keyword options: NSCaseInsensitiveSearch].location != NSNotFound) {
                 if(count < repeatFactor) {
                     count ++;
@@ -279,10 +279,14 @@ static AXUIElementRef getFrontMostApp() {
                     break;
                 }
             }
-            
+
+            loopCount ++;
+            if( loopCount > self.windows.count ) {
+                break;
+            }
         }
         while(nextIndex != currentIndex);
-        
+
         if(newIndex >= 0 && newIndex < self.windows.count) {
             TargetWindow *switchWindow = [self.windows objectAtIndex:newIndex];
             AXUIElementSetAttributeValue(switchWindow.window, kAXMainAttribute, kCFBooleanTrue);
