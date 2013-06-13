@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04B0F4111769667200727250 /* CommandWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 04B0F4101769667200727250 /* CommandWindow.m */; };
 		354CE17EBF627892F3386F05 /* MASShortcutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CEA660A9E2E1859FFEA61 /* MASShortcutView.m */; };
 		354CE31B34E0CA108D4DE299 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 354CE40A310630F5FAC80989 /* Quartz.framework */; };
 		354CE3B5FFD36CEB5E7CE2E2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CE1DFC9CA9D4524F9F69A /* AppDelegate.m */; };
@@ -26,6 +27,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		04B0F40F1769667200727250 /* CommandWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandWindow.h; sourceTree = "<group>"; };
+		04B0F4101769667200727250 /* CommandWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommandWindow.m; sourceTree = "<group>"; };
 		354CE05035FD33EE7ED458F5 /* TargetWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TargetWindow.m; sourceTree = "<group>"; };
 		354CE0B51F9CEA0F030D3F1E /* MASShortcut+Monitoring.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MASShortcut+Monitoring.m"; sourceTree = "<group>"; };
 		354CE0FB7CE5FF39250ED9D1 /* VimdowManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VimdowManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -122,6 +125,8 @@
 				354CE9CD8270F8D3CF620B27 /* ScannedWindow.m */,
 				354CEF6DA6F0DE12263D2CB5 /* TargetWindow.h */,
 				354CE05035FD33EE7ED458F5 /* TargetWindow.m */,
+				04B0F40F1769667200727250 /* CommandWindow.h */,
+				04B0F4101769667200727250 /* CommandWindow.m */,
 			);
 			path = VimdowManager;
 			sourceTree = "<group>";
@@ -229,6 +234,7 @@
 				354CEA845815D0B8A92D4DBB /* MASShortcutView+UserDefaults.m in Sources */,
 				354CEF8FE603933A7C40B8F7 /* ScannedWindow.m in Sources */,
 				354CEE2EC2C17C9093D092F4 /* TargetWindow.m in Sources */,
+				04B0F4111769667200727250 /* CommandWindow.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
