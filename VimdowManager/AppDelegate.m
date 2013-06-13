@@ -454,6 +454,9 @@ static AXUIElementRef getFrontMostApp() {
         for (MASShortcut *s in quickGo) {
             const NSUInteger i = index;
             [MASShortcut addGlobalHotkeyMonitorWithShortcut:s handler:^{
+                if (quickSwitchOffset == -1) {
+                    quickSwitchOffset = 0;
+                }
                 NSUInteger windowIndex = i - 1 + quickSwitchOffset;
                 if ([self.windows count] >= windowIndex + 1) {
                     TargetWindow *targetWindow = [self.windows objectAtIndex:windowIndex];
