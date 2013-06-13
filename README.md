@@ -10,7 +10,7 @@ Vimdow is a window management application for Mac OS X.
  - `<option>`-hjkl: Resize current window based on bottom-right
  - q + [1-9]: Switch window by displaying shortcut numbers order by x coordinates
     * If you have opened windows more than 9, then simply press 'q' again
- - /: Switch windows by app name search
+ - /: Switch windows by searching app name (e.g. Finder, Chrome, Terminal)
     * n: switch in search result forward
     * N: switch in search result backward
  - x: Quit Vimdow
