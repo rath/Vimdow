@@ -35,16 +35,24 @@
     MASShortcut *switchNext2;
 
     MASShortcut *quit;
+    
+    MASShortcut *searchCommand;
+    MASShortcut *searchNext;
+    MASShortcut *searchPrev;
 
+    
     NSMutableArray* quickGo;
 
     NSInteger repeatFactor;
     NSInteger quickSwitchOffset;
     
     BOOL commandMode;
+    
 }
 
 @property (assign) IBOutlet NSWindow *window;
+@property (unsafe_unretained) IBOutlet NSWindow *commandWindow;
+@property (weak) IBOutlet NSTextField *commandText;
 @property (nonatomic, retain) NSMutableArray *windows;
 
 @end
