@@ -40,7 +40,9 @@
     MASShortcut *searchNext;
     MASShortcut *searchPrev;
 
-    
+    MASShortcut *volumeUp;
+    MASShortcut *volumeDown;
+
     NSMutableArray* quickGo;
 
     NSInteger repeatFactor;

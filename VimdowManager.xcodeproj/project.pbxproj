@@ -8,7 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		04B0F4111769667200727250 /* CommandWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 04B0F4101769667200727250 /* CommandWindow.m */; };
+		354CE0761A7601D9DB0DC0DB /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 354CE20C68284466FE335109 /* CoreServices.framework */; };
+		354CE10DED3C2E8DD19B89CB /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 354CEF7FBC92797CAC668E38 /* AudioToolbox.framework */; };
 		354CE17EBF627892F3386F05 /* MASShortcutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CEA660A9E2E1859FFEA61 /* MASShortcutView.m */; };
+		354CE2F1A38B2099D91A1C9A /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 354CEF44047954DAF770E954 /* CoreAudio.framework */; };
 		354CE31B34E0CA108D4DE299 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 354CE40A310630F5FAC80989 /* Quartz.framework */; };
 		354CE3B5FFD36CEB5E7CE2E2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CE1DFC9CA9D4524F9F69A /* AppDelegate.m */; };
 		354CE54583EA2ECD82B8B841 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 354CE47731E6A71418BD4C94 /* MainMenu.xib */; };
@@ -34,6 +37,7 @@
 		354CE0FB7CE5FF39250ED9D1 /* VimdowManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VimdowManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		354CE1CDA9B66994CD986E30 /* MASShortcut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASShortcut.h; sourceTree = "<group>"; };
 		354CE1DFC9CA9D4524F9F69A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		354CE20C68284466FE335109 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		354CE290A28456D9BE6B8F5A /* MASShortcutView+UserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MASShortcutView+UserDefaults.h"; sourceTree = "<group>"; };
 		354CE2FDF8996E9BE4FC3397 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		354CE40A310630F5FAC80989 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
@@ -57,7 +61,9 @@
 		354CEE109B5954EF4D9336F4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		354CEE1D8EE6CADED8AB82C3 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		354CEE6327F10E4D74ED49D8 /* MASShortcut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASShortcut.m; sourceTree = "<group>"; };
+		354CEF44047954DAF770E954 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		354CEF6DA6F0DE12263D2CB5 /* TargetWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TargetWindow.h; sourceTree = "<group>"; };
+		354CEF7FBC92797CAC668E38 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		DEBF8621176635FC0097F8B8 /* launcher.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = launcher.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -69,6 +75,9 @@
 				354CED3A66232359237E2848 /* Cocoa.framework in Frameworks */,
 				354CE31B34E0CA108D4DE299 /* Quartz.framework in Frameworks */,
 				354CEF3D3C994F3DA484E7AA /* Carbon.framework in Frameworks */,
+				354CE0761A7601D9DB0DC0DB /* CoreServices.framework in Frameworks */,
+				354CE2F1A38B2099D91A1C9A /* CoreAudio.framework in Frameworks */,
+				354CE10DED3C2E8DD19B89CB /* AudioToolbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,6 +91,9 @@
 				354CEA4C73EA8476DC748B73 /* Other Frameworks */,
 				354CE40A310630F5FAC80989 /* Quartz.framework */,
 				354CE853C22EFE50943014DF /* Carbon.framework */,
+				354CE20C68284466FE335109 /* CoreServices.framework */,
+				354CEF44047954DAF770E954 /* CoreAudio.framework */,
+				354CEF7FBC92797CAC668E38 /* AudioToolbox.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

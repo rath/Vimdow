@@ -7,6 +7,9 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
+//#import <CoreServices/CoreServices.h>
+#import <AudioToolbox/AudioServices.h>
+//#import <CoreAudio/CoreAudio.h>
 #import "AppDelegate.h"
 #import "TargetWindow.h"
 #import "ScannedWindow.h"
@@ -398,6 +401,8 @@ static AXUIElementRef getFrontMostApp() {
 //    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", switchNext2.description]];
 
     [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", quit.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", volumeDown.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", volumeUp.description]];
 
     [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", searchCommand.description]];
     [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", searchNext.description]];
@@ -408,6 +413,61 @@ static AXUIElementRef getFrontMostApp() {
     repeatFactor = -1;
     quickSwitchOffset = -1;
     commandMode = NO;
+}
+
+- (void)increaseVolume:(Float32)amount {
+    AudioDeviceID deviceId = 0;
+    OSStatus result;
+    AudioObjectPropertyAddress propertyAddress;
+
+    // Get default output device
+    propertyAddress.mSelector = kAudioHardwarePropertyDefaultOutputDevice;
+    propertyAddress.mScope = kAudioObjectPropertyScopeGlobal;
+    propertyAddress.mElement = kAudioObjectPropertyElementMaster;
+    if (!AudioHardwareServiceHasProperty(kAudioObjectSystemObject, &propertyAddress)) {
+        NSLog(@"Can't find default output device");
+        return;
+    }
+
+    result = AudioHardwareServiceGetPropertyData(kAudioObjectSystemObject, &propertyAddress, 0, NULL, (UInt32[]) {sizeof(AudioDeviceID)}, &deviceId);
+    if (kAudioHardwareNoError != result) {
+        NSLog(@"Failed to get output device");
+        return;
+    }
+
+    // Get the volume
+    propertyAddress.mSelector = kAudioHardwareServiceDeviceProperty_VirtualMasterVolume;
+    propertyAddress.mScope = kAudioDevicePropertyScopeOutput;
+    propertyAddress.mElement = kAudioObjectPropertyElementMaster;
+
+    if (!AudioHardwareServiceHasProperty(deviceId, &propertyAddress)) {
+        NSLog(@"Failed to get virtual master volume properties for %0x", deviceId);
+        return;
+    }
+
+    Float32 volume;
+    UInt32 dataSize = sizeof(volume);
+    result = AudioHardwareServiceGetPropertyData(deviceId, &propertyAddress, 0, NULL, &dataSize, &volume);
+    if (kAudioHardwareNoError != result) {
+        NSLog(@"Failed to get volume property");
+        return;
+    }
+
+    volume += amount;
+    if( volume < 0.0f ) {
+        volume = 0.0f;
+    }
+    if( volume > 1.0f ) {
+        volume = 1.0f;
+    }
+
+    result = AudioHardwareServiceSetPropertyData(deviceId, &propertyAddress, 0, NULL, dataSize, &volume);
+    if (kAudioHardwareNoError != result) {
+        NSLog(@"Failed to set volume property");
+        return;
+    }
+
+    NSLog(@"Volume reset: %4.2f", volume);
 }
 
 - (void)enterCommandMode {
@@ -523,7 +583,15 @@ static AXUIElementRef getFrontMostApp() {
     [MASShortcut addGlobalHotkeyMonitorWithShortcut:quit handler:^{
         [NSApp terminate:self];
     }];
-    
+
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:volumeDown handler:^{
+        [self increaseVolume:-0.1f];
+    }];
+
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:volumeUp handler:^{
+        [self increaseVolume:0.1f];
+    }];
+
     [MASShortcut addGlobalHotkeyMonitorWithShortcut:searchCommand handler:^{
         NSInteger index = [self collectWindows];
         if(index >= 0 && index < self.windows.count) {
@@ -609,6 +677,9 @@ static AXUIElementRef getFrontMostApp() {
     switchNext2 = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:NSControlKeyMask|NSShiftKeyMask];
 
     quit = [MASShortcut shortcutWithKeyCode:kVK_ANSI_X modifierFlags:0];
+
+    volumeDown = [MASShortcut shortcutWithKeyCode:kVK_F9 modifierFlags:0];
+    volumeUp = [MASShortcut shortcutWithKeyCode:kVK_F10 modifierFlags:0];
 
     searchCommand = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Slash modifierFlags:0];
     searchNext = [MASShortcut shortcutWithKeyCode:kVK_ANSI_N modifierFlags:0];
