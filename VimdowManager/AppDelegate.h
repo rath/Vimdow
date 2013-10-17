@@ -42,6 +42,7 @@
 
     MASShortcut *shortcutVolumeUp;
     MASShortcut *shortcutVolumeDown;
+    MASShortcut *shortcutPausePlayiTunes;
 
     NSMutableArray* quickGo;
 

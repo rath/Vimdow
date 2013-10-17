@@ -402,6 +402,7 @@ static AXUIElementRef getFrontMostApp() {
     [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutQuit.description]];
     [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutVolumeDown.description]];
     [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutVolumeUp.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutPausePlayiTunes.description]];
 
 
     [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSearchCommand.description]];
@@ -466,8 +467,7 @@ static AXUIElementRef getFrontMostApp() {
         NSLog(@"Failed to set volume property");
         return;
     }
-
-    NSLog(@"Volume reset: %4.2f", volume);
+    //NSLog(@"Volume reset: %4.2f", volume);
 }
 
 - (void)enterCommandMode {
@@ -592,6 +592,23 @@ static AXUIElementRef getFrontMostApp() {
         [self increaseVolume:0.05f];
     }];
 
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutPausePlayiTunes handler:^{
+        NSString *toggleScript = [NSString stringWithFormat:
+@"tell application \"iTunes\"\n\
+  if player state is playing then\n\
+    pause\n\
+  else if player state is paused then\n\
+    play\n\
+  end if\n\
+end tell"];
+        NSAppleScript *script = [[NSAppleScript alloc] initWithSource:toggleScript];
+        NSDictionary *errorInfo;
+        [script executeAndReturnError:&errorInfo];
+        if (errorInfo!=nil ) {
+            NSLog(@"iTunes AppleScript error: %@", [errorInfo description]);
+        }
+    }];
+
     [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSearchCommand handler:^{
         NSInteger index = [self collectWindows];
         if (index >= 0 && index < self.windows.count) {
@@ -680,6 +697,7 @@ static AXUIElementRef getFrontMostApp() {
 
     shortcutVolumeDown = [MASShortcut shortcutWithKeyCode:kVK_F9 modifierFlags:0];
     shortcutVolumeUp = [MASShortcut shortcutWithKeyCode:kVK_F10 modifierFlags:0];
+    shortcutPausePlayiTunes = [MASShortcut shortcutWithKeyCode:kVK_F13 modifierFlags:0];
 
     shortcutSearchCommand = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Slash modifierFlags:0];
     shortcutSearchNext = [MASShortcut shortcutWithKeyCode:kVK_ANSI_N modifierFlags:0];
