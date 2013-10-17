@@ -7,13 +7,11 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
-//#import <CoreServices/CoreServices.h>
-#import <AudioToolbox/AudioServices.h>
-//#import <CoreAudio/CoreAudio.h>
+#import <CoreAudio/CoreAudio.h>
+#import <AudioToolbox/AudioToolbox.h>
 #import "AppDelegate.h"
 #import "TargetWindow.h"
 #import "ScannedWindow.h"
-#import "AudioTest.h"
 
 typedef struct {
     CGFloat x;
@@ -377,39 +375,38 @@ static AXUIElementRef getFrontMostApp() {
 }
 	
 - (void)exitCommandMode {
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", escape.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", escape2.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutEscape.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutEscape2.description]];
 
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", leftMove.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", topMove.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", bottomMove.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", rightMove.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutMoveLeft.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutMoveTop.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutMoveBottom.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutMoveRight.description]];
 
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", leftSize.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", topSize.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", bottomSize.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", rightSize.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeLeft.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeTop.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeBottom.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeRight.description]];
 
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", upperLeftSize.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", upperTopSize.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", upperBottomSize.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", upperRightSize.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeUpperLeft.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeUpperTop.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeUpperBottom.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeUpperRight.description]];
 
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", quickSwitch.description]];
-//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", switchPrev.description]];
-//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", switchPrev2.description]];
-//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", switchNext.description]];
-//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", switchNext2.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutQuickSwitch.description]];
+//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSwitchPrev.description]];
+//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSwitchPrev2.description]];
+//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSwitchNext.description]];
+//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSwitchNext2.description]];
 
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", quit.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", volumeDown.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", volumeUp.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutQuit.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutVolumeDown.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutVolumeUp.description]];
 
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", searchCommand.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", searchNext.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", searchPrev.description]];
 
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutTest.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSearchCommand.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSearchNext.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSearchPrev.description]];
 
     [self exitNumbers];
     [self.windows removeAllObjects];
@@ -495,16 +492,16 @@ static AXUIElementRef getFrontMostApp() {
             repeatFactor += value;
         }];
     }
-    
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:escape handler:^{
+
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutEscape handler:^{
         [self exitCommandMode];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:escape2 handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutEscape2 handler:^{
         [self exitCommandMode];
     }];
-    
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:quickSwitch handler:^{
-        if(quickSwitchOffset < 0) {
+
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutQuickSwitch handler:^{
+        if (quickSwitchOffset < 0) {
             quickSwitchOffset = 0;
         }
         else {
@@ -512,7 +509,7 @@ static AXUIElementRef getFrontMostApp() {
         }
         [self exitNumbers];
         [self prepareQuickSwitch];
-        
+
         int index = 1;
         for (MASShortcut *s in quickGo) {
             const NSUInteger i = index;
@@ -531,102 +528,97 @@ static AXUIElementRef getFrontMostApp() {
             index++;
         }
     }];
-    
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:leftMove handler:^{
+
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutMoveLeft handler:^{
         RectDelta delta = {-UNIT, 0, 0, 0};
         [self moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:rightMove handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutMoveRight handler:^{
         RectDelta delta = {UNIT, 0, 0, 0};
         [self moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:topMove handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutMoveTop handler:^{
         RectDelta delta = {0, -UNIT, 0, 0};
         [self moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:bottomMove handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutMoveBottom handler:^{
         RectDelta delta = {0, UNIT, 0, 0};
         [self moveWithDelta:delta];
     }];
-    
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:leftSize handler:^{
+
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeLeft handler:^{
         RectDelta delta = {0, 0, -UNIT, 0};
         [self moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:rightSize handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeRight handler:^{
         RectDelta delta = {0, 0, UNIT, 0};
         [self moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:topSize handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeTop handler:^{
         RectDelta delta = {0, 0, 0, -UNIT};
         [self moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:bottomSize handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeBottom handler:^{
         RectDelta delta = {0, 0, 0, UNIT};
         [self moveWithDelta:delta];
     }];
-    
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:upperLeftSize handler:^{
+
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeUpperLeft handler:^{
         RectDelta delta = {-UNIT, 0, UNIT, 0};
         [self moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:upperRightSize handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeUpperRight handler:^{
         RectDelta delta = {UNIT, 0, -UNIT, 0};
         [self moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:upperTopSize handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeUpperTop handler:^{
         RectDelta delta = {0, -UNIT, 0, UNIT};
         [self moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:upperBottomSize handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeUpperBottom handler:^{
         RectDelta delta = {0, UNIT, 0, -UNIT};
         [self moveWithDelta:delta];
     }];
-    
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:quit handler:^{
+
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutQuit handler:^{
         [NSApp terminate:self];
     }];
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:volumeDown handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutVolumeDown handler:^{
         [self increaseVolume:-0.05f];
     }];
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:volumeUp handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutVolumeUp handler:^{
         [self increaseVolume:0.05f];
     }];
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:searchCommand handler:^{
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSearchCommand handler:^{
         NSInteger index = [self collectWindows];
-        if(index >= 0 && index < self.windows.count) {
+        if (index >= 0 && index < self.windows.count) {
             prevWindow = self.windows[index];
         }
-        
+
         [self exitCommandMode];
-        [MASShortcut addGlobalHotkeyMonitorWithShortcut:escape handler:^{
+        [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutEscape handler:^{
             dispatch_async(dispatch_get_main_queue(), ^{ /* because esc hot key monitor cannot be removed in this block */
                 [self.commandWindow resignKeyWindow];
             });
         }];
-        [self.commandText setStringValue: @""];
-        [self.commandWindow makeKeyAndOrderFront: self];
-        [NSApp activateIgnoringOtherApps: YES];
+        [self.commandText setStringValue:@""];
+        [self.commandWindow makeKeyAndOrderFront:self];
+        [NSApp activateIgnoringOtherApps:YES];
     }];
-    
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:searchNext handler:^{
-        if(searchKeywords.count > 0) {
-            [self switchWindow:1 withKeyword: searchKeywords[searchKeywords.count - 1]];
-        }
-    }];
-    
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:searchPrev handler:^{
-        if(searchKeywords.count > 0) {
-            [self switchWindow:-1 withKeyword: searchKeywords[searchKeywords.count - 1]];
+
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSearchNext handler:^{
+        if (searchKeywords.count > 0) {
+            [self switchWindow:1 withKeyword:searchKeywords[searchKeywords.count - 1]];
         }
     }];
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutTest handler:^{
-        AudioTest *test = [AudioTest alloc];
-        [test testPlay];
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSearchPrev handler:^{
+        if (searchKeywords.count > 0) {
+            [self switchWindow:-1 withKeyword:searchKeywords[searchKeywords.count - 1]];
+        }
     }];
 }
 
@@ -662,36 +654,36 @@ static AXUIElementRef getFrontMostApp() {
     repeatFactor = -1;
     commandMode = NO;
 
-    escape = [MASShortcut shortcutWithKeyCode:kVK_Escape modifierFlags:0];
-    escape2 = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Period modifierFlags:0];
-    leftMove = [MASShortcut shortcutWithKeyCode:kVK_ANSI_H modifierFlags:0];
-    topMove = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:0];
-    bottomMove = [MASShortcut shortcutWithKeyCode:kVK_ANSI_J modifierFlags:0];
-    rightMove = [MASShortcut shortcutWithKeyCode:kVK_ANSI_L modifierFlags:0];
+    shortcutEscape = [MASShortcut shortcutWithKeyCode:kVK_Escape modifierFlags:0];
+    shortcutEscape2 = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Period modifierFlags:0];
+    shortcutMoveLeft = [MASShortcut shortcutWithKeyCode:kVK_ANSI_H modifierFlags:0];
+    shortcutMoveTop = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:0];
+    shortcutMoveBottom = [MASShortcut shortcutWithKeyCode:kVK_ANSI_J modifierFlags:0];
+    shortcutMoveRight = [MASShortcut shortcutWithKeyCode:kVK_ANSI_L modifierFlags:0];
 
-    leftSize = [MASShortcut shortcutWithKeyCode:kVK_ANSI_H modifierFlags:NSAlternateKeyMask];
-    topSize = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:NSAlternateKeyMask];
-    bottomSize = [MASShortcut shortcutWithKeyCode:kVK_ANSI_J modifierFlags:NSAlternateKeyMask];
-    rightSize = [MASShortcut shortcutWithKeyCode:kVK_ANSI_L modifierFlags:NSAlternateKeyMask];
+    shortcutResizeLeft = [MASShortcut shortcutWithKeyCode:kVK_ANSI_H modifierFlags:NSAlternateKeyMask];
+    shortcutResizeTop = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:NSAlternateKeyMask];
+    shortcutResizeBottom = [MASShortcut shortcutWithKeyCode:kVK_ANSI_J modifierFlags:NSAlternateKeyMask];
+    shortcutResizeRight = [MASShortcut shortcutWithKeyCode:kVK_ANSI_L modifierFlags:NSAlternateKeyMask];
 
-    upperLeftSize = [MASShortcut shortcutWithKeyCode:kVK_ANSI_H modifierFlags:NSShiftKeyMask];
-    upperTopSize = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:NSShiftKeyMask];
-    upperBottomSize = [MASShortcut shortcutWithKeyCode:kVK_ANSI_J modifierFlags:NSShiftKeyMask];
-    upperRightSize = [MASShortcut shortcutWithKeyCode:kVK_ANSI_L modifierFlags:NSShiftKeyMask];
+    shortcutResizeUpperLeft = [MASShortcut shortcutWithKeyCode:kVK_ANSI_H modifierFlags:NSShiftKeyMask];
+    shortcutResizeUpperTop = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:NSShiftKeyMask];
+    shortcutResizeUpperBottom = [MASShortcut shortcutWithKeyCode:kVK_ANSI_J modifierFlags:NSShiftKeyMask];
+    shortcutResizeUpperRight = [MASShortcut shortcutWithKeyCode:kVK_ANSI_L modifierFlags:NSShiftKeyMask];
 
-    switchPrev = [MASShortcut shortcutWithKeyCode:kVK_ANSI_H modifierFlags:NSControlKeyMask|NSShiftKeyMask];
-    switchPrev2 = [MASShortcut shortcutWithKeyCode:kVK_ANSI_J modifierFlags:NSControlKeyMask|NSShiftKeyMask];
-    switchNext = [MASShortcut shortcutWithKeyCode:kVK_ANSI_L modifierFlags:NSControlKeyMask|NSShiftKeyMask];
-    switchNext2 = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:NSControlKeyMask|NSShiftKeyMask];
+    shortcutSwitchPrev = [MASShortcut shortcutWithKeyCode:kVK_ANSI_H modifierFlags:NSControlKeyMask|NSShiftKeyMask];
+    shortcutSwitchPrev2 = [MASShortcut shortcutWithKeyCode:kVK_ANSI_J modifierFlags:NSControlKeyMask|NSShiftKeyMask];
+    shortcutSwitchNext = [MASShortcut shortcutWithKeyCode:kVK_ANSI_L modifierFlags:NSControlKeyMask|NSShiftKeyMask];
+    shortcutSwitchNext2 = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:NSControlKeyMask|NSShiftKeyMask];
 
-    quit = [MASShortcut shortcutWithKeyCode:kVK_ANSI_X modifierFlags:0];
+    shortcutQuit = [MASShortcut shortcutWithKeyCode:kVK_ANSI_X modifierFlags:0];
 
-    volumeDown = [MASShortcut shortcutWithKeyCode:kVK_F9 modifierFlags:0];
-    volumeUp = [MASShortcut shortcutWithKeyCode:kVK_F10 modifierFlags:0];
+    shortcutVolumeDown = [MASShortcut shortcutWithKeyCode:kVK_F9 modifierFlags:0];
+    shortcutVolumeUp = [MASShortcut shortcutWithKeyCode:kVK_F10 modifierFlags:0];
 
-    searchCommand = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Slash modifierFlags:0];
-    searchNext = [MASShortcut shortcutWithKeyCode:kVK_ANSI_N modifierFlags:0];
-    searchPrev = [MASShortcut shortcutWithKeyCode:kVK_ANSI_N modifierFlags:NSShiftKeyMask];
+    shortcutSearchCommand = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Slash modifierFlags:0];
+    shortcutSearchNext = [MASShortcut shortcutWithKeyCode:kVK_ANSI_N modifierFlags:0];
+    shortcutSearchPrev = [MASShortcut shortcutWithKeyCode:kVK_ANSI_N modifierFlags:NSShiftKeyMask];
     
     quickGo = [NSMutableArray arrayWithCapacity:10];
     [quickGo addObject:[MASShortcut shortcutWithKeyCode:kVK_ANSI_1 modifierFlags:0]];
@@ -705,9 +697,7 @@ static AXUIElementRef getFrontMostApp() {
     [quickGo addObject:[MASShortcut shortcutWithKeyCode:kVK_ANSI_9 modifierFlags:0]];
     [quickGo addObject:[MASShortcut shortcutWithKeyCode:kVK_ANSI_0 modifierFlags:0]];
 
-    quickSwitch = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Q modifierFlags:0];
-
-    shortcutTest = [MASShortcut shortcutWithKeyCode:kVK_ANSI_T modifierFlags:0];
+    shortcutQuickSwitch = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Q modifierFlags:0];
 
     MASShortcut *shortcut = [MASShortcut shortcutWithKeyCode:kVK_ANSI_A modifierFlags:NSAlternateKeyMask];
     [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcut handler:^{
@@ -715,17 +705,17 @@ static AXUIElementRef getFrontMostApp() {
     }];
 
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:switchPrev handler:^{
-        [self switchWindow:-1 withKeyword: nil];
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSwitchPrev handler:^{
+        [self switchWindow:-1 withKeyword:nil];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:switchPrev2 handler:^{
-        [self switchWindow:-1 withKeyword: nil];
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSwitchPrev2 handler:^{
+        [self switchWindow:-1 withKeyword:nil];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:switchNext handler:^{
-        [self switchWindow:1 withKeyword: nil];
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSwitchNext handler:^{
+        [self switchWindow:1 withKeyword:nil];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:switchNext2 handler:^{
-        [self switchWindow:1 withKeyword: nil];
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSwitchNext2 handler:^{
+        [self switchWindow:1 withKeyword:nil];
     }];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(commandWindowDidOpen) name:NSWindowDidBecomeKeyNotification object:self.commandWindow];
@@ -741,7 +731,7 @@ static AXUIElementRef getFrontMostApp() {
 }
 
 - (void)closeCommandWindow {
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", escape.description]];
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutEscape.description]];
     [self.commandWindow orderOut: self];
     [self enterCommandMode];
     if(prevWindow != nil) {

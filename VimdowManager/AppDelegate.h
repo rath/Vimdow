@@ -11,41 +11,39 @@
 #import "MASShortcut+Monitoring.h"
 
 @interface AppDelegate : NSObject <NSApplicationDelegate> {
-    MASShortcut *escape;
-    MASShortcut *escape2;
-    MASShortcut *leftMove;
-    MASShortcut *topMove;
-    MASShortcut *bottomMove;
-    MASShortcut *rightMove;
+    MASShortcut *shortcutEscape;
+    MASShortcut *shortcutEscape2;
+    MASShortcut *shortcutMoveLeft;
+    MASShortcut *shortcutMoveTop;
+    MASShortcut *shortcutMoveBottom;
+    MASShortcut *shortcutMoveRight;
 
-    MASShortcut *leftSize;
-    MASShortcut *topSize;
-    MASShortcut *bottomSize;
-    MASShortcut *rightSize;
+    MASShortcut *shortcutResizeLeft;
+    MASShortcut *shortcutResizeTop;
+    MASShortcut *shortcutResizeBottom;
+    MASShortcut *shortcutResizeRight;
 
-    MASShortcut *upperLeftSize;
-    MASShortcut *upperTopSize;
-    MASShortcut *upperBottomSize;
-    MASShortcut *upperRightSize;
+    MASShortcut *shortcutResizeUpperLeft;
+    MASShortcut *shortcutResizeUpperTop;
+    MASShortcut *shortcutResizeUpperBottom;
+    MASShortcut *shortcutResizeUpperRight;
 
-    MASShortcut *quickSwitch;
-    MASShortcut *switchPrev;
-    MASShortcut *switchPrev2;
-    MASShortcut *switchNext;
-    MASShortcut *switchNext2;
+    MASShortcut *shortcutQuickSwitch;
+    MASShortcut *shortcutSwitchPrev;
+    MASShortcut *shortcutSwitchPrev2;
+    MASShortcut *shortcutSwitchNext;
+    MASShortcut *shortcutSwitchNext2;
 
-    MASShortcut *quit;
+    MASShortcut *shortcutQuit;
     
-    MASShortcut *searchCommand;
-    MASShortcut *searchNext;
-    MASShortcut *searchPrev;
+    MASShortcut *shortcutSearchCommand;
+    MASShortcut *shortcutSearchNext;
+    MASShortcut *shortcutSearchPrev;
 
-    MASShortcut *volumeUp;
-    MASShortcut *volumeDown;
+    MASShortcut *shortcutVolumeUp;
+    MASShortcut *shortcutVolumeDown;
 
     NSMutableArray* quickGo;
-
-    MASShortcut *shortcutTest;
 
     NSInteger repeatFactor;
     NSInteger quickSwitchOffset;
