@@ -45,6 +45,8 @@
 
     NSMutableArray* quickGo;
 
+    MASShortcut *shortcutTest;
+
     NSInteger repeatFactor;
     NSInteger quickSwitchOffset;
     

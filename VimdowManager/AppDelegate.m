@@ -13,6 +13,7 @@
 #import "AppDelegate.h"
 #import "TargetWindow.h"
 #import "ScannedWindow.h"
+#import "AudioTest.h"
 
 typedef struct {
     CGFloat x;
@@ -408,6 +409,8 @@ static AXUIElementRef getFrontMostApp() {
     [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", searchNext.description]];
     [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", searchPrev.description]];
 
+    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutTest.description]];
+
     [self exitNumbers];
     [self.windows removeAllObjects];
     repeatFactor = -1;
@@ -585,11 +588,11 @@ static AXUIElementRef getFrontMostApp() {
     }];
 
     [MASShortcut addGlobalHotkeyMonitorWithShortcut:volumeDown handler:^{
-        [self increaseVolume:-0.1f];
+        [self increaseVolume:-0.05f];
     }];
 
     [MASShortcut addGlobalHotkeyMonitorWithShortcut:volumeUp handler:^{
-        [self increaseVolume:0.1f];
+        [self increaseVolume:0.05f];
     }];
 
     [MASShortcut addGlobalHotkeyMonitorWithShortcut:searchCommand handler:^{
@@ -619,6 +622,11 @@ static AXUIElementRef getFrontMostApp() {
         if(searchKeywords.count > 0) {
             [self switchWindow:-1 withKeyword: searchKeywords[searchKeywords.count - 1]];
         }
+    }];
+
+    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutTest handler:^{
+        AudioTest *test = [AudioTest alloc];
+        [test testPlay];
     }];
 }
 
@@ -698,6 +706,8 @@ static AXUIElementRef getFrontMostApp() {
     [quickGo addObject:[MASShortcut shortcutWithKeyCode:kVK_ANSI_0 modifierFlags:0]];
 
     quickSwitch = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Q modifierFlags:0];
+
+    shortcutTest = [MASShortcut shortcutWithKeyCode:kVK_ANSI_T modifierFlags:0];
 
     MASShortcut *shortcut = [MASShortcut shortcutWithKeyCode:kVK_ANSI_A modifierFlags:NSAlternateKeyMask];
     [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcut handler:^{
