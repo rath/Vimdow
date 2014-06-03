@@ -12,6 +12,7 @@
 #import "AppDelegate.h"
 #import "TargetWindow.h"
 #import "ScannedWindow.h"
+#import "AXUtil.h"
 
 typedef struct {
     CGFloat x;
@@ -128,7 +129,10 @@ static AXUIElementRef getFrontMostApp() {
     AXUIElementRef frontMostApp = getFrontMostApp();
     AXUIElementRef frontMostWindow = nil;
     error = AXUIElementCopyAttributeValue(frontMostApp, kAXFocusedWindowAttribute, (CFTypeRef*)&frontMostWindow);
-
+    if (error==kAXErrorAPIDisabled) {
+        showAXProblemAndTerminate(0);
+    }
+    
     CGPoint currentPosition;
     CGSize currentSize;
     if( error==kAXErrorSuccess ) {
@@ -323,7 +327,7 @@ static AXUIElementRef getFrontMostApp() {
     AXValueRef tmp;
     CGSize windowSize;
     CGPoint windowPosition;
-
+    
     [self clearGuideWindows];
     if( repeatFactor > 0 ) {
         delta.x *= repeatFactor;
@@ -333,8 +337,12 @@ static AXUIElementRef getFrontMostApp() {
     }
 
     error = AXUIElementCopyAttributeValue(frontMost, kAXFocusedWindowAttribute, (CFTypeRef*)&frontMostWindow);
-    if( error!=kAXErrorSuccess )
+    if (error==kAXErrorAPIDisabled)
+        showAXProblemAndTerminate(0);
+    
+    if (error!=kAXErrorSuccess) {
         return;
+    }
     AXUIElementCopyAttributeValue(frontMostWindow, kAXSizeAttribute, (CFTypeRef*)&tmp);
     AXValueGetValue(tmp, kAXValueCGSizeType, &windowSize);
     CFRelease(tmp);
@@ -348,7 +356,7 @@ static AXUIElementRef getFrontMostApp() {
         windowPosition.y += delta.y;
 
         tmp = AXValueCreate(kAXValueCGPointType, &windowPosition);
-        AXUIElementSetAttributeValue(frontMostWindow, kAXPositionAttribute, tmp);
+        error = AXUIElementSetAttributeValue(frontMostWindow, kAXPositionAttribute, tmp);
         CFRelease(tmp);
     }
 
@@ -357,7 +365,7 @@ static AXUIElementRef getFrontMostApp() {
         windowSize.height += delta.h;
 
         tmp = AXValueCreate(kAXValueCGSizeType, &windowSize);
-        AXUIElementSetAttributeValue(frontMostWindow, kAXSizeAttribute, tmp);
+        error = AXUIElementSetAttributeValue(frontMostWindow, kAXSizeAttribute, tmp);
         CFRelease(tmp);
     }
 
@@ -642,31 +650,18 @@ end tell"];
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     [self.window setIsVisible:FALSE];
-
-    Boolean axEnabled = AXAPIEnabled();
-    if( !axEnabled ) {
-        SInt32 osxVersion = 0;
-        NSAlert *alert = [[NSAlert alloc] init];
-        alert.alertStyle = NSCriticalAlertStyle;
-        alert.messageText = @"Unabled to launch";
-
-        Gestalt(gestaltSystemVersion, &osxVersion);
-        if( osxVersion >= 0x1090 ) {
-            alert.informativeText = @"This program use accessibility API.\n"
-                    "You can turn it on in\n"
-                    "System Preferences > Security & Privacy > \n"
-                    "Accessibility > [X] Vimdow";
-        } else {
-            alert.informativeText = @"This program use accessibility API.\n"
-                    "You can turn it on in\n"
-                    "System Preferences > Accessibility > \n"
-                    "[X] Enabled access for assistive devices.";
+    
+    SInt32 osxVersion = 0;
+    Gestalt(gestaltSystemVersion, &osxVersion);
+    
+    if (osxVersion < 0x1010) {
+        Boolean axEnabled = AXAPIEnabled();
+        if( !axEnabled ) {
+            showAXProblemAndTerminate(osxVersion);
+            return;
         }
-        [alert runModal];
-        [NSApp terminate:self];
-        return;
     }
-
+    
     self.windows = [[NSMutableArray alloc] initWithCapacity:20];
     repeatFactor = -1;
     commandMode = NO;
@@ -716,7 +711,7 @@ end tell"];
     [quickGo addObject:[MASShortcut shortcutWithKeyCode:kVK_ANSI_0 modifierFlags:0]];
 
     shortcutQuickSwitch = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Q modifierFlags:0];
-
+    
     MASShortcut *shortcut = [MASShortcut shortcutWithKeyCode:kVK_ANSI_A modifierFlags:NSAlternateKeyMask];
     [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcut handler:^{
         [self enterCommandMode];

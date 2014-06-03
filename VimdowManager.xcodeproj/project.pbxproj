@@ -27,6 +27,7 @@
 		354CEF84223DAFD4657FDDF1 /* MASShortcut+UserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CEC2FBCD7726D619C774F /* MASShortcut+UserDefaults.m */; };
 		354CEF8FE603933A7C40B8F7 /* ScannedWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CE9CD8270F8D3CF620B27 /* ScannedWindow.m */; };
 		DEBF8622176635FC0097F8B8 /* launcher.icns in Resources */ = {isa = PBXBuildFile; fileRef = DEBF8621176635FC0097F8B8 /* launcher.icns */; };
+		DED104C1193E5D14004054E9 /* AXUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = DED104C0193E5D14004054E9 /* AXUtil.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,7 +65,9 @@
 		354CEF44047954DAF770E954 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		354CEF6DA6F0DE12263D2CB5 /* TargetWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TargetWindow.h; sourceTree = "<group>"; };
 		354CEF7FBC92797CAC668E38 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		DE36A221193E59A500753E76 /* AXUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AXUtil.h; sourceTree = "<group>"; };
 		DEBF8621176635FC0097F8B8 /* launcher.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = launcher.icns; sourceTree = "<group>"; };
+		DED104C0193E5D14004054E9 /* AXUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AXUtil.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +131,8 @@
 		354CE6D76E18FA4E1A48A227 /* VimdowManager */ = {
 			isa = PBXGroup;
 			children = (
+				DE36A221193E59A500753E76 /* AXUtil.h */,
+				DED104C0193E5D14004054E9 /* AXUtil.m */,
 				354CEFEA4E6F560C482DC860 /* Supporting Files */,
 				354CED4B1AE7D52E9810072E /* AppDelegate.h */,
 				354CE1DFC9CA9D4524F9F69A /* AppDelegate.m */,
@@ -242,6 +247,7 @@
 				354CE6B350C63C31B8398C80 /* MASShortcut.m in Sources */,
 				354CEBD1083332E17AC00D11 /* MASShortcut+Monitoring.m in Sources */,
 				354CEF84223DAFD4657FDDF1 /* MASShortcut+UserDefaults.m in Sources */,
+				DED104C1193E5D14004054E9 /* AXUtil.m in Sources */,
 				354CE17EBF627892F3386F05 /* MASShortcutView.m in Sources */,
 				354CEA845815D0B8A92D4DBB /* MASShortcutView+UserDefaults.m in Sources */,
 				354CEF8FE603933A7C40B8F7 /* ScannedWindow.m in Sources */,
