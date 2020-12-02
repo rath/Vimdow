@@ -481,6 +481,7 @@ static AXUIElementRef getFrontMostApp() {
                         TargetWindow *targetWindow = [self_.windows objectAtIndex:windowIndex];
                         AXUIElementSetAttributeValue(targetWindow.window, kAXMainAttribute, kCFBooleanTrue);
                         AXUIElementSetAttributeValue(targetWindow.app, kAXFrontmostAttribute, kCFBooleanTrue);
+                        CGDisplayMoveCursorToPoint(0, CGPointMake(targetWindow.x + targetWindow.width / 2, targetWindow.y + targetWindow.height / 2));
                     }
                     [self_ exitCommandMode];
                 });
