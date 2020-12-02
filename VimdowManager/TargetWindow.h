@@ -18,6 +18,6 @@
 @property (nonatomic, retain) NSWindow *guideWindow;
 @property (nonatomic) AXUIElementRef window;
 @property (nonatomic) AXUIElementRef app;
-@property (nonatomic) NSString *name;
+@property (nonatomic, strong) NSString *name;
 
 @end

@@ -8,23 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		04B0F4111769667200727250 /* CommandWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 04B0F4101769667200727250 /* CommandWindow.m */; };
+		242BAC840B756883280E6409 /* libPods-VimdowManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D9D489C3595C80DF199F19B /* libPods-VimdowManager.a */; };
 		354CE0761A7601D9DB0DC0DB /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 354CE20C68284466FE335109 /* CoreServices.framework */; };
 		354CE10DED3C2E8DD19B89CB /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 354CEF7FBC92797CAC668E38 /* AudioToolbox.framework */; };
-		354CE17EBF627892F3386F05 /* MASShortcutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CEA660A9E2E1859FFEA61 /* MASShortcutView.m */; };
 		354CE2F1A38B2099D91A1C9A /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 354CEF44047954DAF770E954 /* CoreAudio.framework */; };
 		354CE31B34E0CA108D4DE299 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 354CE40A310630F5FAC80989 /* Quartz.framework */; };
 		354CE3B5FFD36CEB5E7CE2E2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CE1DFC9CA9D4524F9F69A /* AppDelegate.m */; };
 		354CE54583EA2ECD82B8B841 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 354CE47731E6A71418BD4C94 /* MainMenu.xib */; };
-		354CE6B350C63C31B8398C80 /* MASShortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CEE6327F10E4D74ED49D8 /* MASShortcut.m */; };
 		354CE7AC32120AF4C5F26031 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CE467198BAEB78AC043B2 /* main.m */; };
 		354CE9D6F9EF020AE290331A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 354CE4505A486C9139830B1C /* InfoPlist.strings */; };
-		354CEA845815D0B8A92D4DBB /* MASShortcutView+UserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CE5A90E732904A5C201E3 /* MASShortcutView+UserDefaults.m */; };
 		354CEB02116257A3E3A53B6B /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 354CEBF9C35C383F27D966CF /* Credits.rtf */; };
-		354CEBD1083332E17AC00D11 /* MASShortcut+Monitoring.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CE0B51F9CEA0F030D3F1E /* MASShortcut+Monitoring.m */; };
 		354CED3A66232359237E2848 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 354CEA18FB8C4C287940F6CF /* Cocoa.framework */; };
 		354CEE2EC2C17C9093D092F4 /* TargetWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CE05035FD33EE7ED458F5 /* TargetWindow.m */; };
 		354CEF3D3C994F3DA484E7AA /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 354CE853C22EFE50943014DF /* Carbon.framework */; };
-		354CEF84223DAFD4657FDDF1 /* MASShortcut+UserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CEC2FBCD7726D619C774F /* MASShortcut+UserDefaults.m */; };
 		354CEF8FE603933A7C40B8F7 /* ScannedWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 354CE9CD8270F8D3CF620B27 /* ScannedWindow.m */; };
 		DEBF8622176635FC0097F8B8 /* launcher.icns in Resources */ = {isa = PBXBuildFile; fileRef = DEBF8621176635FC0097F8B8 /* launcher.icns */; };
 		DED104C1193E5D14004054E9 /* AXUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = DED104C0193E5D14004054E9 /* AXUtil.m */; };
@@ -34,17 +30,12 @@
 		04B0F40F1769667200727250 /* CommandWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandWindow.h; sourceTree = "<group>"; };
 		04B0F4101769667200727250 /* CommandWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommandWindow.m; sourceTree = "<group>"; };
 		354CE05035FD33EE7ED458F5 /* TargetWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TargetWindow.m; sourceTree = "<group>"; };
-		354CE0B51F9CEA0F030D3F1E /* MASShortcut+Monitoring.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MASShortcut+Monitoring.m"; sourceTree = "<group>"; };
 		354CE0FB7CE5FF39250ED9D1 /* VimdowManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VimdowManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		354CE1CDA9B66994CD986E30 /* MASShortcut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASShortcut.h; sourceTree = "<group>"; };
 		354CE1DFC9CA9D4524F9F69A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		354CE20C68284466FE335109 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
-		354CE290A28456D9BE6B8F5A /* MASShortcutView+UserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MASShortcutView+UserDefaults.h"; sourceTree = "<group>"; };
 		354CE2FDF8996E9BE4FC3397 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		354CE40A310630F5FAC80989 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		354CE467198BAEB78AC043B2 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		354CE4F0CEEECDCC4A5D2436 /* MASShortcut+UserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MASShortcut+UserDefaults.h"; sourceTree = "<group>"; };
-		354CE5A90E732904A5C201E3 /* MASShortcutView+UserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MASShortcutView+UserDefaults.m"; sourceTree = "<group>"; };
 		354CE5CC3497927E914390E0 /* VimdowManager-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.info; path = "VimdowManager-Info.plist"; sourceTree = "<group>"; };
 		354CE6A65A0BBF0EB7264B5A /* ScannedWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScannedWindow.h; sourceTree = "<group>"; };
 		354CE78EB98B4D17D62F8448 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -54,20 +45,18 @@
 		354CE9CD8270F8D3CF620B27 /* ScannedWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScannedWindow.m; sourceTree = "<group>"; };
 		354CEA073C7193576AE9A65C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		354CEA18FB8C4C287940F6CF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		354CEA660A9E2E1859FFEA61 /* MASShortcutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASShortcutView.m; sourceTree = "<group>"; };
-		354CEC2FBCD7726D619C774F /* MASShortcut+UserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MASShortcut+UserDefaults.m"; sourceTree = "<group>"; };
 		354CED4B1AE7D52E9810072E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		354CEDDB1A1D5C9CF1863BE3 /* MASShortcutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASShortcutView.h; sourceTree = "<group>"; };
-		354CEDDEED8EB08AA33F980D /* MASShortcut+Monitoring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MASShortcut+Monitoring.h"; sourceTree = "<group>"; };
 		354CEE109B5954EF4D9336F4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		354CEE1D8EE6CADED8AB82C3 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		354CEE6327F10E4D74ED49D8 /* MASShortcut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASShortcut.m; sourceTree = "<group>"; };
 		354CEF44047954DAF770E954 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		354CEF6DA6F0DE12263D2CB5 /* TargetWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TargetWindow.h; sourceTree = "<group>"; };
 		354CEF7FBC92797CAC668E38 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		8D9D489C3595C80DF199F19B /* libPods-VimdowManager.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-VimdowManager.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D24AF516D992F2A84A59CEE /* Pods-VimdowManager.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VimdowManager.release.xcconfig"; path = "Target Support Files/Pods-VimdowManager/Pods-VimdowManager.release.xcconfig"; sourceTree = "<group>"; };
 		DE36A221193E59A500753E76 /* AXUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AXUtil.h; sourceTree = "<group>"; };
 		DEBF8621176635FC0097F8B8 /* launcher.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = launcher.icns; sourceTree = "<group>"; };
 		DED104C0193E5D14004054E9 /* AXUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AXUtil.m; sourceTree = "<group>"; };
+		FDA8743FFB514C7CDB8E8B8A /* Pods-VimdowManager.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VimdowManager.debug.xcconfig"; path = "Target Support Files/Pods-VimdowManager/Pods-VimdowManager.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +70,7 @@
 				354CE0761A7601D9DB0DC0DB /* CoreServices.framework in Frameworks */,
 				354CE2F1A38B2099D91A1C9A /* CoreAudio.framework in Frameworks */,
 				354CE10DED3C2E8DD19B89CB /* AudioToolbox.framework in Frameworks */,
+				242BAC840B756883280E6409 /* libPods-VimdowManager.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,6 +87,7 @@
 				354CE20C68284466FE335109 /* CoreServices.framework */,
 				354CEF44047954DAF770E954 /* CoreAudio.framework */,
 				354CEF7FBC92797CAC668E38 /* AudioToolbox.framework */,
+				8D9D489C3595C80DF199F19B /* libPods-VimdowManager.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -108,24 +99,8 @@
 				354CEA7FA133403219C2266E /* Products */,
 				354CE3E50C6353ED78761087 /* Frameworks */,
 				354CE6D76E18FA4E1A48A227 /* VimdowManager */,
+				C8B7886811E6A3508585504C /* Pods */,
 			);
-			sourceTree = "<group>";
-		};
-		354CE55835F0D3E9DA3630E4 /* MASShortcut */ = {
-			isa = PBXGroup;
-			children = (
-				354CE1CDA9B66994CD986E30 /* MASShortcut.h */,
-				354CEE6327F10E4D74ED49D8 /* MASShortcut.m */,
-				354CEDDEED8EB08AA33F980D /* MASShortcut+Monitoring.h */,
-				354CE0B51F9CEA0F030D3F1E /* MASShortcut+Monitoring.m */,
-				354CE4F0CEEECDCC4A5D2436 /* MASShortcut+UserDefaults.h */,
-				354CEC2FBCD7726D619C774F /* MASShortcut+UserDefaults.m */,
-				354CEDDB1A1D5C9CF1863BE3 /* MASShortcutView.h */,
-				354CEA660A9E2E1859FFEA61 /* MASShortcutView.m */,
-				354CE290A28456D9BE6B8F5A /* MASShortcutView+UserDefaults.h */,
-				354CE5A90E732904A5C201E3 /* MASShortcutView+UserDefaults.m */,
-			);
-			path = MASShortcut;
 			sourceTree = "<group>";
 		};
 		354CE6D76E18FA4E1A48A227 /* VimdowManager */ = {
@@ -137,7 +112,6 @@
 				354CED4B1AE7D52E9810072E /* AppDelegate.h */,
 				354CE1DFC9CA9D4524F9F69A /* AppDelegate.m */,
 				354CE47731E6A71418BD4C94 /* MainMenu.xib */,
-				354CE55835F0D3E9DA3630E4 /* MASShortcut */,
 				354CE6A65A0BBF0EB7264B5A /* ScannedWindow.h */,
 				354CE9CD8270F8D3CF620B27 /* ScannedWindow.m */,
 				354CEF6DA6F0DE12263D2CB5 /* TargetWindow.h */,
@@ -178,6 +152,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		C8B7886811E6A3508585504C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				9D24AF516D992F2A84A59CEE /* Pods-VimdowManager.release.xcconfig */,
+				FDA8743FFB514C7CDB8E8B8A /* Pods-VimdowManager.debug.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -185,9 +168,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 354CEAE5ACE1FFCD5DEC48DE /* Build configuration list for PBXNativeTarget "VimdowManager" */;
 			buildPhases = (
+				FA8DD374C095A43381C69786 /* [CP] Check Pods Manifest.lock */,
 				354CE9BD0F5B79974C04D9E6 /* Sources */,
 				354CEC39D139C09A99F7EEDC /* Frameworks */,
 				354CEFB0E56C7A40D755CB43 /* Resources */,
+				F77E4DC7263CB70EEA20468B /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -205,12 +190,19 @@
 			isa = PBXProject;
 			attributes = {
 				ORGANIZATIONNAME = "Jang Ho Hwang";
+				TargetAttributes = {
+					354CEDC1FDF7F3ADFD093F02 = {
+						DevelopmentTeam = 6PQ959D822;
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = 354CED94CB8425F4F2F000E0 /* Build configuration list for PBXProject "VimdowManager" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 354CE463BE4D5621DA840C87;
@@ -237,6 +229,49 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		F77E4DC7263CB70EEA20468B /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-VimdowManager/Pods-VimdowManager-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/MASShortcut/MASShortcut.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MASShortcut.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-VimdowManager/Pods-VimdowManager-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FA8DD374C095A43381C69786 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-VimdowManager-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		354CE9BD0F5B79974C04D9E6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -244,12 +279,7 @@
 			files = (
 				354CE7AC32120AF4C5F26031 /* main.m in Sources */,
 				354CE3B5FFD36CEB5E7CE2E2 /* AppDelegate.m in Sources */,
-				354CE6B350C63C31B8398C80 /* MASShortcut.m in Sources */,
-				354CEBD1083332E17AC00D11 /* MASShortcut+Monitoring.m in Sources */,
-				354CEF84223DAFD4657FDDF1 /* MASShortcut+UserDefaults.m in Sources */,
 				DED104C1193E5D14004054E9 /* AXUtil.m in Sources */,
-				354CE17EBF627892F3386F05 /* MASShortcutView.m in Sources */,
-				354CEA845815D0B8A92D4DBB /* MASShortcutView+UserDefaults.m in Sources */,
 				354CEF8FE603933A7C40B8F7 /* ScannedWindow.m in Sources */,
 				354CEE2EC2C17C9093D092F4 /* TargetWindow.m in Sources */,
 				04B0F4111769667200727250 /* CommandWindow.m in Sources */,
@@ -288,13 +318,18 @@
 /* Begin XCBuildConfiguration section */
 		354CE3B186541DC028030600 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9D24AF516D992F2A84A59CEE /* Pods-VimdowManager.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6PQ959D822;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "VimdowManager/VimdowManager-Prefix.pch";
 				INFOPLIST_FILE = "VimdowManager/VimdowManager-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -320,20 +355,25 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				SDKROOT = macosx;
 			};
 			name = Release;
 		};
 		354CEE0E4DA91286366ACF78 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FDA8743FFB514C7CDB8E8B8A /* Pods-VimdowManager.debug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6PQ959D822;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "VimdowManager/VimdowManager-Prefix.pch";
 				INFOPLIST_FILE = "VimdowManager/VimdowManager-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -365,7 +405,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};

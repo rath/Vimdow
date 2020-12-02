@@ -37,11 +37,11 @@ typedef struct {
 void callbackWindowAttribute(const NSDictionary *inputDictionary, NSMutableSet *data) {
     NSDictionary *entry = (NSDictionary *) inputDictionary;
 
-    int sharingState = [[entry objectForKey:(id)kCGWindowSharingState] intValue];
+//    int sharingState = [[entry objectForKey:(id)kCGWindowSharingState] intValue];
     int onScreen = [[entry objectForKey:(id)kCGWindowIsOnscreen] intValue];
     int windowLayer = [[entry objectForKey:(id)kCGWindowLayer] intValue];
     int windowAlpha = [[entry objectForKey:(id)kCGWindowAlpha] intValue];
-    if(sharingState != kCGWindowSharingNone && onScreen==1 && windowLayer==0 && windowAlpha==1) {
+    if(onScreen==1 && windowLayer==0 && windowAlpha==1) {
 //        NSLog(@"Dictionary: %@", entry);
 
         CGRect bounds;
@@ -68,7 +68,6 @@ static AXUIElementRef getFrontMostApp() {
 }
 
 - (NSWindow*)drawGuideWindow:(CGPoint)position guideNumber:(NSUInteger)number {
-    int windowLevel = CGShieldingWindowLevel();
     NSScreen *screen = [NSScreen mainScreen];
     NSRect windowRect = NSRectFromCGRect(CGRectMake(position.x, screen.frame.size.height - position.y - 40.f, 40.0f, 40.0f));
     NSWindow *overlayWindow = [[NSWindow alloc] initWithContentRect:windowRect
@@ -76,9 +75,6 @@ static AXUIElementRef getFrontMostApp() {
                                                             backing:NSBackingStoreBuffered
                                                               defer:NO
                                                              screen:[NSScreen mainScreen]];
-
-    [overlayWindow setLevel:windowLevel];
-    [overlayWindow setReleasedWhenClosed:YES];
     [overlayWindow setBackgroundColor:[NSColor colorWithCalibratedRed:0.0
                                                                 green:0.0
                                                                  blue:0.0
@@ -104,11 +100,7 @@ static AXUIElementRef getFrontMostApp() {
     return overlayWindow;
 }
 
-- (void)clearGuideWindows {
-     for(TargetWindow *window in self.windows) {
-        CFRelease(window.app);
-        CFRelease(window.window);
-    }
+- (void)clearWindows {
     [self.windows removeAllObjects];
 }
 
@@ -144,7 +136,7 @@ static AXUIElementRef getFrontMostApp() {
         CFRelease(tmp);
     }
 
-    [self clearGuideWindows];
+    [self clearWindows];
 
     ScannedWindow *testScanWindow = [[ScannedWindow alloc] init];
     for (NSNumber *pid in pidDic) {
@@ -186,13 +178,14 @@ static AXUIElementRef getFrontMostApp() {
             TargetWindow *value = [[TargetWindow alloc] init];
             value.app = CFRetain(app);
             value.window = CFRetain(window);
+            value.guideWindow = nil;
             value.x = position.x;
             value.y = position.y;
             value.width = size.width;
             value.height = size.height;
             value.isCurrent = NO;
             value.name = name;
-            
+
             if (frontMostWindow != nil &&
                     CGPointEqualToPoint(currentPosition, position) &&
                     CGSizeEqualToSize(currentSize, size)) {
@@ -200,7 +193,6 @@ static AXUIElementRef getFrontMostApp() {
             }
 
             [self.windows addObject:value];
-
         }
 
         CFRelease(result);
@@ -260,7 +252,6 @@ static AXUIElementRef getFrontMostApp() {
         AXUIElementSetAttributeValue(switchWindow.app, kAXFrontmostAttribute, kCFBooleanTrue);
     }
     else if(self.windows.count > 0)  {
-        
         NSInteger newIndex = -1;
         NSInteger nextIndex = currentIndex;
         NSInteger count = 1;
@@ -328,7 +319,7 @@ static AXUIElementRef getFrontMostApp() {
     CGSize windowSize;
     CGPoint windowPosition;
     
-    [self clearGuideWindows];
+    [self clearWindows];
     if( repeatFactor > 0 ) {
         delta.x *= repeatFactor;
         delta.y *= repeatFactor;
@@ -373,55 +364,6 @@ static AXUIElementRef getFrontMostApp() {
     CFRelease(frontMost);
 
     repeatFactor = -1;
-}
-
-- (void)exitNumbers {
-    for (MASShortcut *s in quickGo) {
-        [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", s.description]];
-//        NSLog(@"Number description: %@", s.description);
-    }
-}
-	
-- (void)exitCommandMode {
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutEscape.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutEscape2.description]];
-
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutMoveLeft.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutMoveTop.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutMoveBottom.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutMoveRight.description]];
-
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeLeft.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeTop.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeBottom.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeRight.description]];
-
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeUpperLeft.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeUpperTop.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeUpperBottom.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutResizeUpperRight.description]];
-
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutQuickSwitch.description]];
-//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSwitchPrev.description]];
-//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSwitchPrev2.description]];
-//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSwitchNext.description]];
-//    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSwitchNext2.description]];
-
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutQuit.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutVolumeDown.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutVolumeUp.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutPausePlayiTunes.description]];
-
-
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSearchCommand.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSearchNext.description]];
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutSearchPrev.description]];
-
-    [self exitNumbers];
-    [self.windows removeAllObjects];
-    repeatFactor = -1;
-    quickSwitchOffset = -1;
-    commandMode = NO;
 }
 
 - (void)increaseVolume:(Float32)amount {
@@ -475,7 +417,14 @@ static AXUIElementRef getFrontMostApp() {
         NSLog(@"Failed to set volume property");
         return;
     }
-    //NSLog(@"Volume reset: %4.2f", volume);
+}
+
+- (void)addHotKey: (MASShortcut*)shortcut handler: (dispatch_block_t)action {
+    [[MASShortcutMonitor sharedMonitor] registerShortcut:shortcut withAction:action];
+}
+
+- (void)removeHotKey: (MASShortcut*)shortcut {
+    [[MASShortcutMonitor sharedMonitor] unregisterShortcut:shortcut];
 }
 
 - (void)enterCommandMode {
@@ -489,9 +438,10 @@ static AXUIElementRef getFrontMostApp() {
     commandMode = YES;
     
     // Repeater
+
     for(NSUInteger index = 0; index<[quickGo count]; index++) {
         NSUInteger value = index==9 ? 0 : index+1;
-        [MASShortcut addGlobalHotkeyMonitorWithShortcut:[quickGo objectAtIndex:index] handler:^{
+        [self addHotKey:[quickGo objectAtIndex: index] handler:^{
             if( repeatFactor !=-1 ) {
                 repeatFactor *= 10;
             } else {
@@ -501,106 +451,104 @@ static AXUIElementRef getFrontMostApp() {
         }];
     }
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutEscape handler:^{
-        [self exitCommandMode];
+    __weak AppDelegate *self_ = self;
+    [self addHotKey:shortcutEscape handler:^{
+        [self_ exitCommandMode];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutEscape2 handler:^{
-        [self exitCommandMode];
+    [self addHotKey:shortcutEscape2 handler:^{
+        [self_ exitCommandMode];
     }];
-
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutQuickSwitch handler:^{
+    [self addHotKey:shortcutQuickSwitch handler:^{
         if (quickSwitchOffset < 0) {
             quickSwitchOffset = 0;
         }
         else {
             quickSwitchOffset += 9;
         }
-        [self exitNumbers];
-        [self prepareQuickSwitch];
+        [self_ exitNumbers];
+        [self_ prepareQuickSwitch];
 
         int index = 1;
         for (MASShortcut *s in quickGo) {
             const NSUInteger i = index;
-            [MASShortcut addGlobalHotkeyMonitorWithShortcut:s handler:^{
-                if (quickSwitchOffset == -1) {
-                    quickSwitchOffset = 0;
-                }
-                NSUInteger windowIndex = i - 1 + quickSwitchOffset;
-                if ([self.windows count] >= windowIndex + 1) {
-                    TargetWindow *targetWindow = [self.windows objectAtIndex:windowIndex];
-                    AXUIElementSetAttributeValue(targetWindow.window, kAXMainAttribute, kCFBooleanTrue);
-                    AXUIElementSetAttributeValue(targetWindow.app, kAXFrontmostAttribute, kCFBooleanTrue);
-                }
-                [self exitCommandMode];
+            [self addHotKey:s handler:^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (quickSwitchOffset == -1) {
+                        quickSwitchOffset = 0;
+                    }
+                    NSUInteger windowIndex = i - 1 + quickSwitchOffset;
+                    if ([self_.windows count] >= windowIndex + 1) {
+                        TargetWindow *targetWindow = [self_.windows objectAtIndex:windowIndex];
+                        AXUIElementSetAttributeValue(targetWindow.window, kAXMainAttribute, kCFBooleanTrue);
+                        AXUIElementSetAttributeValue(targetWindow.app, kAXFrontmostAttribute, kCFBooleanTrue);
+                    }
+                    [self_ exitCommandMode];
+                });
             }];
             index++;
         }
     }];
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutMoveLeft handler:^{
+    [self addHotKey:shortcutMoveLeft handler:^{
         RectDelta delta = {-UNIT, 0, 0, 0};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutMoveRight handler:^{
+    [self addHotKey:shortcutMoveRight handler:^{
         RectDelta delta = {UNIT, 0, 0, 0};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutMoveTop handler:^{
+    [self addHotKey:shortcutMoveTop handler:^{
         RectDelta delta = {0, -UNIT, 0, 0};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutMoveBottom handler:^{
+    [self addHotKey:shortcutMoveBottom handler:^{
         RectDelta delta = {0, UNIT, 0, 0};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
     }];
-
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeLeft handler:^{
+    [self addHotKey:shortcutResizeLeft handler:^{
         RectDelta delta = {0, 0, -UNIT, 0};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeRight handler:^{
+    [self addHotKey:shortcutResizeRight handler:^{
         RectDelta delta = {0, 0, UNIT, 0};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeTop handler:^{
+    [self addHotKey:shortcutResizeTop handler:^{
         RectDelta delta = {0, 0, 0, -UNIT};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeBottom handler:^{
+    [self addHotKey:shortcutResizeBottom handler:^{
         RectDelta delta = {0, 0, 0, UNIT};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
     }];
-
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeUpperLeft handler:^{
+    [self addHotKey:shortcutResizeUpperLeft handler:^{
         RectDelta delta = {-UNIT, 0, UNIT, 0};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeUpperRight handler:^{
+    [self addHotKey:shortcutResizeUpperRight handler:^{
         RectDelta delta = {UNIT, 0, -UNIT, 0};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeUpperTop handler:^{
+    [self addHotKey:shortcutResizeUpperTop handler:^{
         RectDelta delta = {0, -UNIT, 0, UNIT};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
     }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutResizeUpperBottom handler:^{
+    [self addHotKey:shortcutResizeUpperBottom handler:^{
         RectDelta delta = {0, UNIT, 0, -UNIT};
-        [self moveWithDelta:delta];
+        [self_ moveWithDelta:delta];
+    }];
+    [self addHotKey:shortcutQuit handler:^{
+        [NSApp terminate:self_];
     }];
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutQuit handler:^{
-        [NSApp terminate:self];
+    [self addHotKey:shortcutVolumeDown handler:^{
+        [self_ increaseVolume:-0.05f];
+    }];
+    [self addHotKey:shortcutVolumeUp handler:^{
+        [self_ increaseVolume:0.05f];
     }];
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutVolumeDown handler:^{
-        [self increaseVolume:-0.05f];
-    }];
-
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutVolumeUp handler:^{
-        [self increaseVolume:0.05f];
-    }];
-
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutPausePlayiTunes handler:^{
+    [self addHotKey:shortcutPausePlayiTunes handler:^{
         NSString *toggleScript = [NSString stringWithFormat:
 @"tell application \"iTunes\"\n\
   if player state is playing then\n\
@@ -617,50 +565,84 @@ end tell"];
         }
     }];
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSearchCommand handler:^{
-        NSInteger index = [self collectWindows];
-        if (index >= 0 && index < self.windows.count) {
-            prevWindow = self.windows[index];
+    [self addHotKey:shortcutSearchCommand handler:^{
+        NSInteger index = [self_ collectWindows];
+        if (index >= 0 && index < self_.windows.count) {
+            prevWindow = self_.windows[index];
         }
 
-        [self exitCommandMode];
-        [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutEscape handler:^{
-            dispatch_async(dispatch_get_main_queue(), ^{ /* because esc hot key monitor cannot be removed in this block */
-                [self.commandWindow resignKeyWindow];
+        [self_ exitCommandMode];
+        [self_ addHotKey:shortcutEscape handler:^{
+            dispatch_async(dispatch_get_main_queue(), ^{ // because esc hot key monitor cannot be removed in this block
+                [self_.commandWindow resignKeyWindow];
             });
         }];
-        [self.commandText setStringValue:@""];
-        [self.commandWindow makeKeyAndOrderFront:self];
+        [self_.commandText setStringValue:@""];
+        [self_.commandWindow makeKeyAndOrderFront:self];
         [NSApp activateIgnoringOtherApps:YES];
     }];
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSearchNext handler:^{
+    [self addHotKey:shortcutSearchNext handler:^{
         if (searchKeywords.count > 0) {
-            [self switchWindow:1 withKeyword:searchKeywords[searchKeywords.count - 1]];
+            [self_ switchWindow:1 withKeyword:searchKeywords[searchKeywords.count - 1]];
         }
     }];
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSearchPrev handler:^{
+    [self addHotKey:shortcutSearchPrev handler:^{
         if (searchKeywords.count > 0) {
-            [self switchWindow:-1 withKeyword:searchKeywords[searchKeywords.count - 1]];
+            [self_ switchWindow:-1 withKeyword:searchKeywords[searchKeywords.count - 1]];
         }
     }];
+}
+
+- (void)exitNumbers {
+    for (MASShortcut *s in quickGo) {
+        [self removeHotKey:s];
+//        NSLog(@"Number description: %@", s.description);
+    }
+}
+
+- (void)exitCommandMode {
+    
+    NSArray *shortcuts = @[
+        shortcutEscape,
+        shortcutEscape2,
+        shortcutMoveLeft,
+        shortcutMoveTop,
+        shortcutMoveBottom,
+        shortcutMoveRight,
+        shortcutResizeLeft,
+        shortcutResizeTop,
+        shortcutResizeBottom,
+        shortcutResizeRight,
+        shortcutResizeUpperLeft,
+        shortcutResizeUpperTop,
+        shortcutResizeUpperBottom,
+        shortcutResizeUpperRight,
+        shortcutQuickSwitch,
+        shortcutQuit,
+        shortcutVolumeUp,
+        shortcutVolumeDown,
+        shortcutPausePlayiTunes,
+        shortcutSearchCommand,
+        shortcutSearchNext,
+        shortcutSearchPrev,
+    ];
+    
+    for (MASShortcut *s in shortcuts) {
+        [self removeHotKey:s];
+    }
+
+    [self exitNumbers];
+    [self clearWindows];
+    repeatFactor = -1;
+    quickSwitchOffset = -1;
+    commandMode = NO;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     [self.window setIsVisible:FALSE];
-    
-    SInt32 osxVersion = 0;
-    Gestalt(gestaltSystemVersion, &osxVersion);
-    
-    if (osxVersion < 0x1010) {
-        Boolean axEnabled = AXAPIEnabled();
-        if( !axEnabled ) {
-            showAXProblemAndTerminate(osxVersion);
-            return;
-        }
-    }
     
     self.windows = [[NSMutableArray alloc] initWithCapacity:20];
     repeatFactor = -1;
@@ -712,25 +694,26 @@ end tell"];
 
     shortcutQuickSwitch = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Q modifierFlags:0];
     
+    __weak AppDelegate *self_ = self;
     MASShortcut *shortcut = [MASShortcut shortcutWithKeyCode:kVK_ANSI_A modifierFlags:NSAlternateKeyMask];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcut handler:^{
-        [self enterCommandMode];
+
+    [self addHotKey:shortcut handler:^{
+        [self_ enterCommandMode];
     }];
 
+    [self addHotKey:shortcutSwitchPrev handler:^{
+        [self_ switchWindow:-1 withKeyword:nil];
+    }];
+    [self addHotKey:shortcutSwitchPrev2 handler:^{
+        [self_ switchWindow:-1 withKeyword:nil];
+    }];
+    [self addHotKey:shortcutSwitchNext handler:^{
+        [self_ switchWindow:1 withKeyword:nil];
+    }];
+    [self addHotKey:shortcutSwitchNext2 handler:^{
+        [self_ switchWindow:1 withKeyword:nil];
+    }];
 
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSwitchPrev handler:^{
-        [self switchWindow:-1 withKeyword:nil];
-    }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSwitchPrev2 handler:^{
-        [self switchWindow:-1 withKeyword:nil];
-    }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSwitchNext handler:^{
-        [self switchWindow:1 withKeyword:nil];
-    }];
-    [MASShortcut addGlobalHotkeyMonitorWithShortcut:shortcutSwitchNext2 handler:^{
-        [self switchWindow:1 withKeyword:nil];
-    }];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(commandWindowDidOpen) name:NSWindowDidBecomeKeyNotification object:self.commandWindow];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(commandWindowDidOpen) name:NSWindowDidBecomeMainNotification object:self.commandWindow];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(closeCommandWindow) name:NSWindowDidResignKeyNotification object:self.commandWindow];
@@ -744,7 +727,7 @@ end tell"];
 }
 
 - (void)closeCommandWindow {
-    [MASShortcut removeGlobalHotkeyMonitor:[NSString stringWithFormat:@"%@", shortcutEscape.description]];
+    [self removeHotKey:shortcutEscape];
     [self.commandWindow orderOut: self];
     [self enterCommandMode];
     if(prevWindow != nil) {

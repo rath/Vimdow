@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "MASShortcut.h"
-#import "MASShortcut+Monitoring.h"
+#import "MASShortcutMonitor.h"
 
 @interface AppDelegate : NSObject <NSApplicationDelegate> {
     MASShortcut *shortcutEscape;

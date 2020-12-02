@@ -4,3 +4,6 @@ xcuserdata
 profile
 project.xcworkspace/
 DerivedData
+
+Pods/
+VimdowManager.xcworkspace/
