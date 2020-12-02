@@ -328,6 +328,7 @@
 				GCC_PREFIX_HEADER = "VimdowManager/VimdowManager-Prefix.pch";
 				INFOPLIST_FILE = "VimdowManager/VimdowManager-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = rath.toys.VimdowManager;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -372,6 +373,7 @@
 				GCC_PREFIX_HEADER = "VimdowManager/VimdowManager-Prefix.pch";
 				INFOPLIST_FILE = "VimdowManager/VimdowManager-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = rath.toys.VimdowManager;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
