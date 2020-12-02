@@ -37,13 +37,10 @@ typedef struct {
 void callbackWindowAttribute(const NSDictionary *inputDictionary, NSMutableSet *data) {
     NSDictionary *entry = (NSDictionary *) inputDictionary;
 
-//    int sharingState = [[entry objectForKey:(id)kCGWindowSharingState] intValue];
     int onScreen = [[entry objectForKey:(id)kCGWindowIsOnscreen] intValue];
     int windowLayer = [[entry objectForKey:(id)kCGWindowLayer] intValue];
     int windowAlpha = [[entry objectForKey:(id)kCGWindowAlpha] intValue];
     if(onScreen==1 && windowLayer==0 && windowAlpha==1) {
-//        NSLog(@"Dictionary: %@", entry);
-
         CGRect bounds;
         CGRectMakeWithDictionaryRepresentation((__bridge CFDictionaryRef)[entry objectForKey:(id)kCGWindowBounds], &bounds);
         ScannedWindow *scan = [[ScannedWindow alloc] init];
@@ -69,7 +66,7 @@ static AXUIElementRef getFrontMostApp() {
 
 - (NSWindow*)drawGuideWindow:(CGPoint)position guideNumber:(NSUInteger)number {
     NSScreen *screen = [NSScreen screens].firstObject;
-    NSRect windowRect = NSRectFromCGRect(CGRectMake(position.x, screen.frame.size.height - position.y - 40.f, 40.0f, 40.0f));
+    NSRect windowRect = NSRectFromCGRect(CGRectMake(position.x + 4, screen.frame.size.height - position.y - 36.f - 4, 36.0f, 36.0f));
     NSWindow *overlayWindow = [[NSWindow alloc] initWithContentRect:windowRect
                                                           styleMask:NSWindowStyleMaskBorderless
                                                             backing:NSBackingStoreBuffered
@@ -78,7 +75,7 @@ static AXUIElementRef getFrontMostApp() {
     [overlayWindow setBackgroundColor:[NSColor colorWithCalibratedRed:0.0
                                                                 green:0.0
                                                                  blue:0.0
-                                                                alpha:0.5]];
+                                                                alpha:0.40]];
     [overlayWindow setOpaque:NO];
     [overlayWindow setIgnoresMouseEvents:YES];
     [overlayWindow setReleasedWhenClosed:YES];
@@ -86,12 +83,13 @@ static AXUIElementRef getFrontMostApp() {
 
     CATextLayer *l = [CATextLayer layer];
     l.string = [NSString stringWithFormat:@"%x", (unsigned int)number];
-    l.fontSize = 32.0f;
+    l.fontSize = 28.0f;
     l.foregroundColor = [NSColor whiteColor].CGColor;
     l.alignmentMode = kCAAlignmentCenter;
+    l.contentsScale = NSScreen.mainScreen.backingScaleFactor;
     [l setPosition:CGPointMake(0, 0)];
-    [l setBounds:CGRectMake(0, 0, 40, 40)];
-    NSView *view = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 40, 40)];
+    [l setBounds:CGRectMake(0, 0, 36, 36)];
+    NSView *view = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 36, 36)];
     view.wantsLayer = YES;
     view.layer = l;
 
@@ -700,7 +698,11 @@ end tell"];
     MASShortcut *shortcut = [MASShortcut shortcutWithKeyCode:kVK_ANSI_A modifierFlags:NSControlKeyMask|NSShiftKeyMask];
 
     [self addHotKey:shortcut handler:^{
-        [self_ enterCommandMode];
+//        if (commandMode) {
+//            [self_ exitCommandMode];
+//        } else {
+            [self_ enterCommandMode];
+//        }
     }];
 
     [self addHotKey:shortcutSwitchPrev handler:^{
