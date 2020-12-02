@@ -68,20 +68,21 @@ static AXUIElementRef getFrontMostApp() {
 }
 
 - (NSWindow*)drawGuideWindow:(CGPoint)position guideNumber:(NSUInteger)number {
-    NSScreen *screen = [NSScreen mainScreen];
+    NSScreen *screen = [NSScreen screens].firstObject;
     NSRect windowRect = NSRectFromCGRect(CGRectMake(position.x, screen.frame.size.height - position.y - 40.f, 40.0f, 40.0f));
     NSWindow *overlayWindow = [[NSWindow alloc] initWithContentRect:windowRect
-                                                          styleMask:NSBorderlessWindowMask
+                                                          styleMask:NSWindowStyleMaskBorderless
                                                             backing:NSBackingStoreBuffered
                                                               defer:NO
-                                                             screen:[NSScreen mainScreen]];
+                                                             screen:nil];
     [overlayWindow setBackgroundColor:[NSColor colorWithCalibratedRed:0.0
                                                                 green:0.0
                                                                  blue:0.0
                                                                 alpha:0.5]];
-    [overlayWindow setAlphaValue:1.0];
     [overlayWindow setOpaque:NO];
     [overlayWindow setIgnoresMouseEvents:YES];
+    [overlayWindow setReleasedWhenClosed:YES];
+    [overlayWindow setLevel:CGShieldingWindowLevel()];
 
     CATextLayer *l = [CATextLayer layer];
     l.string = [NSString stringWithFormat:@"%x", (unsigned int)number];
@@ -124,7 +125,7 @@ static AXUIElementRef getFrontMostApp() {
     if (error==kAXErrorAPIDisabled) {
         showAXProblemAndTerminate(0);
     }
-    
+
     CGPoint currentPosition;
     CGSize currentSize;
     if( error==kAXErrorSuccess ) {
@@ -141,7 +142,7 @@ static AXUIElementRef getFrontMostApp() {
     ScannedWindow *testScanWindow = [[ScannedWindow alloc] init];
     for (NSNumber *pid in pidDic) {
         NSString *name = pidDic[pid];
-        
+
         AXUIElementRef app;
         CFArrayRef result = nil;
         app = AXUIElementCreateApplication([pid intValue]);
@@ -174,7 +175,7 @@ static AXUIElementRef getFrontMostApp() {
 
             if(![data containsObject:testScanWindow])
                 continue;
-            
+
             TargetWindow *value = [[TargetWindow alloc] init];
             value.app = CFRetain(app);
             value.window = CFRetain(window);
@@ -328,9 +329,10 @@ static AXUIElementRef getFrontMostApp() {
     }
 
     error = AXUIElementCopyAttributeValue(frontMost, kAXFocusedWindowAttribute, (CFTypeRef*)&frontMostWindow);
-    if (error==kAXErrorAPIDisabled)
+    if (error==kAXErrorAPIDisabled) {
         showAXProblemAndTerminate(0);
-    
+    }
+
     if (error!=kAXErrorSuccess) {
         return;
     }

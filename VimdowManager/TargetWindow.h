@@ -15,7 +15,7 @@
 @property CGFloat width;
 @property CGFloat height;
 @property BOOL isCurrent;
-@property (nonatomic, retain) NSWindow *guideWindow;
+@property (nonatomic) NSWindow *guideWindow;
 @property (nonatomic) AXUIElementRef window;
 @property (nonatomic) AXUIElementRef app;
 @property (nonatomic, strong) NSString *name;

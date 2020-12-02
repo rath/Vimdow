@@ -13,4 +13,10 @@
 
 }
 
+- (void)dealloc {
+    CFRelease(_app);
+    CFRelease(_window);
+    [_guideWindow orderOut:nil];
+}
+
 @end
