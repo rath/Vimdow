@@ -321,6 +321,7 @@
 			baseConfigurationReference = 9D24AF516D992F2A84A59CEE /* Pods-VimdowManager.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 6PQ959D822;
@@ -366,6 +367,7 @@
 			baseConfigurationReference = FDA8743FFB514C7CDB8E8B8A /* Pods-VimdowManager.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 6PQ959D822;
