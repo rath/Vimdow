@@ -387,7 +387,7 @@ static AXUIElementRef getFrontMostApp() {
     }
 
     // Get the volume
-    propertyAddress.mSelector = kAudioHardwareServiceDeviceProperty_VirtualMasterVolume;
+    propertyAddress.mSelector = kAudioHardwareServiceDeviceProperty_VirtualMainVolume;
     propertyAddress.mScope = kAudioDevicePropertyScopeOutput;
     propertyAddress.mElement = kAudioObjectPropertyElementMaster;
 
@@ -451,7 +451,7 @@ static AXUIElementRef getFrontMostApp() {
         }];
     }
 
-    __weak AppDelegate *self_ = self;
+    __unsafe_unretained typeof(self) self_ = self;
     [self addHotKey:shortcutEscape handler:^{
         [self_ exitCommandMode];
     }];
@@ -469,9 +469,9 @@ static AXUIElementRef getFrontMostApp() {
         [self_ prepareQuickSwitch];
 
         int index = 1;
-        for (MASShortcut *s in quickGo) {
+        for (MASShortcut *s in self_->quickGo) {
             const NSUInteger i = index;
-            [self addHotKey:s handler:^{
+            [self_ addHotKey:s handler:^{
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (quickSwitchOffset == -1) {
                         quickSwitchOffset = 0;
@@ -573,25 +573,25 @@ end tell"];
         }
 
         [self_ exitCommandMode];
-        [self_ addHotKey:shortcutEscape handler:^{
+        [self_ addHotKey:self_->shortcutEscape handler:^{
             dispatch_async(dispatch_get_main_queue(), ^{ // because esc hot key monitor cannot be removed in this block
                 [self_.commandWindow resignKeyWindow];
             });
         }];
         [self_.commandText setStringValue:@""];
-        [self_.commandWindow makeKeyAndOrderFront:self];
+        [self_.commandWindow makeKeyAndOrderFront:self_];
         [NSApp activateIgnoringOtherApps:YES];
     }];
 
     [self addHotKey:shortcutSearchNext handler:^{
         if (searchKeywords.count > 0) {
-            [self_ switchWindow:1 withKeyword:searchKeywords[searchKeywords.count - 1]];
+            [self_ switchWindow:1 withKeyword:self_->searchKeywords[searchKeywords.count - 1]];
         }
     }];
 
     [self addHotKey:shortcutSearchPrev handler:^{
         if (searchKeywords.count > 0) {
-            [self_ switchWindow:-1 withKeyword:searchKeywords[searchKeywords.count - 1]];
+            [self_ switchWindow:-1 withKeyword:self_->searchKeywords[searchKeywords.count - 1]];
         }
     }];
 }
