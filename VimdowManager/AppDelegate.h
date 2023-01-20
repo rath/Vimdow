@@ -44,6 +44,9 @@
     MASShortcut *shortcutVolumeDown;
     MASShortcut *shortcutPausePlayiTunes;
 
+    MASShortcut *shortcutMoveToNextScreen;
+    MASShortcut *shortcutMoveToNextScreen2;
+
     NSMutableArray* quickGo;
 
     NSInteger repeatFactor;

@@ -366,6 +366,66 @@ static AXUIElementRef getFrontMostApp() {
     repeatFactor = -1;
 }
 
+- (NSArray*)screenRects {
+    NSMutableArray *screenRects = [[NSMutableArray alloc] init];
+    for (NSScreen *screen in [NSScreen screens]) {
+        CGDirectDisplayID displayID = [[screen deviceDescription][@"NSScreenNumber"] unsignedIntValue];
+        CGRect rect = CGDisplayBounds(displayID);
+        [screenRects addObject:[NSValue valueWithRect:rect]];
+    }
+    return screenRects;
+}
+
+- (void)moveToNextScreen {
+    AXError error;
+
+    AXUIElementRef frontMostWindow;
+    AXUIElementRef frontMost = getFrontMostApp();
+    AXValueRef tmp;
+
+    CGSize windowSize;
+    CGPoint windowPosition;
+
+    error = AXUIElementCopyAttributeValue(frontMost, kAXFocusedWindowAttribute, (CFTypeRef*)&frontMostWindow);
+    if (error==kAXErrorAPIDisabled) {
+        showAXProblemAndTerminate(0);
+    }
+    if (error!=kAXErrorSuccess) {
+        return;
+    }
+    AXUIElementCopyAttributeValue(frontMostWindow, kAXPositionAttribute, (CFTypeRef*)&tmp);
+    AXValueGetValue(tmp, kAXValueCGPointType, &windowPosition);
+    CFRelease(tmp);
+
+    NSArray *screenRects = [self screenRects];
+    int currentScreen = 0;
+    for (int i=0; i<screenRects.count; i++) {
+        CGRect rect = [[screenRects objectAtIndex:i] rectValue];
+        bool contain = CGRectContainsPoint(rect, windowPosition);
+        if (contain == YES) {
+            currentScreen = i;
+        }
+    }
+
+    int nextScreen = currentScreen + 1;
+    if (nextScreen >= screenRects.count) {
+        nextScreen = 0;
+    }
+
+    CGRect nextRect = [[screenRects objectAtIndex:nextScreen] rectValue];
+    windowPosition.x = nextRect.origin.x + 0;
+    windowPosition.y = nextRect.origin.y + 0;
+    windowSize.width = nextRect.size.width - 0;
+    windowSize.height = nextRect.size.height - 0;
+
+    tmp = AXValueCreate(kAXValueCGPointType, &windowPosition);
+    error = AXUIElementSetAttributeValue(frontMostWindow, kAXPositionAttribute, tmp);
+    CFRelease(tmp);
+    tmp = AXValueCreate(kAXValueCGSizeType, &windowSize);
+    error = AXUIElementSetAttributeValue(frontMostWindow, kAXSizeAttribute, tmp);
+    CFRelease(tmp);
+}
+
 - (void)increaseVolume:(Float32)amount {
     AudioDeviceID deviceId = 0;
     OSStatus result;
@@ -430,10 +490,6 @@ static AXUIElementRef getFrontMostApp() {
 - (void)enterCommandMode {
     const double UNIT = 20;
 
-    //        if( commandMode==YES ) {
-    //            [self exitCommandMode];
-    //            return;
-    //        }
     quickSwitchOffset = -1;
     commandMode = YES;
     
@@ -594,6 +650,13 @@ end tell"];
             [self_ switchWindow:-1 withKeyword:self_->searchKeywords[searchKeywords.count - 1]];
         }
     }];
+
+    [self addHotKey:shortcutMoveToNextScreen handler:^{
+        [self_ moveToNextScreen];
+    }];
+    [self addHotKey:shortcutMoveToNextScreen2 handler:^{
+        [self_ moveToNextScreen];
+    }];
 }
 
 - (void)exitNumbers {
@@ -628,6 +691,8 @@ end tell"];
         shortcutSearchCommand,
         shortcutSearchNext,
         shortcutSearchPrev,
+        shortcutMoveToNextScreen,
+        shortcutMoveToNextScreen2,
     ];
     
     for (MASShortcut *s in shortcuts) {
@@ -655,6 +720,8 @@ end tell"];
     shortcutMoveTop = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:0];
     shortcutMoveBottom = [MASShortcut shortcutWithKeyCode:kVK_ANSI_J modifierFlags:0];
     shortcutMoveRight = [MASShortcut shortcutWithKeyCode:kVK_ANSI_L modifierFlags:0];
+    shortcutMoveToNextScreen = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:NSControlKeyMask|NSAlternateKeyMask];
+    shortcutMoveToNextScreen2 = [MASShortcut shortcutWithKeyCode:kVK_ANSI_L modifierFlags:NSControlKeyMask|NSAlternateKeyMask];
 
     shortcutResizeLeft = [MASShortcut shortcutWithKeyCode:kVK_ANSI_H modifierFlags:NSAlternateKeyMask];
     shortcutResizeTop = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:NSAlternateKeyMask];
