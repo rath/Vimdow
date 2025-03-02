@@ -763,7 +763,7 @@ end tell"];
     shortcutQuickSwitch = [MASShortcut shortcutWithKeyCode:kVK_ANSI_Q modifierFlags:0];
     
     __weak AppDelegate *self_ = self;
-    MASShortcut *shortcut = [MASShortcut shortcutWithKeyCode:kVK_ANSI_A modifierFlags:NSControlKeyMask|NSShiftKeyMask];
+    MASShortcut *shortcut = [MASShortcut shortcutWithKeyCode:kVK_ANSI_A modifierFlags:NSControlKeyMask|NSAlternateKeyMask];
 
     [self addHotKey:shortcut handler:^{
 //        if (commandMode) {
