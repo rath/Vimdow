@@ -39,7 +39,7 @@ targets:
     platform: macOS
     sources:
       - path: VimdowManager
-      - path: launcher.icns
+      - path: Artwork/launcher.icns
         buildPhase: resources
       - path: LICENSE
         buildPhase: resources
