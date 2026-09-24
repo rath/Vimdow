@@ -2,7 +2,7 @@ import Foundation
 import CoreGraphics
 
 public enum Mode: Equatable, Sendable {
-    case normal, command, quickSwitch, search
+    case normal, command, quickSwitch, search, settings
 }
 
 public enum Direction: CaseIterable, Sendable {
@@ -15,7 +15,7 @@ public enum ResizeAnchor: Sendable {
 
 public enum Command: Sendable {
     case enter, escape, digit(Int), move(Direction), resize(Direction, ResizeAnchor)
-    case cycle(Int), quickSwitch, search, repeatSearch(Int), nextScreen, quit
+    case cycle(Int), quickSwitch, search, repeatSearch(Int), nextScreen, settings, quit
 }
 
 public struct RepeatPrefix: Sendable {
@@ -84,6 +84,7 @@ public protocol CommandPresenting: AnyObject {
     func hideGuides()
     func showSearch()
     func hideSearch()
+    func showSettings()
     func showFailure(_ error: any Error)
     func quit()
 }

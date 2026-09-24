@@ -15,6 +15,81 @@ import Testing
     #expect(prefix.take() > 0)
 }
 
+@Test @MainActor func settingsUseIndependentStepsAndUpdateWithoutRestarting() {
+    let windows = FakeWindows()
+    var settings = WindowPreferences(moveStep: 7, resizeStep: 3)
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation(), preferences: { settings })
+    controller.handle(.enter)
+    controller.handle(.digit(2))
+    controller.handle(.move(.right))
+    #expect(windows.frames.last?.minX == 14)
+    controller.handle(.digit(3))
+    controller.handle(.resize(.down, .topLeft))
+    #expect(windows.frames.last?.height == 309)
+    settings = WindowPreferences(moveStep: 50, resizeStep: 10)
+    controller.handle(.move(.right))
+    #expect(windows.frames.last?.minX == 64)
+    #expect(WindowPreferences(moveStep: 0, resizeStep: 201) == WindowPreferences())
+}
+
+@Test @MainActor func settingsSuspendCommandsAndClearModalStateWithoutPermission() {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    controller.handle(.enter)
+    controller.handle(.quickSwitch)
+    controller.handle(.settings)
+    #expect(controller.mode == .settings)
+    #expect(ui.guides.isEmpty)
+    windows.failure = .permissionDenied
+    controller.handle(.settings)
+    controller.handle(.cycle(1))
+    controller.handle(.move(.left))
+    #expect(ui.errors.isEmpty)
+    controller.setSettingsActive(false)
+    #expect(controller.mode == .normal)
+    windows.failure = nil
+    controller.handle(.enter)
+    controller.handle(.digit(9))
+    controller.handle(.settings)
+    controller.setSettingsActive(false)
+    controller.handle(.enter)
+    controller.handle(.move(.right))
+    #expect(windows.frames.last?.minX == 20)
+    controller.handle(.search)
+    controller.handle(.settings)
+    #expect(!ui.searchVisible)
+    #expect(controller.mode == .settings)
+}
+
+@Test @MainActor func keepSizePreservesOffsetsAndRoundTripsWhileBehaviorChangesResetHistory() {
+    let windows = FakeWindows()
+    windows.screens.append(CGRect(x: -1440, y: -300, width: 1440, height: 900))
+    let original = windows.list[0].frame
+    var settings = WindowPreferences(displayBehavior: .keepSize)
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation(), preferences: { settings })
+    controller.handle(.enter)
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == original.offsetBy(dx: -1440, dy: -300))
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == original)
+    settings = WindowPreferences(displayBehavior: .fillDisplay)
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == windows.screens[1])
+    controller.resetDisplayHistory()
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == windows.screens[0])
+}
+
+@Test func keepSizeFitsSmallDisplaysAndOffscreenWindows() {
+    let source = CGRect(x: 0, y: 0, width: 1920, height: 1080)
+    let target = CGRect(x: -800, y: -600, width: 800, height: 600)
+    #expect(WindowGeometry.transfer(source, from: source, to: target) == target)
+    let partlyOffscreen = CGRect(x: 1700, y: 900, width: 400, height: 300)
+    #expect(WindowGeometry.transfer(partlyOffscreen, from: source, to: target)
+            == CGRect(x: -400, y: -300, width: 400, height: 300))
+}
+
 @Test func movementAndResizePreserveTheirAnchors() {
     let frame = CGRect(x: -500, y: 100, width: 400, height: 300)
     #expect(WindowGeometry.apply(.down, to: frame, count: 12) == frame.offsetBy(dx: 0, dy: 240))
@@ -182,6 +257,7 @@ private final class FakePresentation: CommandPresenting {
     func hideGuides() { guides = [] }
     func showSearch() { searchVisible = true }
     func hideSearch() { searchVisible = false }
+    func showSettings() {}
     func showFailure(_ error: any Error) { errors.append(error) }
     func quit() { didQuit = true }
 }

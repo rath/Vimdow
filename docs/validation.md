@@ -74,6 +74,19 @@ origin if the target app changed it. This avoids requesting the destination's
 size while the window is still on the source display. Live AX behavior across
 different display sizes still requires the manual checks below.
 
+### Settings follow-up — 2026-09-24
+
+- All 19 core, 4 shortcut, and 5 presentation tests passed; Debug and universal
+  Release builds succeeded.
+- A standalone app using the production settings controller confirmed a visible
+  key window. Both tabs were visually checked in light and dark appearances at
+  the minimum window width. Unhosted XCTest cannot reliably activate a regular
+  application window, so key-window activation was verified separately; its
+  tests cover live field-editor input, window reuse, and shortcut suspension.
+- Tests isolate preferences in temporary suites and use separate shortcut names.
+  Actual Korean IME input, other-app conflicts, and live AX display transfers
+  with the new options remain manual acceptance checks.
+
 ## Manual acceptance matrix
 
 Run these on macOS 14 and the current supported macOS, with Accessibility
@@ -82,8 +95,8 @@ architecture; a successful cross-compile does not establish runtime support.
 
 | Scenario | Expected result |
 | --- | --- |
-| First launch without permission | Guidance appears; Later leaves the app running; Control–Option–A offers another check. |
-| Grant permission while running | The next command works without an app restart. |
+| First launch without permission | Guidance appears; Later leaves the app running; a window command retries permission while Settings remains available. |
+| Grant permission while running | The next window command works without an app restart; Settings refreshes permission status when activated. |
 | Revoke permission during command mode | The next command exits the mode and offers guidance; plain keys are released. |
 | Enter command mode repeatedly | Each key triggers one action; a numeric prefix survives redundant entry. |
 | `hjkl`, `12j`, held movement keys | Correct direction and 20-point units; held keys follow system repeat timing. |
@@ -101,6 +114,14 @@ architecture; a successful cross-compile does not establish runtime support.
 | One display; display layout or resolution changed | One display is a no-op; layout changes clear remembered frames. |
 | Spaces, full-screen apps, Stage Manager | Only eligible visible windows are offered; labels do not steal focus. |
 | Screen unplugged; target closes between scan and selection | No crash, stale labels are removed. |
+| Command mode then comma; app menu Settings; reopen running app | One Settings window opens, including without Accessibility permission. |
+| Settings focus, another app, then Settings again | All shortcuts pause while editing; normal global shortcuts resume outside Settings; modal letters never leak into the form. |
+| Movement 7pt, resize 31pt, numeric prefixes | Separate values apply immediately; prefixes multiply the configured step. |
+| Empty, Korean, fractional, out-of-range step input | Invalid values are not persisted; leaving the field restores its last valid value. |
+| Edit/clear global shortcuts and restart | Changes persist; cleared shortcuts do not cause conflict alerts; reopening the app remains a recovery route. |
+| Duplicate or system/menu-conflicting shortcut | Recording is rejected with an explanation; the previous assignment survives. |
+| Restore Defaults in either tab | Only that tab resets; the other tab is unchanged. |
+| Keep Size; smaller/negative-origin displays; return trip | First visit preserves size/offset where possible and fits within the target; return restores the saved frame. |
 | F9/F10/F13 | Vimdow no longer registers these keys. |
 
 ## Known constraints
@@ -109,10 +130,11 @@ architecture; a successful cross-compile does not establish runtime support.
   window size. AX errors are logged under subsystem `rath.toys.VimdowManager`.
 - Window discovery combines on-screen Quartz bounds with public AX windows.
   It does not use private window identifiers or require screen capture for previews.
-- First visits to a display use its full bounds. Return visits restore the
+- First visits to a display fill its bounds by default, or keep size/offset when
+  selected in Settings. Return visits restore the
   frame saved when that window last left the display. History lasts for the
   running session and is cleared when the display layout changes.
 - Ad-hoc development builds may need their Accessibility entry re-added after
   rebuilding or moving the bundle.
-- Signed distribution, notarization, preferences, login items, and automatic
+- Signed distribution, notarization, login items, and automatic
   updates are outside this migration.

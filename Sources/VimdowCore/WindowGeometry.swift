@@ -4,9 +4,9 @@ import CoreGraphics
 public enum WindowGeometry {
     public static func apply(
         _ direction: Direction, to frame: CGRect, count: Int = 1,
-        anchor: ResizeAnchor? = nil
+        anchor: ResizeAnchor? = nil, step: Int = 20
     ) -> CGRect {
-        let distance = 20 * CGFloat(max(1, count))
+        let distance = CGFloat(max(1, step)) * CGFloat(max(1, count))
         let dx: CGFloat = direction == .left ? -distance : direction == .right ? distance : 0
         let dy: CGFloat = direction == .up ? -distance : direction == .down ? distance : 0
         guard let anchor else { return frame.offsetBy(dx: dx, dy: dy) }
@@ -19,6 +19,14 @@ public enum WindowGeometry {
             let height = max(1, frame.height - dy)
             return CGRect(x: frame.maxX - width, y: frame.maxY - height, width: width, height: height)
         }
+    }
+
+    public static func transfer(_ frame: CGRect, from source: CGRect, to target: CGRect) -> CGRect {
+        let width = min(frame.width, target.width)
+        let height = min(frame.height, target.height)
+        return CGRect(x: min(max(target.minX + frame.minX - source.minX, target.minX), target.maxX - width),
+                      y: min(max(target.minY + frame.minY - source.minY, target.minY), target.maxY - height),
+                      width: width, height: height)
     }
 
     public static func screenIndex(for frame: CGRect, screens: [CGRect]) -> Int? {

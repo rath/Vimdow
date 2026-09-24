@@ -8,18 +8,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
     private let service = WindowService()
     private let guides = GuideWindows()
     private let search = SearchPanel()
+    private let settingsStore = SettingsStore()
+    private var settingsWindow: SettingsWindowController?
     private let logger = Logger(subsystem: "rath.toys.VimdowManager", category: "WindowControl")
-    private lazy var coordinator = CommandCoordinator(windows: service, presentation: self)
+    private lazy var coordinator = CommandCoordinator(windows: service, presentation: self,
+                                                      preferences: { [settingsStore] in settingsStore.preferences })
     private var shortcuts: ShortcutController?
     private var permissionAlert: NSAlert?
     private var reportedConflicts: Set<String> = []
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         installMenu()
+        settingsStore.onDisplayBehaviorChange = { [weak self] in self?.coordinator.resetDisplayHistory() }
         search.onFinish = { [weak self] query in self?.coordinator.finishSearch(query) }
         shortcuts = ShortcutController { [weak self] command in
             guard let self else { return }
-            if !AXIsProcessTrusted() {
+            let requiresPermission: Bool
+            switch command {
+            case .enter, .escape, .settings, .quit: requiresPermission = false
+            default: requiresPermission = true
+            }
+            if requiresPermission && !AXIsProcessTrusted() {
                 coordinator.handle(.escape)
                 showPermissionAlert()
                 return
@@ -28,6 +37,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         }
         setMode(.normal)
         if !AXIsProcessTrusted() { showPermissionAlert() }
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        openSettings(nil)
+        return false
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -48,7 +62,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
             guard !newConflicts.isEmpty else { return }
             let alert = NSAlert()
             alert.messageText = "Some Vimdow shortcuts are unavailable"
-            alert.informativeText = "Another app or macOS may be using: \(newConflicts.sorted().joined(separator: ", ")). Close the other Vimdow instance or resolve the conflict, then restart Vimdow."
+            alert.informativeText = "Another app or macOS may be using: \(newConflicts.sorted().joined(separator: ", ")). Close the other Vimdow instance or choose a different shortcut in Vimdow Settings. Reopen Vimdow from Applications to reach Settings."
             alert.runModal()
         }
     }
@@ -57,6 +71,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
     func hideGuides() { guides.hide() }
     func showSearch() { search.show() }
     func hideSearch() { search.hide() }
+    func showSettings() {
+        guard let shortcuts else { return }
+        if settingsWindow == nil {
+            let controller = SettingsWindowController(store: settingsStore, shortcuts: shortcuts)
+            controller.onActivationChange = { [weak self] active in self?.coordinator.setSettingsActive(active) }
+            settingsWindow = controller
+        }
+        settingsWindow?.show()
+    }
+    @objc private func openSettings(_ sender: Any?) { coordinator.handle(.settings) }
     func quit() { NSApp.terminate(nil) }
 
     func showFailure(_ error: any Error) {
@@ -97,6 +121,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         let applicationItem = NSMenuItem()
         let applicationMenu = NSMenu(title: "Vimdow")
         applicationMenu.addItem(withTitle: "About Vimdow", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
+        let settings = applicationMenu.addItem(withTitle: "Settings…", action: #selector(openSettings(_:)), keyEquivalent: ",")
+        settings.target = self
         applicationMenu.addItem(.separator())
         applicationMenu.addItem(withTitle: "Quit Vimdow", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         applicationItem.submenu = applicationMenu

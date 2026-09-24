@@ -10,24 +10,31 @@ public final class CommandCoordinator {
     private var previousWindow: UUID?
     private var screenLayout: [CGRect] = []
     private var screenHistory: [UUID: [Int: CGRect]] = [:]
+    private var lastDisplayBehavior: DisplayMoveBehavior?
+    private let preferences: () -> WindowPreferences
     private let windows: any WindowControlling
     private let presentation: any CommandPresenting
 
-    public init(windows: any WindowControlling, presentation: any CommandPresenting) {
+    public init(windows: any WindowControlling, presentation: any CommandPresenting,
+                preferences: @escaping () -> WindowPreferences = { WindowPreferences() }) {
         self.windows = windows
         self.presentation = presentation
+        self.preferences = preferences
     }
 
     public func handle(_ command: Command) {
         do {
             switch command {
+            case .settings:
+                setSettingsActive(true)
+                presentation.showSettings()
             case .enter:
                 // Re-entering is idempotent; it must not duplicate handlers or reset a prefix.
                 if mode == .normal { transition(to: .command) }
             case .escape:
                 if mode == .search { finishSearch(nil) } else { transition(to: .normal) }
             case .cycle(let step):
-                guard mode != .search else { return }
+                guard mode != .search && mode != .settings else { return }
                 try cycle(step: step, count: prefix.take())
             default:
                 guard mode == .command || mode == .quickSwitch else { return }
@@ -87,18 +94,35 @@ public final class CommandCoordinator {
 
     private func moveToNextScreen(_ window: WindowInfo) throws {
         let screens = windows.screenFrames()
-        if screens != screenLayout {
+        let behavior = preferences().displayBehavior
+        if screens != screenLayout || behavior != lastDisplayBehavior {
             screenLayout = screens
+            lastDisplayBehavior = behavior
             screenHistory.removeAll()
         }
         guard screens.count > 1,
               let current = WindowGeometry.screenIndex(for: window.frame, screens: screens) else { return }
         let next = (current + 1) % screens.count
-        let target = screenHistory[window.id]?[next] ?? screens[next]
+        let initial = behavior == .fillDisplay ? screens[next]
+            : WindowGeometry.transfer(window.frame, from: screens[current], to: screens[next])
+        let target = screenHistory[window.id]?[next] ?? initial
         try windows.setFrame(target, of: window.id)
         // Only record departures after successful moves. Each window maintains
         // independent geometry, including manual edits made on each display.
         screenHistory[window.id, default: [:]][current] = window.frame
+    }
+
+    public func setSettingsActive(_ active: Bool) {
+        if active {
+            if mode == .search { finishSearch(nil) }
+            if mode != .settings { transition(to: .settings) }
+        } else if mode == .settings {
+            transition(to: .normal)
+        }
+    }
+
+    public func resetDisplayHistory() {
+        screenHistory.removeAll()
     }
 
     public func finishSearch(_ query: String?) {
@@ -125,7 +149,9 @@ public final class CommandCoordinator {
         let count = prefix.take()
         leaveNumbers()
         let window = try windows.focusedWindow()
-        try windows.setFrame(WindowGeometry.apply(direction, to: window.frame, count: count, anchor: anchor),
+        let settings = preferences()
+        let step = anchor == nil ? settings.moveStep : settings.resizeStep
+        try windows.setFrame(WindowGeometry.apply(direction, to: window.frame, count: count, anchor: anchor, step: step),
                              of: window.id)
     }
 

@@ -97,14 +97,15 @@ check permission again.
 
 On first launch, enable VimdowManager in **System Settings → Privacy & Security →
 Accessibility**. The app can open this pane and recheck permission; denial does
-not terminate it. If you chose Later, press Control–Option–A to retry. Rebuilding
+not terminate it. If you chose Later, enter command mode and try a window command
+to retry, or open Vimdow Settings to check permission. Rebuilding
 or moving an ad-hoc signed app may leave an enabled entry that still identifies
 the previous binary. If permission is rejected despite the switch being on:
 
 1. Quit Vimdow.
 2. Select its Accessibility entry and remove it with the minus button.
 3. Use the plus button to add `/Applications/VimdowManager.app` and enable it.
-4. Relaunch that installed app, then press Control–Option–A.
+4. Relaunch that installed app, then enter command mode and try moving a window.
 
 Simply toggling the old entry may not refresh its stored signing requirement.
 
@@ -153,6 +154,32 @@ xcodebuild -project VimdowManager.xcodeproj -scheme VimdowPresentation \
 - **ShortcutController:** KeyboardShortcuts registration and held-key repetition.
 - **AppKit presentation:** native search text field and nonactivating numbered
   panels. UI and command coordination use `@MainActor`.
+- **SettingsStore / SettingsWindowController:** persisted preferences and the
+  native settings window. Global shortcuts use KeyboardShortcuts' saved values.
+
+## Settings
+
+Enter command mode (default **Control–Option–A**), release the keys, then press
+**comma (`,`)**. You can also use **Vimdow → Settings…** (**Command–,**) while
+Vimdow is active, or reopen the running app from `/Applications`.
+
+- **General:** set separate movement and resize steps (1–200 points, default 20),
+  choose **Fill Display** or **Keep Size** for a window's first visit to a display,
+  and check Accessibility permission. Keep Size preserves the offset from the
+  source display, fitting the window within smaller displays when necessary.
+- **Shortcuts:** customize or clear the five global shortcuts. Command-mode keys
+  remain fixed and are listed for reference. Duplicate assignments and detected
+  system/menu conflicts are rejected. If you clear the entry shortcut, reopen
+  Vimdow from Applications to reach Settings again.
+- Changes apply immediately and persist across launches. **Restore Defaults**
+  resets only the current tab. Invalid numeric input is not saved.
+- All Vimdow shortcuts are suspended while Settings has keyboard focus. Switching
+  to another app or closing Settings returns to normal mode. Settings can be used
+  without Accessibility permission.
+
+Returning to a previously visited display still restores its saved window frame.
+Changing the display-movement option clears that history. Settings use local
+`UserDefaults`; they are separate from the build-signing configuration.
 
 ## Controls
 
@@ -160,7 +187,7 @@ xcodebuild -project VimdowManager.xcodeproj -scheme VimdowPresentation \
 
 | Keys | Action |
 | --- | --- |
-| Control–Option–A | Enter command mode |
+| Control–Option–A | Enter command mode (customizable in Settings) |
 | Control–Shift–H / J | Focus the previous window, ordered by horizontal position |
 | Control–Shift–K / L | Focus the next window |
 
@@ -168,13 +195,14 @@ xcodebuild -project VimdowManager.xcodeproj -scheme VimdowPresentation \
 
 | Keys | Action |
 | --- | --- |
-| H / J / K / L | Move left / down / up / right by 20 points |
+| H / J / K / L | Move left / down / up / right by the configured step (default 20 points) |
 | Option–H / J / K / L | Resize, keeping the top-left corner fixed |
 | Shift–H / J / K / L | Resize, keeping the bottom-right corner fixed |
 | Digits, then a movement or resize | Repeat the operation, e.g. `12j` moves down 240 points |
 | Q, then 1–9 | Focus a numbered window and exit command mode |
 | Q again | Show the next page of up to nine windows, wrapping after the last page |
 | / | Search by application name |
+| , | Open Settings |
 | N / Shift–N | Next / previous match for the last search |
 | Control–Option–K / L | Move to the next display; restore its saved window frame, or fill it on the first visit |
 | Escape / . | Exit command mode |

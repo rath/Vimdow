@@ -78,12 +78,16 @@ targets:
     sources:
       - Tests/VimdowPresentationTests
       - VimdowManager/WindowPresentation.swift
+      - VimdowManager/SettingsWindowController.swift
+      - VimdowManager/SettingsStore.swift
+      - VimdowManager/ShortcutController.swift
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: rath.toys.VimdowPresentationTests
     dependencies:
       - target: VimdowCore
+      - package: KeyboardShortcuts
 schemes:
   VimdowManager:
     build:
