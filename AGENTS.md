@@ -79,7 +79,7 @@ Do not modify the TCC database. If Accessibility rejects the app despite an
 enabled switch, have the user remove and re-add the installed app in System
 Settings. A signing change may require this once.
 
-Use `docs/validation.md` for manual checks: enter command mode with
+Use `docs/testing.md` for manual checks: enter command mode with
 Control–Option–A, test movement/resizing, `/` search with Korean input and
 Enter/Escape, and Control–Option–K/L for display round trips. Automated tests do
 not establish live Accessibility or multi-monitor behavior. Report what was

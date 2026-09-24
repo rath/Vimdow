@@ -132,7 +132,7 @@ xcodebuild -project VimdowManager.xcodeproj -scheme VimdowShortcuts \
 It checks modifier-free shortcuts, repeated mode entry, and registration cleanup
 when entering search, returning to normal mode, and stopping. Actual key-repeat
 behavior, IME input, and controlling other apps require the manual checks in
-[docs/validation.md](docs/validation.md).
+[docs/testing.md](docs/testing.md).
 
 The AppKit presentation tests briefly show the search panel on an interactive
 Mac. They check focus, prevent accidental submission during activation, and
