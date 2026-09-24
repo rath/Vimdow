@@ -83,10 +83,15 @@ out of the tracked template and `project.yml`. Remove the local file to restore
 ad-hoc signing. Signed public distribution and notarization are separate from
 this development build.
 
-Using a stable signing identity and bundle identifier lets macOS recognize
-updated builds for Accessibility permission. Switching from ad-hoc signing may
-require removing and re-adding the app **once** using the steps below. Install
-and launch successive builds at the same `/Applications/VimdowManager.app` path.
+**To avoid re-registering Accessibility permission after each rebuild, sign
+every build with the same Apple Development certificate and keep the bundle
+identifier unchanged.** With this stable signing identity, macOS can normally
+recognize updated builds and retain permission. Ad-hoc signing does not provide
+this continuity when the binary changes.
+
+Switching from ad-hoc signing may require removing and re-adding the app **once**
+using the steps below. Install and launch successive builds at the same
+`/Applications/VimdowManager.app` path.
 When the certificate expires or is replaced, update the local fingerprint and
 check permission again.
 
