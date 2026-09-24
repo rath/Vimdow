@@ -1,85 +1,168 @@
-# About Vimdow
+# Vimdow
 
-Vimdow is a window management application for macOS.
+Vimdow is a keyboard-driven window manager for macOS. Move, resize, and switch
+windows using Vim-style commands.
 
-# Development
+## Requirements
 
-The app requires macOS 12.4 or later. Building requires Xcode with its command
-line tools selected, XcodeGen **2.46.0**, and CocoaPods **1.16.2**.
+- **Running:** macOS **14 or later**, with Accessibility permission.
+- **Building:** **Xcode 27.0** (Swift 6.4, Swift 6 language mode), selected with
+  `xcode-select` or `DEVELOPER_DIR`. Xcode itself requires macOS 26.6 or later.
+- **Project generation:** [XcodeGen 2.46.0](https://github.com/yonaskolb/XcodeGen/releases/tag/2.46.0), on your `PATH`.
 
-Install XcodeGen from its [2.46.0 release](https://github.com/yonaskolb/XcodeGen/releases/tag/2.46.0)
-and put `xcodegen` on your `PATH`. With a Ruby environment installed, install
-CocoaPods using:
+Dependencies use Swift Package Manager. Ruby and CocoaPods are no longer required.
+KeyboardShortcuts is pinned to **3.1.0**.
 
-```sh
-gem install cocoapods -v 1.16.2
-```
+## Development
 
-Generate the project and install the locked dependencies:
+From a fresh checkout:
 
 ```sh
 ./scripts/setup.sh
-open VimdowManager.xcworkspace
+open VimdowManager.xcodeproj
 ```
 
-The setup script checks tool versions, runs XcodeGen, then runs `pod install`.
-It can be invoked from any directory and stops if a step fails. It does not
-install tools automatically.
+Setup checks tool versions, generates the Xcode project, restores the tracked
+`Package.resolved`, and resolves the pinned dependencies. The first run needs
+network access. The script works from any directory and stops on failure; it
+does not install tools automatically.
 
-`project.yml` is the source of truth for project settings. Generated Xcode
-projects, workspaces, and Pods are ignored by Git. Edit project settings in
-the YAML and rerun setup after changing settings or adding/removing source
-files. Settings changed only in Xcode are overwritten on regeneration.
-Keep `Podfile.lock` in Git and use `pod install` to preserve dependency versions.
+When upgrading from the CocoaPods version, close the old `.xcworkspace` and open
+the generated `.xcodeproj`. Old ignored `Pods/` and workspace files are unused.
 
-Build either configuration from the repository root:
+### Source of truth
+
+- `project.yml` defines targets, build settings, schemes, and package versions.
+- `Package.resolved` at the repository root locks dependency revisions. Setup
+  copies it into the generated project's SwiftPM directory and verifies that
+  resolution leaves it unchanged.
+- Generated Xcode projects, workspaces, and `DerivedData/` stay out of Git.
+- After adding/removing sources or changing project settings, rerun setup.
+  Changes made only through Xcode project settings are overwritten.
+
+To deliberately update a dependency, edit its version in `project.yml`, run
+`xcodegen generate`, and resolve it with `xcodebuild -resolvePackageDependencies
+-project VimdowManager.xcodeproj -scheme VimdowManager -derivedDataPath DerivedData`.
+Review the generated `VimdowManager.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`
+and copy it to the repository root. Review both files together, then rerun setup.
+
+### Build
 
 ```sh
-xcodebuild -workspace VimdowManager.xcworkspace -scheme VimdowManager \
-  -configuration Debug -derivedDataPath DerivedData build
-xcodebuild -workspace VimdowManager.xcworkspace -scheme VimdowManager \
-  -configuration Release -derivedDataPath DerivedData build
+xcodebuild -project VimdowManager.xcodeproj -scheme VimdowManager \
+  -configuration Debug -derivedDataPath DerivedData \
+  -onlyUsePackageVersionsFromResolvedFile build
+xcodebuild -project VimdowManager.xcodeproj -scheme VimdowManager \
+  -configuration Release -derivedDataPath DerivedData \
+  -onlyUsePackageVersionsFromResolvedFile build
 ```
 
-Both configurations use ad-hoc signing by default, without a development team.
-For a build signed with your installed development certificate, pass your own
-team ID as a command-line setting:
+Debug builds for the host architecture. Release builds support Apple Silicon
+and Intel. The app bundle is under `DerivedData/Build/Products/<configuration>/`.
+
+### Signing and permissions
+
+Both configurations default to **ad-hoc signing**, without a development team.
+For your installed development certificate, override signing on the command line:
 
 ```sh
-xcodebuild -workspace VimdowManager.xcworkspace -scheme VimdowManager \
+xcodebuild -project VimdowManager.xcodeproj -scheme VimdowManager \
   -configuration Debug -derivedDataPath DerivedData \
   DEVELOPMENT_TEAM=YOUR_TEAM_ID CODE_SIGN_IDENTITY="Apple Development" build
 ```
 
-Personal signing settings belong in the build command, not in `project.yml`.
+Keep personal signing settings outside `project.yml`. Signed public distribution
+and notarization are separate from this development build.
 
-# Modes 
+On first launch, enable VimdowManager in **System Settings → Privacy & Security →
+Accessibility**. The app can open this pane and recheck permission; denial does
+not terminate it. If you chose Later, press Control–Option–A to retry. Rebuilding
+or moving an ad-hoc signed app may require removing and re-adding its entry.
 
-## Command mode (Control-Shift-A)
- - hjkl: Move current window's position 
- - `<shift>`-hjkl: Resize current window based on upper-left
- - `<option>`-hjkl: Resize current window based on bottom-right
- - q + [1-9]: Switch window by displaying shortcut numbers order by x coordinates
-    * If you have opened windows more than 9, then simply press 'q' again
- - /: Switch windows by searching app name (e.g. Finder, Chrome, Terminal)
-    * n: switch in search result forward
-    * N: switch in search result backward
- - x: Quit Vimdow
- - `<escape>`: Exit command mode
+### Tests
 
-## Normal mode 
- - `<option>`-a: Enter command mode
- - `<control>`-`<shift>`-hj: Change window focus to the left
- - `<control>`-`<shift>`-kl: Change window focus to the right
+Pure command and geometry tests run without launching Vimdow or granting
+Accessibility permission:
 
-# Notes
-- Try to [0-9]+j or [0-9]+h if you want wide step. 
+```sh
+xcodebuild -project VimdowManager.xcodeproj -scheme VimdowCore \
+  -destination 'platform=macOS' -derivedDataPath DerivedData \
+  -onlyUsePackageVersionsFromResolvedFile test
+```
 
-# Roadmap 
-- Preferences
+The separate shortcut integration test **briefly registers the real global
+shortcuts**. Run it on an interactive Mac with other Vimdow instances closed:
 
-# Credits 
-- [MASShortcut](https://github.com/shpakovski/MASShortcut)
+```sh
+xcodebuild -project VimdowManager.xcodeproj -scheme VimdowShortcuts \
+  -destination 'platform=macOS' -derivedDataPath DerivedData \
+  -onlyUsePackageVersionsFromResolvedFile test
+```
 
-# Copyright 
-- Vimdow is licensed under BSD license.
+It checks modifier-free shortcuts, repeated mode entry, and registration cleanup
+when entering search, returning to normal mode, and stopping. Actual key-repeat
+behavior, IME input, and controlling other apps require the manual checks in
+[docs/validation.md](docs/validation.md).
+
+### Architecture
+
+- **VimdowCore:** command state, repeat counts, window selection, and geometry;
+  tested with Swift Testing and fake window/presentation implementations.
+- **WindowService:** checked Accessibility calls and Quartz window discovery,
+  with bounded AX messaging timeouts. Window identity uses AX elements, so equal
+  positions and sizes do not confuse focus selection.
+- **ShortcutController:** KeyboardShortcuts registration and held-key repetition.
+- **AppKit presentation:** native search text field and nonactivating numbered
+  panels. UI and command coordination use `@MainActor`.
+
+## Controls
+
+### Normal mode
+
+| Keys | Action |
+| --- | --- |
+| Control–Option–A | Enter command mode |
+| Control–Shift–H / J | Focus the previous window, ordered by horizontal position |
+| Control–Shift–K / L | Focus the next window |
+
+### Command mode
+
+| Keys | Action |
+| --- | --- |
+| H / J / K / L | Move left / down / up / right by 20 points |
+| Option–H / J / K / L | Resize, keeping the top-left corner fixed |
+| Shift–H / J / K / L | Resize, keeping the bottom-right corner fixed |
+| Digits, then a movement or resize | Repeat the operation, e.g. `12j` moves down 240 points |
+| Q, then 1–9 | Focus a numbered window and exit command mode |
+| Q again | Show the next page of up to nine windows, wrapping after the last page |
+| / | Search by application name |
+| N / Shift–N | Next / previous match for the last search |
+| Control–Option–K / L | Move to and fill the next display |
+| Escape / . | Exit command mode |
+| X | Quit Vimdow |
+
+H/J/K/L and the normal-mode focus shortcuts repeat while held, using macOS key
+repeat settings. The key bindings use physical ANSI key positions, as in the
+original app. Search accepts normal text input, including input methods; Enter
+submits and Escape cancels. Cancelling returns to command mode and restores the
+previous window when it is still available. Window operations unsupported by a
+particular app fail safely with a beep and a diagnostic in Console.
+
+While in command mode, number prefixes also apply to the Control–Shift focus
+shortcuts and N/Shift–N. Plain focus cycling stops at either end; search cycles
+through matching applications.
+In numbered selection, 0 and numbers without a displayed window are ignored.
+
+The legacy F9/F10 volume shortcuts and F13 iTunes control have been removed.
+
+## Credits
+
+- Original implementation: Jang Ho Hwang (2013–2014).
+- Original command-window implementation: Yoo Yong-Ha (2013).
+- [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts)
+- The original Objective-C version used [MASShortcut](https://github.com/shpakovski/MASShortcut).
+
+## Copyright
+
+Vimdow is licensed under the BSD license. Original authorship and credits are
+preserved in the app's bundled credits.

@@ -1,0 +1,90 @@
+# Migration validation
+
+The behavior baseline is the Objective-C implementation at `a5cc1b3`.
+The Swift migration targets macOS 14+, preserves window-management commands,
+and removes F9/F10 audio control and F13 iTunes control.
+
+## Automated checks
+
+Run setup and the Debug/Release build commands in the README. Run the
+`VimdowCore` test scheme for pure logic and the `VimdowShortcuts` scheme on an
+interactive Mac for real shortcut registration and teardown.
+
+The core suite covers:
+
+- Repeat-prefix consumption and integer overflow.
+- Movement and both resize anchors, including minimum positive dimensions.
+- Quartz/AppKit coordinates and displays with negative origins.
+- Empty window lists, window identity, focus boundaries, and case-insensitive
+  search with wraparound.
+- Idempotent command-mode entry and cleanup on mode exit.
+- Numbered selection beyond nine windows, the last partial page, and wrapping.
+- Search cancellation, repeated identical queries, and no-result focus restoration.
+- Permission denial, vanished windows, unsupported operations, and AX failures.
+
+The shortcut suite briefly registers all actual bindings and verifies that
+modifier-free keys are released in normal/search modes and at shutdown.
+It does not synthesize keystrokes or control other applications.
+
+### Recorded migration checks — 2026-09-24
+
+Environment: Apple Silicon, macOS 26.6.2, Xcode 27.0 (27A266a), Swift 6.4,
+XcodeGen 2.46.0, KeyboardShortcuts 3.1.0.
+
+- Debug app build and all 11 core tests passed (including four parameterized
+  AX failure cases).
+- The separate global-shortcut registration/cleanup test passed.
+- Release built successfully both in the working tree and in a clean source
+  copy with no Pods, generated project, workspace, or build artifacts.
+- Setup succeeded from outside the repository. The generated and canonical
+  dependency lock files matched byte for byte, including in the clean copy.
+- Release contains arm64 and x86_64, declares macOS 14.0 minimum, retains bundle
+  ID `rath.toys.VimdowManager`, and has ad-hoc signing with no team identifier.
+- The final bundle includes the icon, credits, KeyboardShortcuts resources and
+  license notice, and contains no old nib or MASShortcut bundle.
+
+**Not executed:** the manual matrix below, including Accessibility control of
+other apps, real held-key behavior, IME interaction, mixed-display setups, and
+runtime checks on macOS 14 or 27. Automated registration tests do not establish
+those behaviors. Xcode emitted its standard unused-AppIntents metadata warning;
+the shortcut test also logged system `linkd` connection diagnostics while passing.
+
+## Manual acceptance matrix
+
+Run these on macOS 14 and the current supported macOS, with Accessibility
+permission granted to the exact app bundle being tested. Record the OS and
+architecture; a successful cross-compile does not establish runtime support.
+
+| Scenario | Expected result |
+| --- | --- |
+| First launch without permission | Guidance appears; Later leaves the app running; Control–Option–A offers another check. |
+| Grant permission while running | The next command works without an app restart. |
+| Revoke permission during command mode | The next command exits the mode and offers guidance; plain keys are released. |
+| Enter command mode repeatedly | Each key triggers one action; a numeric prefix survives redundant entry. |
+| `hjkl`, `12j`, held movement keys | Correct direction and 20-point units; held keys follow system repeat timing. |
+| Option/Shift resize in all directions | Top-left/bottom-right anchors respectively remain fixed, subject to the target app's size constraints. |
+| Escape and period | Plain letters and numbers immediately return to the focused app. |
+| Q with 0, 1, 9, 10, 12, and 19 windows | At most nine labels; paging wraps; only visible numbers select; the last page selects the correct window. |
+| Number selection | The selected window activates and the pointer moves to its center. |
+| `/`, Enter, Escape, N, Shift–N | Search by app name, next/previous matching window, cancellation and focus restoration work. |
+| Korean IME and English search input | Marked text composition works; Escape first cancels composition; normal copy/paste works. |
+| No search match / target closes during search | No crash; restore the previous window if still available. |
+| Finder, Terminal, browser; dialogs and nonresizable windows | Supported operations work; unsupported operations fail safely. |
+| Two windows with identical positions and dimensions | Focus identity is not inferred from geometry. |
+| Mixed Retina/non-Retina displays; display above/left of primary | Labels use the correct coordinates and remain sharp; next-display movement fills the intended display. |
+| Spaces, full-screen apps, Stage Manager | Only eligible visible windows are offered; labels do not steal focus. |
+| Screen unplugged; target closes between scan and selection | No crash, stale labels are removed. |
+| F9/F10/F13 | Vimdow no longer registers these keys. |
+
+## Known constraints
+
+- Other apps may reject Accessibility operations or enforce their own minimum
+  window size. AX errors are logged under subsystem `rath.toys.VimdowManager`.
+- Window discovery combines on-screen Quartz bounds with public AX windows.
+  It does not use private window identifiers or require screen capture for previews.
+- Next-display movement deliberately uses the full display bounds, matching the
+  original behavior, rather than introducing a new tiling policy.
+- Ad-hoc development builds may need their Accessibility entry re-added after
+  rebuilding or moving the bundle.
+- Signed distribution, notarization, preferences, login items, and automatic
+  updates are outside this migration.
