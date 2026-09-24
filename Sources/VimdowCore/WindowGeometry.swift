@@ -21,10 +21,23 @@ public enum WindowGeometry {
         }
     }
 
-    public static func nextScreen(for frame: CGRect, screens: [CGRect]) -> CGRect? {
+    public static func screenIndex(for frame: CGRect, screens: [CGRect]) -> Int? {
         guard !screens.isEmpty else { return nil }
-        let current = screens.lastIndex(where: { $0.contains(frame.origin) }) ?? 0
-        return screens[(current + 1) % screens.count]
+        // A window can straddle displays or have its top-left corner off screen.
+        // Prefer the display containing most of it, then the nearest display.
+        func area(_ screen: CGRect) -> CGFloat {
+            let overlap = screen.intersection(frame)
+            return overlap.isNull ? 0 : overlap.width * overlap.height
+        }
+        func distance(_ screen: CGRect) -> CGFloat {
+            let dx = max(screen.minX - frame.midX, 0, frame.midX - screen.maxX)
+            let dy = max(screen.minY - frame.midY, 0, frame.midY - screen.maxY)
+            return dx * dx + dy * dy
+        }
+        return screens.indices.max { lhs, rhs in
+            let left = area(screens[lhs]), right = area(screens[rhs])
+            return left == right ? distance(screens[lhs]) > distance(screens[rhs]) : left < right
+        }
     }
 
     /// AX/Quartz uses a top-left origin; AppKit uses the primary display's bottom-left origin.

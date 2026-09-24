@@ -95,16 +95,31 @@ final class WindowService: WindowControlling {
               desired.width > 0, desired.height > 0 else { throw WindowFailure.unsupportedOperation }
         if current.size != desired.size { try requireSettable(element, kAXSizeAttribute) }
         if current.origin != desired.origin { try requireSettable(element, kAXPositionAttribute) }
-        if current.size != desired.size {
+        // Move before resizing: apps can constrain size to the current display.
+        // Resizing on the smaller source display can otherwise prevent a window
+        // from filling the larger destination display.
+        if current.origin != desired.origin {
+            try setPosition(desired.origin, of: element)
+        }
+        let moved = try frame(of: element)
+        if moved.size != desired.size {
+            try requireSettable(element, kAXSizeAttribute)
             var size = desired.size
             guard let value = AXValueCreate(.cgSize, &size) else { throw WindowFailure.unsupportedOperation }
             try check(AXUIElementSetAttributeValue(element, kAXSizeAttribute as CFString, value))
         }
-        if current.origin != desired.origin {
-            var position = desired.origin
-            guard let value = AXValueCreate(.cgPoint, &position) else { throw WindowFailure.unsupportedOperation }
-            try check(AXUIElementSetAttributeValue(element, kAXPositionAttribute as CFString, value))
+        // Moving or resizing may adjust the origin to keep the old frame on
+        // screen. Reapply the requested origin after the final size is in place.
+        if try frame(of: element).origin != desired.origin {
+            try requireSettable(element, kAXPositionAttribute)
+            try setPosition(desired.origin, of: element)
         }
+    }
+
+    private func setPosition(_ origin: CGPoint, of element: AXUIElement) throws {
+        var position = origin
+        guard let value = AXValueCreate(.cgPoint, &position) else { throw WindowFailure.unsupportedOperation }
+        try check(AXUIElementSetAttributeValue(element, kAXPositionAttribute as CFString, value))
     }
 
     func screenFrames() -> [CGRect] {

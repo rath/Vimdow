@@ -33,10 +33,14 @@ import Testing
 @Test func screensUseQuartzCoordinatesIncludingNegativeOrigins() {
     let primary = CGRect(x: 0, y: 0, width: 1440, height: 900)
     let left = CGRect(x: -1920, y: -180, width: 1920, height: 1080)
-    #expect(WindowGeometry.nextScreen(for: CGRect(x: -1000, y: 0, width: 200, height: 200),
-                                      screens: [primary, left]) == primary)
-    #expect(WindowGeometry.nextScreen(for: primary, screens: [primary, left]) == left)
-    #expect(WindowGeometry.nextScreen(for: primary, screens: []) == nil)
+    #expect(WindowGeometry.screenIndex(for: CGRect(x: -1000, y: 0, width: 200, height: 200),
+                                       screens: [primary, left]) == 1)
+    #expect(WindowGeometry.screenIndex(for: primary, screens: [primary, left]) == 0)
+    #expect(WindowGeometry.screenIndex(for: primary, screens: []) == nil)
+    #expect(WindowGeometry.screenIndex(for: CGRect(x: -20, y: 100, width: 600, height: 300),
+                                       screens: [primary, left]) == 0)
+    #expect(WindowGeometry.screenIndex(for: CGRect(x: -2200, y: 0, width: 200, height: 200),
+                                       screens: [primary, left]) == 1)
     #expect(WindowGeometry.appKitFrame(from: left, primaryHeight: 900) == CGRect(x: -1920, y: 0, width: 1920, height: 1080))
 }
 
@@ -52,6 +56,82 @@ import Testing
     #expect(WindowSelection.index(in: list, current: nil, step: 1, query: "missing") == nil)
 }
 
+@Test @MainActor func displayRoundTripRestoresEachDisplaysLatestFrame() {
+    let windows = FakeWindows()
+    windows.screens.append(CGRect(x: -1440, y: -300, width: 1440, height: 900))
+    let original = windows.list[0]
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    controller.handle(.enter)
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == windows.screens[1])
+    let edited = CGRect(x: -1300, y: -200, width: 900, height: 600)
+    windows.list[0] = WindowInfo(id: original.id, name: original.name, frame: edited)
+    controller.handle(.escape)
+    controller.handle(.enter)
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == original.frame)
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == edited)
+    #expect(ui.errors.isEmpty)
+}
+
+@Test @MainActor func displayHistoryIsIndependentForEachWindowAndCyclesThreeDisplays() {
+    let windows = FakeWindows()
+    windows.screens += [CGRect(x: -1440, y: 0, width: 1440, height: 900),
+                        CGRect(x: 0, y: -1200, width: 1920, height: 1200)]
+    let originals = Array(windows.list.prefix(2))
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation())
+    controller.handle(.enter)
+    controller.handle(.nextScreen)
+    windows.list.swapAt(0, 1)
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == windows.screens[1])
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == windows.screens[2])
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == originals[1].frame)
+    windows.list.swapAt(0, 1)
+    controller.handle(.nextScreen)
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == originals[0].frame)
+}
+
+@Test @MainActor func displayChangesClearHistoryAndSingleDisplayDoesNotResize() {
+    let windows = FakeWindows()
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation())
+    controller.handle(.enter)
+    controller.handle(.nextScreen)
+    #expect(windows.frames.isEmpty)
+    windows.screens.append(CGRect(x: 1920, y: 0, width: 1440, height: 900))
+    controller.handle(.nextScreen)
+    windows.screens[0].size.height = 1200
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == windows.screens[0])
+    windows.screens = []
+    let count = windows.frames.count
+    controller.handle(.nextScreen)
+    #expect(windows.frames.count == count)
+}
+
+@Test @MainActor func failedDisplayMoveDoesNotSaveAnUnvisitedFrame() {
+    let windows = FakeWindows()
+    windows.screens.append(CGRect(x: 1920, y: 0, width: 1440, height: 900))
+    let original = windows.list[0]
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    controller.handle(.enter)
+    windows.frameFailure = .unsupportedOperation
+    controller.handle(.nextScreen)
+    #expect(windows.frames.isEmpty)
+    #expect(ui.errors.last as? WindowFailure == .unsupportedOperation)
+    windows.frameFailure = nil
+    // A manual move after the failed command must not restore a phantom visit.
+    windows.list[0] = WindowInfo(id: original.id, name: original.name, frame: windows.screens[1])
+    controller.handle(.nextScreen)
+    #expect(windows.frames.last == windows.screens[0])
+}
+
 @MainActor
 private final class FakeWindows: WindowControlling {
     var list = (0..<12).map { index in
@@ -62,6 +142,8 @@ private final class FakeWindows: WindowControlling {
     var focused: [UUID] = []
     var frames: [CGRect] = []
     var pointerMoves = 0
+    var screens = [CGRect(x: 0, y: 0, width: 1920, height: 1080)]
+    var frameFailure: WindowFailure?
 
     func check() throws { if let failure { throw failure } }
     func windows() throws -> [WindowInfo] { try check(); return list }
@@ -76,8 +158,16 @@ private final class FakeWindows: WindowControlling {
         focused.append(id)
         if movePointer { pointerMoves += 1 }
     }
-    func setFrame(_ frame: CGRect, of id: UUID) throws { try check(); frames.append(frame) }
-    func screenFrames() -> [CGRect] { [CGRect(x: 0, y: 0, width: 1920, height: 1080)] }
+    func setFrame(_ frame: CGRect, of id: UUID) throws {
+        try check()
+        if let frameFailure { throw frameFailure }
+        frames.append(frame)
+        if let index = list.firstIndex(where: { $0.id == id }) {
+            let window = list[index]
+            list[index] = WindowInfo(id: id, name: window.name, frame: frame, isFocused: window.isFocused)
+        }
+    }
+    func screenFrames() -> [CGRect] { screens }
 }
 
 @MainActor

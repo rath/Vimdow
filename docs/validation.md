@@ -15,6 +15,9 @@ The core suite covers:
 - Repeat-prefix consumption and integer overflow.
 - Movement and both resize anchors, including minimum positive dimensions.
 - Quartz/AppKit coordinates and displays with negative origins.
+- Display round trips restore each window's per-display position and size;
+  manual adjustments, three-display cycles, failed moves, layout changes, and
+  single-display no-ops are covered.
 - Empty window lists, window identity, focus boundaries, and case-insensitive
   search with wraparound.
 - Idempotent command-mode entry and cleanup on mode exit.
@@ -63,6 +66,14 @@ runtime checks on macOS 14 or 27. Automated registration tests do not establish
 those behaviors. Xcode emitted its standard unused-AppIntents metadata warning;
 the shortcut test also logged system `linkd` connection diagnostics while passing.
 
+### Display restoration follow-up — 2026-09-24
+
+All 15 core tests and the Release app build passed after adding per-display
+frame history. AX frame updates now move before resizing, then reapply the
+origin if the target app changed it. This avoids requesting the destination's
+size while the window is still on the source display. Live AX behavior across
+different display sizes still requires the manual checks below.
+
 ## Manual acceptance matrix
 
 Run these on macOS 14 and the current supported macOS, with Accessibility
@@ -85,7 +96,9 @@ architecture; a successful cross-compile does not establish runtime support.
 | No search match / target closes during search | No crash; restore the previous window if still available. |
 | Finder, Terminal, browser; dialogs and nonresizable windows | Supported operations work; unsupported operations fail safely. |
 | Two windows with identical positions and dimensions | Focus identity is not inferred from geometry. |
-| Mixed Retina/non-Retina displays; display above/left of primary | Labels use the correct coordinates and remain sharp; next-display movement fills the intended display. |
+| Mixed Retina/non-Retina displays; display above/left of primary | Labels use the correct coordinates and remain sharp; first visits fill the intended display and return visits restore the previous position and size. Check small-to-large and large-to-small moves. |
+| Adjust a window on either display, then cycle displays | Each window restores its most recent frame on each display independently. |
+| One display; display layout or resolution changed | One display is a no-op; layout changes clear remembered frames. |
 | Spaces, full-screen apps, Stage Manager | Only eligible visible windows are offered; labels do not steal focus. |
 | Screen unplugged; target closes between scan and selection | No crash, stale labels are removed. |
 | F9/F10/F13 | Vimdow no longer registers these keys. |
@@ -96,8 +109,9 @@ architecture; a successful cross-compile does not establish runtime support.
   window size. AX errors are logged under subsystem `rath.toys.VimdowManager`.
 - Window discovery combines on-screen Quartz bounds with public AX windows.
   It does not use private window identifiers or require screen capture for previews.
-- Next-display movement deliberately uses the full display bounds, matching the
-  original behavior, rather than introducing a new tiling policy.
+- First visits to a display use its full bounds. Return visits restore the
+  frame saved when that window last left the display. History lasts for the
+  running session and is cleared when the display layout changes.
 - Ad-hoc development builds may need their Accessibility entry re-added after
   rebuilding or moving the bundle.
 - Signed distribution, notarization, preferences, login items, and automatic

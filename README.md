@@ -176,7 +176,7 @@ xcodebuild -project VimdowManager.xcodeproj -scheme VimdowPresentation \
 | Q again | Show the next page of up to nine windows, wrapping after the last page |
 | / | Search by application name |
 | N / Shift–N | Next / previous match for the last search |
-| Control–Option–K / L | Move to and fill the next display |
+| Control–Option–K / L | Move to the next display; restore its saved window frame, or fill it on the first visit |
 | Escape / . | Exit command mode |
 | X | Quit Vimdow |
 
@@ -191,6 +191,12 @@ While in command mode, number prefixes also apply to the Control–Shift focus
 shortcuts and N/Shift–N. Plain focus cycling stops at either end; search cycles
 through matching applications.
 In numbered selection, 0 and numbers without a displayed window are ignored.
+
+Display movement remembers each window's last position and size on each display
+while Vimdow is running. Returning to a display restores that frame, including
+manual adjustments made before leaving it. A single display is left unchanged.
+Changing the display layout or resolution clears this history. Restoration is
+subject to the target app's size and position constraints.
 
 The legacy F9/F10 volume shortcuts and F13 iTunes control have been removed.
 

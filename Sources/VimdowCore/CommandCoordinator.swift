@@ -8,6 +8,8 @@ public final class CommandCoordinator {
     private var pageOffset: Int?
     private var page: [WindowInfo] = []
     private var previousWindow: UUID?
+    private var screenLayout: [CGRect] = []
+    private var screenHistory: [UUID: [Int: CGRect]] = [:]
     private let windows: any WindowControlling
     private let presentation: any CommandPresenting
 
@@ -75,14 +77,28 @@ public final class CommandCoordinator {
             let window = try windows.focusedWindow()
             leaveNumbers()
             prefix.reset()
-            if let frame = WindowGeometry.nextScreen(for: window.frame, screens: windows.screenFrames()) {
-                try windows.setFrame(frame, of: window.id)
-            }
+            try moveToNextScreen(window)
         case .quit:
             transition(to: .normal)
             presentation.quit()
         default: break
         }
+    }
+
+    private func moveToNextScreen(_ window: WindowInfo) throws {
+        let screens = windows.screenFrames()
+        if screens != screenLayout {
+            screenLayout = screens
+            screenHistory.removeAll()
+        }
+        guard screens.count > 1,
+              let current = WindowGeometry.screenIndex(for: window.frame, screens: screens) else { return }
+        let next = (current + 1) % screens.count
+        let target = screenHistory[window.id]?[next] ?? screens[next]
+        try windows.setFrame(target, of: window.id)
+        // Only record departures after successful moves. Each window maintains
+        // independent geometry, including manual edits made on each display.
+        screenHistory[window.id, default: [:]][current] = window.frame
     }
 
     public func finishSearch(_ query: String?) {
