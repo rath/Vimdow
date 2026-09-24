@@ -72,6 +72,18 @@ targets:
     dependencies:
       - target: VimdowCore
       - package: KeyboardShortcuts
+  VimdowPresentationTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Tests/VimdowPresentationTests
+      - VimdowManager/WindowPresentation.swift
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: rath.toys.VimdowPresentationTests
+    dependencies:
+      - target: VimdowCore
 schemes:
   VimdowManager:
     build:
@@ -99,4 +111,11 @@ schemes:
         VimdowCore: all
     test:
       targets: [VimdowShortcutTests]
+      parallelizable: false
+  VimdowPresentation:
+    build:
+      targets:
+        VimdowCore: all
+    test:
+      targets: [VimdowPresentationTests]
       parallelizable: false

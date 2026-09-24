@@ -112,6 +112,16 @@ when entering search, returning to normal mode, and stopping. Actual key-repeat
 behavior, IME input, and controlling other apps require the manual checks in
 [docs/validation.md](docs/validation.md).
 
+The AppKit presentation tests briefly show the search panel on an interactive
+Mac. They check focus, prevent accidental submission during activation, and
+exercise Return/Escape with committed and marked text:
+
+```sh
+xcodebuild -project VimdowManager.xcodeproj -scheme VimdowPresentation \
+  -destination 'platform=macOS' -derivedDataPath DerivedData \
+  -onlyUsePackageVersionsFromResolvedFile test
+```
+
 ### Architecture
 
 - **VimdowCore:** command state, repeat counts, window selection, and geometry;

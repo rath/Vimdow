@@ -26,6 +26,20 @@ The shortcut suite briefly registers all actual bindings and verifies that
 modifier-free keys are released in normal/search modes and at shutdown.
 It does not synthesize keystrokes or control other applications.
 
+The `VimdowPresentation` scheme shows the real AppKit search panel. It verifies
+that showing/changing the first responder does not submit a query, that the
+panel takes keyboard focus while other apps can remain active, that Return
+submits the live field-editor text once, and that marked text keeps Return and
+Escape within the input method. Testing with an actual Korean input source
+remains part of the manual matrix.
+
+The search regression was reproduced in a standalone AppKit app: assigning the
+first responder called `textDidEndEditing`, which submitted an empty query and
+immediately hid the panel. Submission now uses explicit Return handling, and
+the panel takes keyboard focus without depending on app activation. All three
+presentation tests passed after the fix, and a standalone launch confirmed the
+panel remained visible and key after showing.
+
 ### Recorded migration checks — 2026-09-24
 
 Environment: Apple Silicon, macOS 26.6.2, Xcode 27.0 (27A266a), Swift 6.4,

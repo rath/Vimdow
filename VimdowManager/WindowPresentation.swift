@@ -47,8 +47,9 @@ final class SearchPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
 
     init() {
         super.init(contentRect: CGRect(x: 0, y: 0, width: 480, height: 70),
-                   styleMask: [.borderless], backing: .buffered, defer: false)
+                   styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         isReleasedWhenClosed = false
+        hidesOnDeactivate = false
         level = .floating
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         backgroundColor = .windowBackgroundColor
@@ -59,8 +60,9 @@ final class SearchPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
         field.isBordered = false
         field.focusRingType = .none
         field.delegate = self
-        field.target = self
-        field.action = #selector(submit)
+        // Focus changes can end field editing while the panel is being activated.
+        // They must not submit a search; only an explicit Return command does that.
+        field.cell?.sendsActionOnEndEditing = false
         field.translatesAutoresizingMaskIntoConstraints = false
         contentView?.addSubview(field)
         if let contentView {
@@ -80,7 +82,8 @@ final class SearchPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
             setFrameOrigin(CGPoint(x: screen.visibleFrame.midX - frame.width / 2,
                                    y: screen.visibleFrame.midY - frame.height / 2))
         }
-        NSApp.activate(ignoringOtherApps: true)
+        // A global hotkey can show the panel while another app remains active.
+        // A nonactivating panel takes keyboard focus without an activation race.
         makeKeyAndOrderFront(nil)
         makeFirstResponder(field)
     }
@@ -90,14 +93,20 @@ final class SearchPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
         orderOut(nil)
     }
 
-    @objc private func submit() { finish(field.stringValue) }
-
     func windowDidResignKey(_ notification: Notification) { finish(nil) }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy selector: Selector) -> Bool {
-        guard selector == #selector(NSResponder.cancelOperation(_:)), !textView.hasMarkedText() else { return false }
-        finish(nil)
-        return true
+        guard !textView.hasMarkedText() else { return false }
+        switch selector {
+        case #selector(NSResponder.insertNewline(_:)):
+            finish(textView.string)
+            return true
+        case #selector(NSResponder.cancelOperation(_:)):
+            finish(nil)
+            return true
+        default:
+            return false
+        }
     }
 
     private func finish(_ query: String?) {
