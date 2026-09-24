@@ -41,6 +41,8 @@ targets:
       - path: VimdowManager
       - path: launcher.icns
         buildPhase: resources
+      - path: LICENSE
+        buildPhase: resources
     settings:
       base:
         INFOPLIST_FILE: VimdowManager/VimdowManager-Info.plist

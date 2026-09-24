@@ -235,7 +235,10 @@ The legacy F9/F10 volume shortcuts and F13 iTunes control have been removed.
 - [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts)
 - The original Objective-C version used [MASShortcut](https://github.com/shpakovski/MASShortcut).
 
-## Copyright
+## License
 
-Vimdow is licensed under the BSD license. Original authorship and credits are
-preserved in the app's bundled credits.
+Vimdow is licensed under the [BSD 3-Clause License](LICENSE) (`BSD-3-Clause`).
+The license and original author credits are included in the app bundle.
+
+KeyboardShortcuts is distributed under its own MIT license; see
+[ThirdPartyNotices.txt](VimdowManager/ThirdPartyNotices.txt).
