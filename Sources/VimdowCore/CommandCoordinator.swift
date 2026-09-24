@@ -20,6 +20,7 @@ public final class CommandCoordinator {
     private var lastDisplayBehavior: DisplayMoveBehavior?
     private var undoHistory = UndoHistory()
     private var openRun: StepRun?
+    private var pendingKey: SequenceKey?
     private let preferences: () -> WindowPreferences
     private let windows: any WindowControlling
     private let presentation: any CommandPresenting
@@ -32,6 +33,9 @@ public final class CommandCoordinator {
     }
 
     public func handle(_ command: Command) {
+        // A key waiting for a second one is settled by the very next command, whatever it is.
+        let pending = pendingKey
+        pendingKey = nil
         switch command {
         case .move, .resize: break
         default: openRun = nil // Any other command ends a run of repeated steps.
@@ -51,7 +55,7 @@ public final class CommandCoordinator {
                 try cycle(step: step, count: prefix.take())
             default:
                 guard mode == .command || mode == .quickSwitch else { return }
-                try handleModal(command)
+                if let pending { try complete(pending, with: command) } else { try handleModal(command) }
             }
         } catch {
             prefix.reset()
@@ -71,6 +75,8 @@ public final class CommandCoordinator {
                 let id = page[digit - 1].id
                 transition(to: .normal)
                 try windows.focus(id, movePointer: true)
+            } else if digit == 0, prefix.value == nil {
+                try place(.edge(.left)) // As in Vim, 0 is a motion unless it continues a count.
             } else {
                 prefix.append(digit)
             }
@@ -78,6 +84,11 @@ public final class CommandCoordinator {
             try transform(direction, anchor: nil)
         case .resize(let direction, let anchor):
             try transform(direction, anchor: anchor)
+        case .place(let placement):
+            try place(placement)
+        case .sequence(let key):
+            leaveNumbers()
+            if key != .only { pendingKey = key } // A lone O means nothing.
         case .undo:
             try restore(.undo)
         case .redo:
@@ -172,11 +183,8 @@ public final class CommandCoordinator {
         let settings = preferences()
         let step = anchor == nil ? settings.moveStep : settings.resizeStep
         var target = WindowGeometry.apply(direction, to: window.frame, count: count, anchor: anchor, step: step)
-        if anchor != nil, settings.resizeStopsAtDisplayEdges {
-            let displays = windows.visibleScreenFrames()
-            if let index = WindowGeometry.screenIndex(for: window.frame, screens: displays) {
-                target = WindowGeometry.limitGrowth(from: window.frame, to: target, within: displays[index])
-            }
+        if anchor != nil, settings.resizeStopsAtDisplayEdges, let display = usableDisplay(around: window.frame) {
+            target = WindowGeometry.limitGrowth(from: window.frame, to: target, within: display)
         }
         try windows.setFrame(target, of: window.id, animated: settings.animatesSteps)
         // Repeating a step without a count, as a held key does, extends one
@@ -187,6 +195,39 @@ public final class CommandCoordinator {
         guard target != window.frame else { return }
         undoHistory.record(window.frame, canGlide: true, for: window.id)
         openRun = run
+    }
+
+    /// Finishes a two-key command, or drops both keys when they form none.
+    private func complete(_ pending: SequenceKey, with command: Command) throws {
+        switch (pending, command) {
+        case (.g, .sequence(.g)): try place(.edge(.up))
+        case (.z, .sequence(.z)): try place(.center)
+        case (.window, .sequence(.only)): try place(.fill)
+        // Shift–H/J/K/L already resize, and a key combination registers only
+        // once, so after Control–W their resize command tiles instead.
+        case (.window, .resize(let direction, .bottomRight)): try place(.half(direction))
+        default: prefix.reset()
+        }
+    }
+
+    /// Moves or tiles the focused window on the display holding most of it.
+    private func place(_ placement: Placement) throws {
+        prefix.reset()
+        leaveNumbers()
+        openRun = nil
+        let window = try windows.focusedWindow()
+        guard let display = usableDisplay(around: window.frame) else { return }
+        let target = WindowGeometry.place(placement, frame: window.frame, within: display)
+        try windows.setFrame(target, of: window.id, animated: preferences().animatesSteps)
+        // Placing a window where it already is, like tiling a tiled window again, is not a change.
+        guard target != window.frame else { return }
+        undoHistory.record(window.frame, canGlide: true, for: window.id)
+    }
+
+    /// The area outside the menu bar and Dock of the display holding most of `frame`.
+    private func usableDisplay(around frame: CGRect) -> CGRect? {
+        let displays = windows.visibleScreenFrames()
+        return WindowGeometry.screenIndex(for: frame, screens: displays).map { displays[$0] }
     }
 
     /// Undoes or redoes changes to the focused window, committing the history
@@ -219,6 +260,7 @@ public final class CommandCoordinator {
         mode = next
         prefix.reset()
         openRun = nil
+        pendingKey = nil
         pageOffset = nil
         page = []
         presentation.hideGuides()

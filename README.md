@@ -154,7 +154,7 @@ xcodebuild -project VimdowManager.xcodeproj -scheme VimdowPresentation \
 ### Architecture
 
 - **VimdowCore:** command state, repeat counts, undo history, window selection,
-  geometry, and glide motion; tested with Swift Testing and fake
+  geometry, placement, and glide motion; tested with Swift Testing and fake
   window/presentation implementations.
 - **WindowService:** checked Accessibility calls and Quartz window discovery,
   with bounded AX messaging timeouts. Window identity uses AX elements, so equal
@@ -210,7 +210,12 @@ Changing the display-movement option clears that history. Settings use local
 | Option–H / J / K / L | Resize, keeping the top-left corner fixed |
 | Shift–H / J / K / L | Resize, keeping the bottom-right corner fixed |
 | Digits, then a movement or resize | Repeat the operation, e.g. `12j` moves down 240 points |
-| U / Control–R | Undo / redo the focused window's last move, resize, or display move |
+| U / Control–R | Undo / redo the focused window's last move, resize, snap, tiling, or display move |
+| 0 / $ (Shift–4) | Move to the left / right edge of the display, keeping the size |
+| G, then G / Shift–G | Move to the top / bottom edge, keeping the size |
+| Z, then Z | Center on the display, keeping the size |
+| Control–W, then Shift–H / J / K / L | Fill the left / bottom / top / right half of the display |
+| Control–W, then O | Fill the display |
 | Q, then 1–9 | Focus a numbered window and exit command mode |
 | Q again | Show the next page of up to nine windows, wrapping after the last page |
 | / | Search by application name |
@@ -231,8 +236,8 @@ repeat. Every glide ends exactly where the steps put the window. Turn off
 **Animate moving and resizing** in Settings to apply each step at once. Display
 moves are not animated.
 
-U undoes the focused window's last move, resize, or display move, and
-Control–R redoes it. Each window has its own history while Vimdow is running,
+U undoes the focused window's last move, resize, snap, tiling, or display move,
+and Control–R redoes it. Each window has its own history while Vimdow is running,
 and a count repeats either key, e.g. `3u`. Repeating one move or resize without
 a count, including holding its key, makes a single change. A count, any other
 command, or leaving command mode starts a new change, and a new change clears
@@ -240,6 +245,17 @@ the window's redo history. Undo restores the recorded frame even if the window
 was moved by other means since, and redo then returns it there. Undo and redo
 glide like the steps they pass and jump across display moves. Vimdow keeps the
 last 100 changes for each of the 50 windows changed or restored most recently.
+
+Snaps and tiling use the display holding most of the window, without the menu
+bar and the Dock, so `zz` also brings back a window that has strayed mostly off
+screen. `0`, `$`, `gg`, `G`, and `zz` keep the window's size, even when it is
+larger than the display; the halves and Control–W, O set it. A two-key command
+waits for its second key, and any other key cancels it and does nothing. A count
+before these commands is ignored, and 0 begins a snap only when no count is
+being typed, so `10j` still moves ten steps. Snaps and tiling glide like moves
+and resizes, each is one undo change, and one that changes nothing, such as
+tiling a tiled window again, does nothing. While command mode is active,
+Control–W does not reach the frontmost app.
 
 H/J/K/L and the normal-mode focus shortcuts repeat while held, using macOS key
 repeat settings. The key bindings use physical ANSI key positions, as in the

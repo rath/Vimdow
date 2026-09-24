@@ -31,6 +31,27 @@ public enum WindowGeometry {
         return CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
     }
 
+    /// Places `frame` on `bounds`, the usable area of its display. Edges and the
+    /// center keep the size; halves meet at a whole point, so they tile exactly.
+    public static func place(_ placement: Placement, frame: CGRect, within bounds: CGRect) -> CGRect {
+        func moved(to origin: CGPoint) -> CGRect { CGRect(origin: origin, size: frame.size) }
+        let splitX = bounds.midX.rounded(.down), splitY = bounds.midY.rounded(.down)
+        switch placement {
+        case .edge(.left): return moved(to: CGPoint(x: bounds.minX, y: frame.minY))
+        case .edge(.right): return moved(to: CGPoint(x: bounds.maxX - frame.width, y: frame.minY))
+        case .edge(.up): return moved(to: CGPoint(x: frame.minX, y: bounds.minY))
+        case .edge(.down): return moved(to: CGPoint(x: frame.minX, y: bounds.maxY - frame.height))
+        case .center:
+            return moved(to: CGPoint(x: (bounds.midX - frame.width / 2).rounded(),
+                                     y: (bounds.midY - frame.height / 2).rounded()))
+        case .half(.left): return CGRect(x: bounds.minX, y: bounds.minY, width: splitX - bounds.minX, height: bounds.height)
+        case .half(.right): return CGRect(x: splitX, y: bounds.minY, width: bounds.maxX - splitX, height: bounds.height)
+        case .half(.up): return CGRect(x: bounds.minX, y: bounds.minY, width: bounds.width, height: splitY - bounds.minY)
+        case .half(.down): return CGRect(x: bounds.minX, y: splitY, width: bounds.width, height: bounds.maxY - splitY)
+        case .fill: return bounds
+        }
+    }
+
     public static func transfer(_ frame: CGRect, from source: CGRect, to target: CGRect) -> CGRect {
         let width = min(frame.width, target.width)
         let height = min(frame.height, target.height)

@@ -13,8 +13,27 @@ public enum ResizeAnchor: Sendable {
     case topLeft, bottomRight
 }
 
+/// Where an absolute placement puts the focused window on its display.
+public enum Placement: Equatable, Sendable {
+    /// Against one edge, keeping the size.
+    case edge(Direction)
+    /// Centered, keeping the size.
+    case center
+    /// Filling the half of the display on that side.
+    case half(Direction)
+    /// Filling the display.
+    case fill
+}
+
+/// Keys that mean something only inside a two-key command: `g`, `z` and
+/// Control–W begin one, and `o` completes Control–W.
+public enum SequenceKey: Equatable, Sendable {
+    case g, z, window, only
+}
+
 public enum Command: Sendable {
     case enter, escape, digit(Int), move(Direction), resize(Direction, ResizeAnchor), undo, redo
+    case place(Placement), sequence(SequenceKey)
     case cycle(Int), quickSwitch, search, repeatSearch(Int), nextScreen, settings, quit
 }
 

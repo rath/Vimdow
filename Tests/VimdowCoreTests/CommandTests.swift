@@ -505,6 +505,202 @@ import Testing
     #expect(history.travel(.undo, count: 1, for: ids[0], from: frames[2])?.frame == frames[1])
 }
 
+@Test func placementsSnapTileAndCenterWithinTheUsableDisplay() {
+    // An odd-sized display whose center falls between whole points.
+    let bounds = CGRect(x: 1920, y: 25, width: 1435, height: 875)
+    let frame = CGRect(x: 2000, y: 100, width: 400, height: 300)
+    func place(_ placement: Placement, _ window: CGRect = frame) -> CGRect {
+        WindowGeometry.place(placement, frame: window, within: bounds)
+    }
+    #expect(place(.edge(.left)) == CGRect(x: 1920, y: 100, width: 400, height: 300))
+    #expect(place(.edge(.right)) == CGRect(x: 2955, y: 100, width: 400, height: 300))
+    #expect(place(.edge(.up)) == CGRect(x: 2000, y: 25, width: 400, height: 300))
+    #expect(place(.edge(.down)) == CGRect(x: 2000, y: 600, width: 400, height: 300))
+    #expect(place(.center) == CGRect(x: 2438, y: 313, width: 400, height: 300))
+    // Halves meet at a whole point without a gap or an overlap.
+    let left = place(.half(.left)), right = place(.half(.right))
+    #expect(left == CGRect(x: 1920, y: 25, width: 717, height: 875))
+    #expect(left.maxX == right.minX && left.union(right) == bounds)
+    let top = place(.half(.up)), bottom = place(.half(.down))
+    #expect(top == CGRect(x: 1920, y: 25, width: 1435, height: 437))
+    #expect(top.maxY == bottom.minY && top.union(bottom) == bounds)
+    #expect(place(.fill) == bounds)
+    // Snaps keep the size of a window larger than the display.
+    let large = CGRect(x: 0, y: 0, width: 2000, height: 1000)
+    #expect(place(.edge(.right), large) == CGRect(x: 1355, y: 0, width: 2000, height: 1000))
+    #expect(place(.center, large).size == large.size)
+}
+
+@Test @MainActor func zeroSnapsUnlessItContinuesACount() {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let window = windows.list[0]
+    windows.list[0] = WindowInfo(id: window.id, name: window.name, frame: CGRect(x: 300, y: 100, width: 400, height: 300))
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    controller.handle(.enter)
+    for command in [Command.digit(1), .digit(0), .move(.down)] { controller.handle(command) }
+    #expect(windows.list[0].frame == CGRect(x: 300, y: 300, width: 400, height: 300))
+    controller.handle(.digit(0))
+    #expect(windows.list[0].frame == CGRect(x: 0, y: 300, width: 400, height: 300))
+    // Numbered selection still ignores 0.
+    let applied = windows.frames.count
+    controller.handle(.quickSwitch)
+    controller.handle(.digit(0))
+    #expect(windows.frames.count == applied)
+    #expect(controller.mode == .quickSwitch)
+    #expect(ui.guides.count == 9)
+    #expect(ui.errors.isEmpty)
+}
+
+@Test @MainActor func twoKeyCommandsCompleteOrCancelWithoutMovingTheWindow() {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    func press(_ commands: Command...) { commands.forEach(controller.handle) }
+    func expectUnchanged(_ commands: Command..., sourceLocation: SourceLocation = #_sourceLocation) {
+        let applied = windows.frames.count
+        commands.forEach(controller.handle)
+        #expect(windows.frames.count == applied, sourceLocation: sourceLocation)
+    }
+    controller.handle(.enter)
+    press(.sequence(.g), .sequence(.g))
+    #expect(windows.list[0].frame == CGRect(x: 0, y: 25, width: 400, height: 300))
+    press(.sequence(.z), .sequence(.z))
+    #expect(windows.list[0].frame == CGRect(x: 760, y: 375, width: 400, height: 300))
+    // Any other second key drops both keys, and the next key acts normally.
+    expectUnchanged(.sequence(.g), .move(.down))
+    expectUnchanged(.sequence(.g), .digit(0))
+    press(.move(.down))
+    #expect(windows.list[0].frame == CGRect(x: 760, y: 395, width: 400, height: 300))
+    expectUnchanged(.sequence(.z), .sequence(.g), .sequence(.only))
+    expectUnchanged(.sequence(.window), .move(.down))
+    expectUnchanged(.sequence(.window), .resize(.left, .topLeft))
+    expectUnchanged(.sequence(.window), .sequence(.window), .sequence(.only))
+    // A count before a placement is dropped.
+    press(.digit(3), .sequence(.g), .sequence(.g), .move(.down))
+    #expect(windows.list[0].frame == CGRect(x: 760, y: 45, width: 400, height: 300))
+    // A first key leaves numbered selection and still waits for its second.
+    press(.quickSwitch, .sequence(.g))
+    #expect(controller.mode == .command)
+    #expect(ui.guides.isEmpty)
+    press(.sequence(.g))
+    #expect(windows.list[0].frame == CGRect(x: 760, y: 25, width: 400, height: 300))
+    press(.move(.down))
+    // Enter and Escape cancel a waiting key, so the next G begins a new command.
+    expectUnchanged(.sequence(.g), .enter, .sequence(.g), .move(.down))
+    press(.sequence(.g), .escape)
+    #expect(controller.mode == .normal)
+    expectUnchanged(.sequence(.g), .place(.edge(.right)))
+    expectUnchanged(.enter, .sequence(.g), .move(.down))
+    #expect(ui.errors.isEmpty)
+}
+
+@Test @MainActor func tilingFillsHalvesAndTheDisplayAndRepeatsAsNoOps() {
+    let windows = FakeWindows()
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation())
+    let original = windows.list[0].frame
+    // Control–W, then Shift–H/J/K/L, which otherwise resize from the bottom-right corner.
+    func tile(_ direction: Direction) {
+        controller.handle(.sequence(.window))
+        controller.handle(.resize(direction, .bottomRight))
+    }
+    controller.handle(.enter)
+    tile(.left)
+    let leftHalf = CGRect(x: 0, y: 25, width: 960, height: 1000)
+    #expect(windows.list[0].frame == leftHalf)
+    // Tiling a tiled window again sets the same frame and is not a change.
+    tile(.left)
+    #expect(windows.list[0].frame == leftHalf)
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == original)
+    controller.handle(.redo)
+    let halves: [(Direction, CGRect)] = [
+        (.right, CGRect(x: 960, y: 25, width: 960, height: 1000)),
+        (.up, CGRect(x: 0, y: 25, width: 1920, height: 500)),
+        (.down, CGRect(x: 0, y: 525, width: 1920, height: 500)),
+    ]
+    for (direction, half) in halves {
+        tile(direction)
+        #expect(windows.list[0].frame == half)
+    }
+    controller.handle(.sequence(.window))
+    controller.handle(.sequence(.only))
+    #expect(windows.list[0].frame == windows.visibleScreens[0])
+    for expected in halves.reversed().map(\.1) + [leftHalf, original] {
+        controller.handle(.undo)
+        #expect(windows.list[0].frame == expected)
+    }
+}
+
+@Test @MainActor func placementsUseTheDisplayHoldingMostOfTheWindowAndRecoverStrays() {
+    let windows = FakeWindows()
+    windows.visibleScreens.append(CGRect(x: 1920, y: 0, width: 1440, height: 900))
+    let ui = FakePresentation()
+    let window = windows.list[0]
+    func place(_ frame: CGRect) { windows.list[0] = WindowInfo(id: window.id, name: window.name, frame: frame) }
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    controller.handle(.enter)
+    place(CGRect(x: 2000, y: 100, width: 400, height: 300))
+    controller.handle(.place(.edge(.right)))
+    #expect(windows.list[0].frame == CGRect(x: 2960, y: 100, width: 400, height: 300))
+    // Windows mostly or entirely off screen return to the nearest display.
+    let centered = CGRect(x: 760, y: 375, width: 400, height: 300)
+    for stray in [CGRect(x: -350, y: 100, width: 400, height: 300), CGRect(x: -1000, y: 100, width: 400, height: 300)] {
+        place(stray)
+        controller.handle(.sequence(.z))
+        controller.handle(.sequence(.z))
+        #expect(windows.list[0].frame == centered)
+    }
+    // Without a display there is nowhere to place the window.
+    windows.visibleScreens = []
+    let applied = windows.frames.count
+    controller.handle(.digit(0))
+    #expect(windows.frames.count == applied)
+    #expect(ui.errors.isEmpty)
+}
+
+@Test @MainActor func placementsGlideLikeStepsAndUndoOneAtATime() {
+    let windows = FakeWindows()
+    let window = windows.list[0]
+    let start = CGRect(x: 300, y: 100, width: 400, height: 300)
+    windows.list[0] = WindowInfo(id: window.id, name: window.name, frame: start)
+    var settings = WindowPreferences()
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation(), preferences: { settings })
+    controller.handle(.enter)
+    for _ in 0..<3 { controller.handle(.move(.right)) }
+    let slid = windows.list[0].frame
+    controller.handle(.digit(0))
+    let snapped = windows.list[0].frame
+    controller.handle(.sequence(.g))
+    controller.handle(.sequence(.g))
+    #expect(windows.list[0].frame == CGRect(x: 0, y: 25, width: 400, height: 300))
+    for expected in [snapped, slid, start] {
+        controller.handle(.undo)
+        #expect(windows.list[0].frame == expected)
+    }
+    // A held resize joins neither the tiling that uses its key nor the resize after it.
+    controller.handle(.resize(.right, .bottomRight))
+    controller.handle(.resize(.right, .bottomRight))
+    let shrunk = windows.list[0].frame
+    controller.handle(.sequence(.window))
+    controller.handle(.resize(.right, .bottomRight))
+    let rightHalf = windows.list[0].frame
+    controller.handle(.resize(.right, .bottomRight))
+    controller.handle(.resize(.right, .bottomRight))
+    #expect(windows.list[0].frame == CGRect(x: 1000, y: 25, width: 920, height: 1000))
+    for expected in [rightHalf, shrunk, start] {
+        controller.handle(.undo)
+        #expect(windows.list[0].frame == expected)
+    }
+    #expect(windows.animations.allSatisfy { $0 })
+    settings = WindowPreferences(animatesSteps: false)
+    controller.handle(.sequence(.z))
+    controller.handle(.sequence(.z))
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == start)
+    #expect(windows.animations.suffix(2) == [false, false])
+}
+
 private func glide(from start: CGRect, to target: CGRect, retargets: [Int: CGRect] = [:]) -> [CGRect] {
     var motion = FrameMotion(from: start, to: target, smoothTime: 1.0 / 30)
     var frames: [CGRect] = []

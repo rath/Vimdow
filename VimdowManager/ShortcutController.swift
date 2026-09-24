@@ -31,6 +31,12 @@ final class ShortcutController {
         }
         add("undo", .u, [], .undo)
         add("redo", .r, [.control], .redo)
+        add("place.right", .four, [.shift], .place(.edge(.right))) // $
+        add("place.bottom", .g, [.shift], .place(.edge(.down))) // G
+        add("sequence.g", .g, [], .sequence(.g))
+        add("sequence.z", .z, [], .sequence(.z))
+        add("sequence.window", .w, [.control], .sequence(.window))
+        add("sequence.o", .o, [], .sequence(.only))
         add("escape", .escape, [], .escape)
         add("period", .period, [], .escape)
         add("quickSwitch", .q, [], .quickSwitch)
