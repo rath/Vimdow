@@ -1,0 +1,5 @@
+// Copy to Signing.local.xcconfig and fill in your installed certificate details.
+// Use the SHA-1 identity from: security find-identity -v -p codesigning
+CODE_SIGN_IDENTITY = YOUR_CERTIFICATE_SHA1
+CODE_SIGN_STYLE = Manual
+DEVELOPMENT_TEAM = YOUR_TEAM_ID

@@ -10,12 +10,12 @@ options:
 configs:
   Debug: debug
   Release: release
+configFiles:
+  Debug: Config/Signing.xcconfig
+  Release: Config/Signing.xcconfig
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    CODE_SIGN_IDENTITY: "-"
-    CODE_SIGN_STYLE: Automatic
-    DEVELOPMENT_TEAM: ""
   configs:
     Debug:
       ONLY_ACTIVE_ARCH: YES

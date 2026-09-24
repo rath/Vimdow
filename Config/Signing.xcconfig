@@ -1,0 +1,6 @@
+// Public defaults. Personal signing settings stay in the ignored local file.
+CODE_SIGN_IDENTITY = -
+CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM =
+
+#include? "Signing.local.xcconfig"

@@ -6,3 +6,4 @@ DerivedData
 Pods/
 VimdowManager.xcodeproj/
 VimdowManager.xcworkspace/
+Config/Signing.local.xcconfig

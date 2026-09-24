@@ -62,17 +62,33 @@ and Intel. The app bundle is under `DerivedData/Build/Products/<configuration>/`
 
 ### Signing and permissions
 
-Both configurations default to **ad-hoc signing**, without a development team.
-For your installed development certificate, override signing on the command line:
+Both configurations default to **ad-hoc signing**, without a development team,
+through `Config/Signing.xcconfig`. For regular local use, select an installed
+**Apple Development** certificate once:
 
 ```sh
-xcodebuild -project VimdowManager.xcodeproj -scheme VimdowManager \
-  -configuration Debug -derivedDataPath DerivedData \
-  DEVELOPMENT_TEAM=YOUR_TEAM_ID CODE_SIGN_IDENTITY="Apple Development" build
+cp Config/Signing.local.xcconfig.example Config/Signing.local.xcconfig
+security find-identity -v -p codesigning
 ```
 
-Keep personal signing settings outside `project.yml`. Signed public distribution
-and notarization are separate from this development build.
+Set `CODE_SIGN_IDENTITY` in the local file to that identity's SHA-1 fingerprint
+and `DEVELOPMENT_TEAM` to its Team ID. The fingerprint selects the exact
+certificate even when multiple certificates have the same name. Its private key
+must be available in your keychain. Run `./scripts/setup.sh`, then build normally.
+Both Xcode and command-line Debug/Release builds use this file, including after
+project regeneration. Later edits to the local file do not require regeneration.
+
+`Config/Signing.local.xcconfig` is ignored by Git. Keep personal signing settings
+out of the tracked template and `project.yml`. Remove the local file to restore
+ad-hoc signing. Signed public distribution and notarization are separate from
+this development build.
+
+Using a stable signing identity and bundle identifier lets macOS recognize
+updated builds for Accessibility permission. Switching from ad-hoc signing may
+require removing and re-adding the app **once** using the steps below. Install
+and launch successive builds at the same `/Applications/VimdowManager.app` path.
+When the certificate expires or is replaced, update the local fingerprint and
+check permission again.
 
 On first launch, enable VimdowManager in **System Settings → Privacy & Security →
 Accessibility**. The app can open this pane and recheck permission; denial does
