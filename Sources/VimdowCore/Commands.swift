@@ -73,7 +73,9 @@ public protocol WindowControlling: AnyObject {
     func windows() throws -> [WindowInfo]
     func focusedWindow() throws -> WindowInfo
     func focus(_ id: UUID, movePointer: Bool) throws
-    func setFrame(_ frame: CGRect, of id: UUID) throws
+    /// Animated changes return immediately. Until the window arrives,
+    /// `focusedWindow()` reports the destination so that repeated steps add up.
+    func setFrame(_ frame: CGRect, of id: UUID, animated: Bool) throws
     func screenFrames() -> [CGRect]
     /// Display areas outside the menu bar and Dock, in window-frame coordinates.
     func visibleScreenFrames() -> [CGRect]

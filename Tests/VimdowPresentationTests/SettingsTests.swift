@@ -22,9 +22,10 @@ extension SearchPanelTests {
         store.setDisplayBehavior(.keepSize)
         #expect(resets == 1)
         store.setResizeStopsAtDisplayEdges(false)
+        store.setAnimatesSteps(false)
         let recreated = SettingsStore(defaults: defaults)
         #expect(recreated.preferences == WindowPreferences(moveStep: 7, resizeStep: 31, displayBehavior: .keepSize,
-                                                           resizeStopsAtDisplayEdges: false))
+                                                           resizeStopsAtDisplayEdges: false, animatesSteps: false))
         defaults.set("unrelated", forKey: "anotherPreference")
         store.restoreDefaults()
         #expect(resets == 2)
@@ -65,15 +66,20 @@ extension SearchPanelTests {
         }
     }
 
-    @Test func edgeCheckboxShowsAndSavesTheResizePreference() async throws {
+    @Test func checkboxesShowAndSaveWindowPreferences() async throws {
         try await withSettings { store, _, controller in
             controller.show()
-            #expect(controller.stopAtEdges.state == .on)
-            controller.stopAtEdges.performClick(nil)
-            #expect(controller.stopAtEdges.state == .off)
-            #expect(!store.preferences.resizeStopsAtDisplayEdges)
-            controller.stopAtEdges.performClick(nil)
-            #expect(store.preferences.resizeStopsAtDisplayEdges)
+            let checkboxes: [(NSButton, KeyPath<WindowPreferences, Bool>)] = [
+                (controller.stopAtEdges, \.resizeStopsAtDisplayEdges), (controller.animateSteps, \.animatesSteps),
+            ]
+            for (checkbox, preference) in checkboxes {
+                #expect(checkbox.state == .on)
+                checkbox.performClick(nil)
+                #expect(checkbox.state == .off)
+                #expect(!store.preferences[keyPath: preference])
+                checkbox.performClick(nil)
+                #expect(store.preferences[keyPath: preference])
+            }
         }
     }
 

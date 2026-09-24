@@ -106,7 +106,7 @@ public final class CommandCoordinator {
         let initial = behavior == .fillDisplay ? screens[next]
             : WindowGeometry.transfer(window.frame, from: screens[current], to: screens[next])
         let target = screenHistory[window.id]?[next] ?? initial
-        try windows.setFrame(target, of: window.id)
+        try windows.setFrame(target, of: window.id, animated: false)
         // Only record departures after successful moves. Each window maintains
         // independent geometry, including manual edits made on each display.
         screenHistory[window.id, default: [:]][current] = window.frame
@@ -158,7 +158,7 @@ public final class CommandCoordinator {
                 target = WindowGeometry.limitGrowth(from: window.frame, to: target, within: displays[index])
             }
         }
-        try windows.setFrame(target, of: window.id)
+        try windows.setFrame(target, of: window.id, animated: settings.animatesSteps)
     }
 
     private func cycle(step: Int, count: Int, query: String? = nil, current: UUID? = nil) throws {

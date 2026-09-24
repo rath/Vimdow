@@ -153,11 +153,13 @@ xcodebuild -project VimdowManager.xcodeproj -scheme VimdowPresentation \
 
 ### Architecture
 
-- **VimdowCore:** command state, repeat counts, window selection, and geometry;
-  tested with Swift Testing and fake window/presentation implementations.
+- **VimdowCore:** command state, repeat counts, window selection, geometry, and
+  glide motion; tested with Swift Testing and fake window/presentation
+  implementations.
 - **WindowService:** checked Accessibility calls and Quartz window discovery,
   with bounded AX messaging timeouts. Window identity uses AX elements, so equal
-  positions and sizes do not confuse focus selection.
+  positions and sizes do not confuse focus selection. Its WindowAnimator applies
+  glides in step with the display refresh.
 - **ShortcutController:** KeyboardShortcuts registration and held-key repetition.
 - **AppKit presentation:** native search text field and nonactivating numbered
   panels. UI and command coordination use `@MainActor`.
@@ -171,10 +173,11 @@ Enter command mode (default **Control–Option–A**), release the keys, then pr
 Vimdow is active, or reopen the running app from `/Applications`.
 
 - **General:** set separate movement and resize steps (1–200 points, default 20),
-  choose whether resizing stops at display edges (on by default), choose
-  **Fill Display** or **Keep Size** for a window's first visit to a display, and
-  check Accessibility permission. Keep Size preserves the offset from the source
-  display, fitting the window within smaller displays when necessary.
+  choose whether resizing stops at display edges and whether moving and resizing
+  animate (both on by default), choose **Fill Display** or **Keep Size** for a
+  window's first visit to a display, and check Accessibility permission. Keep
+  Size preserves the offset from the source display, fitting the window within
+  smaller displays when necessary.
 - **Shortcuts:** customize or clear the five global shortcuts. Command-mode keys
   remain fixed and are listed for reference. Duplicate assignments and detected
   system/menu conflicts are rejected. If you clear the entry shortcut, reopen
@@ -220,6 +223,12 @@ By default, enlarging a window with Option or Shift stops at the menu bar, the
 Dock, and the edges of the display containing most of the window; an edge
 already beyond them stays where it is. Turn off **Stop resizing at display
 edges** in Settings to resize across displays. Movement is never limited.
+
+Moving and resizing also glide by default: each step eases into place, and a
+held key moves or resizes the window continuously at the same speed as its key
+repeat. Every glide ends exactly where the steps put the window. Turn off
+**Animate moving and resizing** in Settings to apply each step at once. Display
+moves are not animated.
 
 H/J/K/L and the normal-mode focus shortcuts repeat while held, using macOS key
 repeat settings. The key bindings use physical ANSI key positions, as in the

@@ -12,9 +12,20 @@ final class WindowService: WindowControlling {
     }
 
     private var handles: [UUID: Handle] = [:]
+    private lazy var animator = WindowAnimator { [unowned self] id, frame, previous, isFinal in
+        try self.applyGlide(frame, previous: previous, isFinal: isFinal, of: id)
+    }
+
+    /// Reports failures of glides that continue after `setFrame` returns.
+    var onGlideFailure: ((any Error) -> Void)? {
+        get { animator.onFailure }
+        set { animator.onFailure = newValue }
+    }
 
     func windows() throws -> [WindowInfo] {
         try requirePermission()
+        // Listing matches AX frames against on-screen bounds, so glides land first.
+        animator.finishAll()
         guard let raw = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
             as? [[String: Any]] else { return [] }
         var visible: [pid_t: [CGRect]] = [:]
@@ -70,15 +81,16 @@ final class WindowService: WindowControlling {
         guard CFGetTypeID(value) == AXUIElementGetTypeID() else { throw WindowFailure.noFocusedWindow }
         let element = value as! AXUIElement
         AXUIElementSetMessagingTimeout(element, 0.25)
-        let bounds = try frame(of: element)
         let id = remember(Handle(pid: running.processIdentifier, app: app, window: element))
+        // A gliding window reports its destination so that repeated steps add up.
+        let bounds = try animator.destination(of: id) ?? frame(of: element)
         return WindowInfo(id: id, name: running.localizedName ?? "Application", frame: bounds, isFocused: true)
     }
 
     func focus(_ id: UUID, movePointer: Bool) throws {
         try requirePermission()
         let handle = try handle(for: id)
-        let bounds = try frame(of: handle.window)
+        let bounds = try animator.destination(of: id) ?? frame(of: handle.window)
         let mainResult = AXUIElementSetAttributeValue(handle.window, kAXMainAttribute as CFString, kCFBooleanTrue)
         if mainResult != .attributeUnsupported { try check(mainResult) }
         let raiseResult = AXUIElementPerformAction(handle.window, kAXRaiseAction as CFString)
@@ -87,12 +99,36 @@ final class WindowService: WindowControlling {
         if movePointer { CGWarpMouseCursorPosition(CGPoint(x: bounds.midX, y: bounds.midY)) }
     }
 
-    func setFrame(_ desired: CGRect, of id: UUID) throws {
+    func setFrame(_ desired: CGRect, of id: UUID, animated: Bool) throws {
         try requirePermission()
         let element = try handle(for: id).window
-        let current = try frame(of: element)
         guard desired.minX.isFinite, desired.minY.isFinite, desired.width.isFinite, desired.height.isFinite,
               desired.width > 0, desired.height > 0 else { throw WindowFailure.unsupportedOperation }
+        guard animated else {
+            animator.cancel(id)
+            try place(element, at: desired)
+            return
+        }
+        let current = try animator.presentedFrame(of: id) ?? frame(of: element)
+        if current.size != desired.size { try requireSettable(element, kAXSizeAttribute) }
+        if current.origin != desired.origin { try requireSettable(element, kAXPositionAttribute) }
+        try animator.glide(id, from: current, to: desired)
+    }
+
+    /// Applies one glide frame. Intermediate frames set only what changed, back to
+    /// back, so that edges meant to stay put barely shift between the two calls.
+    private func applyGlide(_ frame: CGRect, previous: CGRect, isFinal: Bool, of id: UUID) throws {
+        guard let element = handles[id]?.window else { throw WindowFailure.unavailableWindow }
+        if isFinal {
+            try place(element, at: frame)
+            return
+        }
+        if frame.origin != previous.origin { try setPosition(frame.origin, of: element) }
+        if frame.size != previous.size { try setSize(frame.size, of: element) }
+    }
+
+    private func place(_ element: AXUIElement, at desired: CGRect) throws {
+        let current = try frame(of: element)
         if current.size != desired.size { try requireSettable(element, kAXSizeAttribute) }
         if current.origin != desired.origin { try requireSettable(element, kAXPositionAttribute) }
         // Move before resizing: apps can constrain size to the current display.
@@ -104,9 +140,7 @@ final class WindowService: WindowControlling {
         let moved = try frame(of: element)
         if moved.size != desired.size {
             try requireSettable(element, kAXSizeAttribute)
-            var size = desired.size
-            guard let value = AXValueCreate(.cgSize, &size) else { throw WindowFailure.unsupportedOperation }
-            try check(AXUIElementSetAttributeValue(element, kAXSizeAttribute as CFString, value))
+            try setSize(desired.size, of: element)
         }
         // Moving or resizing may adjust the origin to keep the old frame on
         // screen. Reapply the requested origin after the final size is in place.
@@ -120,6 +154,12 @@ final class WindowService: WindowControlling {
         var position = origin
         guard let value = AXValueCreate(.cgPoint, &position) else { throw WindowFailure.unsupportedOperation }
         try check(AXUIElementSetAttributeValue(element, kAXPositionAttribute as CFString, value))
+    }
+
+    private func setSize(_ size: CGSize, of element: AXUIElement) throws {
+        var size = size
+        guard let value = AXValueCreate(.cgSize, &size) else { throw WindowFailure.unsupportedOperation }
+        try check(AXUIElementSetAttributeValue(element, kAXSizeAttribute as CFString, value))
     }
 
     func screenFrames() -> [CGRect] {

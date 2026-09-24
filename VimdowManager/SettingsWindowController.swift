@@ -21,6 +21,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
     private(set) var resizeField = NSTextField(string: "20")
     private(set) var tabs = NSTabView()
     private(set) var stopAtEdges = NSButton(checkboxWithTitle: "Stop resizing at display edges", target: nil, action: nil)
+    private(set) var animateSteps = NSButton(checkboxWithTitle: "Animate moving and resizing", target: nil, action: nil)
     private let moveStepper = NSStepper()
     private let resizeStepper = NSStepper()
     private let behavior = NSPopUpButton()
@@ -153,13 +154,18 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         grid.columnSpacing = 20
         grid.yPlacement = .center
         stack.addArrangedSubview(grid)
+        stack.setCustomSpacing(4, after: grid)
         validation.textColor = .systemRed
         validation.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
         stack.addArrangedSubview(validation)
         stopAtEdges.target = self
         stopAtEdges.action = #selector(stopAtEdgesChanged)
         stack.addArrangedSubview(stopAtEdges)
+        stack.setCustomSpacing(4, after: stopAtEdges)
         stack.addArrangedSubview(note("Enlarging a window stops at the menu bar, the Dock, and the edges of its display."))
+        animateSteps.target = self
+        animateSteps.action = #selector(animateStepsChanged)
+        stack.addArrangedSubview(animateSteps)
         stack.addArrangedSubview(heading("Moving between displays"))
         behavior.addItems(withTitles: ["Fill Display", "Keep Size"])
         behavior.target = self
@@ -268,6 +274,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         resizeStepper.integerValue = settings.resizeStep
         behavior.selectItem(at: settings.displayBehavior == .fillDisplay ? 0 : 1)
         stopAtEdges.state = settings.resizeStopsAtDisplayEdges ? .on : .off
+        animateSteps.state = settings.animatesSteps ? .on : .off
         updateValidation()
         refreshPermission()
     }
@@ -287,6 +294,10 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
 
     @objc private func stopAtEdgesChanged() {
         store.setResizeStopsAtDisplayEdges(stopAtEdges.state == .on)
+    }
+
+    @objc private func animateStepsChanged() {
+        store.setAnimatesSteps(animateSteps.state == .on)
     }
 
     @objc private func resetGeneral() {

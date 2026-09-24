@@ -267,6 +267,78 @@ import Testing
     #expect(windows.frames.last == CGRect(x: 1740, y: 100, width: 660, height: 300))
 }
 
+@Test @MainActor func stepsGlideUnlessTurnedOffAndDisplayMovesJump() {
+    let windows = FakeWindows()
+    windows.screens.append(CGRect(x: 1920, y: 0, width: 1440, height: 900))
+    var settings = WindowPreferences()
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation(), preferences: { settings })
+    controller.handle(.enter)
+    controller.handle(.move(.right))
+    controller.handle(.resize(.down, .topLeft))
+    controller.handle(.nextScreen)
+    settings = WindowPreferences(animatesSteps: false)
+    controller.handle(.resize(.left, .bottomRight))
+    #expect(windows.animations == [true, true, false, false])
+}
+
+private func glide(from start: CGRect, to target: CGRect, retargets: [Int: CGRect] = [:]) -> [CGRect] {
+    var motion = FrameMotion(from: start, to: target, smoothTime: 1.0 / 30)
+    var frames: [CGRect] = []
+    while (!motion.isFinished || retargets.keys.contains(where: { $0 >= frames.count })) && frames.count < 600 {
+        if let next = retargets[frames.count] { motion.retarget(next) }
+        frames.append(motion.advance(by: 1.0 / 60))
+    }
+    return frames
+}
+
+@Test func aStepGlidesIntoPlaceWithoutPassingIt() {
+    let start = CGRect(x: 100, y: 100, width: 400, height: 300)
+    let moved = start.offsetBy(dx: 20, dy: 0)
+    let frames = glide(from: start, to: moved)
+    #expect((4...8).contains(frames.count))
+    #expect(frames.last == moved)
+    #expect(frames.allSatisfy { $0.size == start.size && $0.minX <= moved.minX })
+    #expect(zip(frames.dropFirst(), frames).allSatisfy { $0.minX > $1.minX })
+    // Resizing moves only the free edges; the anchored corner stays exact on every frame.
+    let shift = WindowGeometry.apply(.left, to: start, count: 2, anchor: .bottomRight)
+    let shiftFrames = glide(from: start, to: shift)
+    #expect(shiftFrames.last == shift)
+    #expect(shiftFrames.allSatisfy { $0.maxX == start.maxX && $0.maxY == start.maxY && $0.minY == start.minY })
+    let option = WindowGeometry.apply(.down, to: start, anchor: .topLeft)
+    #expect(glide(from: start, to: option).allSatisfy { $0.origin == start.origin && $0.width == start.width })
+    // A fractional frame still moves without changing size.
+    let fractional = CGRect(x: 100.5, y: 0, width: 600.25, height: 300)
+    #expect(glide(from: fractional, to: fractional.offsetBy(dx: 20, dy: 0)).allSatisfy { $0.size == fractional.size })
+}
+
+@Test func heldStepsBlendIntoSteadyMotionAndStopOnTheLastStep() {
+    // Key repeats every other 60 Hz frame, 20 points each: 600 points per second.
+    let start = CGRect(x: 0, y: 0, width: 400, height: 300)
+    let retargets = Dictionary(uniqueKeysWithValues: (1..<20).map { ($0 * 2, start.offsetBy(dx: CGFloat($0 + 1) * 20, dy: 0)) })
+    let frames = glide(from: start, to: start.offsetBy(dx: 20, dy: 0), retargets: retargets)
+    let steps = zip(frames.dropFirst(), frames).map { $0.minX - $1.minX }
+    #expect(frames.last?.minX == 400)
+    #expect(steps.allSatisfy { $0 > 0 })
+    #expect(steps[4..<36].allSatisfy { (9...11).contains($0) })
+    #expect(frames.count < 50)
+}
+
+@Test func stalledOrRedirectedGlidesStillEndExactly() {
+    let start = CGRect(x: 0, y: 0, width: 400, height: 300)
+    let far = start.offsetBy(dx: 100, dy: 0)
+    var motion = FrameMotion(from: start, to: far, smoothTime: 1.0 / 30)
+    #expect(motion.advance(by: 1) == far)
+    #expect(motion.isFinished)
+    let reversed = glide(from: start, to: far, retargets: [2: start])
+    #expect(reversed.last == start)
+    #expect(reversed.allSatisfy { (0...100).contains($0.minX) })
+    // A fast glide whose destination moves just ahead stops there instead of sailing past it.
+    let near = start.offsetBy(dx: 70, dy: 0)
+    let redirected = glide(from: start, to: start.offsetBy(dx: 240, dy: 0), retargets: [1: near])
+    #expect(redirected.last == near)
+    #expect(redirected.allSatisfy { $0.minX <= near.minX })
+}
+
 @MainActor
 private final class FakeWindows: WindowControlling {
     var list = (0..<12).map { index in
@@ -276,6 +348,7 @@ private final class FakeWindows: WindowControlling {
     var failure: WindowFailure?
     var focused: [UUID] = []
     var frames: [CGRect] = []
+    var animations: [Bool] = []
     var pointerMoves = 0
     var screens = [CGRect(x: 0, y: 0, width: 1920, height: 1080)]
     var visibleScreens = [CGRect(x: 0, y: 25, width: 1920, height: 1000)]
@@ -294,10 +367,11 @@ private final class FakeWindows: WindowControlling {
         focused.append(id)
         if movePointer { pointerMoves += 1 }
     }
-    func setFrame(_ frame: CGRect, of id: UUID) throws {
+    func setFrame(_ frame: CGRect, of id: UUID, animated: Bool) throws {
         try check()
         if let frameFailure { throw frameFailure }
         frames.append(frame)
+        animations.append(animated)
         if let index = list.firstIndex(where: { $0.id == id }) {
             let window = list[index]
             list[index] = WindowInfo(id: id, name: window.name, frame: frame, isFocused: window.isFocused)

@@ -20,6 +20,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
     func applicationDidFinishLaunching(_ notification: Notification) {
         installMenu()
         settingsStore.onDisplayBehaviorChange = { [weak self] in self?.coordinator.resetDisplayHistory() }
+        service.onGlideFailure = { [weak self] error in self?.showFailure(error) }
         search.onFinish = { [weak self] query in self?.coordinator.finishSearch(query) }
         shortcuts = ShortcutController { [weak self] command in
             guard let self else { return }

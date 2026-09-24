@@ -17,7 +17,11 @@ in the relevant PR or issue. Check supported OS versions before a release.
   apply; Option/Shift resize keeps the top-left/bottom-right corner fixed.
   Held Option/Shift resizes stop exactly at the menu bar, the Dock, and each
   display edge, including on a secondary display, and pass them when the edge
-  setting is off. Escape or period returns ordinary typing to the focused app.
+  setting is off. Taps glide one step, held keys move and resize smoothly, and
+  counts glide the whole distance; every glide ends on the step with fixed
+  edges unchanged. Q, focus cycling, and display moves right after a glide land
+  on its final frame. With animation off, steps apply at once. Escape or period
+  returns ordinary typing to the focused app.
 - [ ] **Window selection:** use Q with more than nine windows, page again,
   and select a number. The right window activates and the pointer centers on it.
 - [ ] **Search:** `/` stays open and accepts English and Korean composition.
