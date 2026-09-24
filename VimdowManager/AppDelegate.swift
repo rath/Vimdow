@@ -1,6 +1,5 @@
 import AppKit
-// The C accessibility constants predate Swift concurrency annotations.
-@preconcurrency import ApplicationServices
+import ApplicationServices
 import OSLog
 import VimdowCore
 
@@ -68,11 +67,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
 
     private func showPermissionAlert() {
         guard permissionAlert == nil else { return }
+        logger.notice("Accessibility permission missing for \(Bundle.main.bundleURL.path, privacy: .public), PID \(ProcessInfo.processInfo.processIdentifier)")
         // Explicit checks and a Retry button avoid terminating the app or repeatedly prompting macOS.
         let alert = NSAlert()
         permissionAlert = alert
         alert.messageText = "Allow Vimdow to control windows"
-        alert.informativeText = "Enable VimdowManager in System Settings → Privacy & Security → Accessibility. Then choose Retry, or press Control–Option–A after closing this dialog."
+        alert.informativeText = "Enable VimdowManager in System Settings → Privacy & Security → Accessibility. If it is already enabled after an update, remove its entry with the minus button, add this app again, and restart Vimdow.\n\nApp: \(Bundle.main.bundleURL.path)\n\nChoose Retry to check again, or press Control–Option–A after closing this dialog."
         alert.addButton(withTitle: "Open System Settings")
         alert.addButton(withTitle: "Retry")
         alert.addButton(withTitle: "Later")
@@ -80,8 +80,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         let response = alert.runModal()
         permissionAlert = nil
         if response == .alertFirstButtonReturn {
-            let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
-            _ = AXIsProcessTrustedWithOptions(options)
+            // This dialog already explains the request; opening Settings must not also
+            // ask macOS to display a second accessibility prompt.
             if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
                 NSWorkspace.shared.open(url)
             }

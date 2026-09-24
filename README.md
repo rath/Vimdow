@@ -77,7 +77,15 @@ and notarization are separate from this development build.
 On first launch, enable VimdowManager in **System Settings → Privacy & Security →
 Accessibility**. The app can open this pane and recheck permission; denial does
 not terminate it. If you chose Later, press Control–Option–A to retry. Rebuilding
-or moving an ad-hoc signed app may require removing and re-adding its entry.
+or moving an ad-hoc signed app may leave an enabled entry that still identifies
+the previous binary. If permission is rejected despite the switch being on:
+
+1. Quit Vimdow.
+2. Select its Accessibility entry and remove it with the minus button.
+3. Use the plus button to add `/Applications/VimdowManager.app` and enable it.
+4. Relaunch that installed app, then press Control–Option–A.
+
+Simply toggling the old entry may not refresh its stored signing requirement.
 
 ### Tests
 
