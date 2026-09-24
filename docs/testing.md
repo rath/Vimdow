@@ -15,7 +15,9 @@ in the relevant PR or issue. Check supported OS versions before a release.
   revoking it releases modal keys after the next window command.
 - [ ] **Movement and resize:** try `hjkl`, held keys, and `12j`. Configured steps
   apply; Option/Shift resize keeps the top-left/bottom-right corner fixed.
-  Escape or period returns ordinary typing to the focused app.
+  Held Option/Shift resizes stop exactly at the menu bar, the Dock, and each
+  display edge, including on a secondary display, and pass them when the edge
+  setting is off. Escape or period returns ordinary typing to the focused app.
 - [ ] **Window selection:** use Q with more than nine windows, page again,
   and select a number. The right window activates and the pointer centers on it.
 - [ ] **Search:** `/` stays open and accepts English and Korean composition.

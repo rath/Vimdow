@@ -151,8 +151,14 @@ public final class CommandCoordinator {
         let window = try windows.focusedWindow()
         let settings = preferences()
         let step = anchor == nil ? settings.moveStep : settings.resizeStep
-        try windows.setFrame(WindowGeometry.apply(direction, to: window.frame, count: count, anchor: anchor, step: step),
-                             of: window.id)
+        var target = WindowGeometry.apply(direction, to: window.frame, count: count, anchor: anchor, step: step)
+        if anchor != nil, settings.resizeStopsAtDisplayEdges {
+            let displays = windows.visibleScreenFrames()
+            if let index = WindowGeometry.screenIndex(for: window.frame, screens: displays) {
+                target = WindowGeometry.limitGrowth(from: window.frame, to: target, within: displays[index])
+            }
+        }
+        try windows.setFrame(target, of: window.id)
     }
 
     private func cycle(step: Int, count: Int, query: String? = nil, current: UUID? = nil) throws {

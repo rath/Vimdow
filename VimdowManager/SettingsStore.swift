@@ -12,7 +12,8 @@ final class SettingsStore {
         WindowPreferences(moveStep: defaults.object(forKey: "windowMoveStep") as? Int ?? 20,
                           resizeStep: defaults.object(forKey: "windowResizeStep") as? Int ?? 20,
                           displayBehavior: DisplayMoveBehavior(rawValue:
-                            defaults.string(forKey: "displayMoveBehavior") ?? "") ?? .fillDisplay)
+                            defaults.string(forKey: "displayMoveBehavior") ?? "") ?? .fillDisplay,
+                          resizeStopsAtDisplayEdges: defaults.object(forKey: "resizeStopsAtDisplayEdges") as? Bool ?? true)
     }
 
     @discardableResult
@@ -29,9 +30,15 @@ final class SettingsStore {
         if previous != behavior { onDisplayBehaviorChange?() }
     }
 
+    func setResizeStopsAtDisplayEdges(_ enabled: Bool) {
+        defaults.set(enabled, forKey: "resizeStopsAtDisplayEdges")
+    }
+
     func restoreDefaults() {
         let previous = preferences.displayBehavior
-        for key in ["windowMoveStep", "windowResizeStep", "displayMoveBehavior"] { defaults.removeObject(forKey: key) }
+        for key in ["windowMoveStep", "windowResizeStep", "displayMoveBehavior", "resizeStopsAtDisplayEdges"] {
+            defaults.removeObject(forKey: key)
+        }
         if previous != preferences.displayBehavior { onDisplayBehaviorChange?() }
     }
 }

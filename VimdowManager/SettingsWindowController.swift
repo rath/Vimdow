@@ -20,6 +20,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
     private(set) var moveField = NSTextField(string: "20")
     private(set) var resizeField = NSTextField(string: "20")
     private(set) var tabs = NSTabView()
+    private(set) var stopAtEdges = NSButton(checkboxWithTitle: "Stop resizing at display edges", target: nil, action: nil)
     private let moveStepper = NSStepper()
     private let resizeStepper = NSStepper()
     private let behavior = NSPopUpButton()
@@ -155,6 +156,10 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         validation.textColor = .systemRed
         validation.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
         stack.addArrangedSubview(validation)
+        stopAtEdges.target = self
+        stopAtEdges.action = #selector(stopAtEdgesChanged)
+        stack.addArrangedSubview(stopAtEdges)
+        stack.addArrangedSubview(note("Enlarging a window stops at the menu bar, the Dock, and the edges of its display."))
         stack.addArrangedSubview(heading("Moving between displays"))
         behavior.addItems(withTitles: ["Fill Display", "Keep Size"])
         behavior.target = self
@@ -262,6 +267,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         moveStepper.integerValue = settings.moveStep
         resizeStepper.integerValue = settings.resizeStep
         behavior.selectItem(at: settings.displayBehavior == .fillDisplay ? 0 : 1)
+        stopAtEdges.state = settings.resizeStopsAtDisplayEdges ? .on : .off
         updateValidation()
         refreshPermission()
     }
@@ -277,6 +283,10 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
 
     @objc private func behaviorChanged() {
         store.setDisplayBehavior(behavior.indexOfSelectedItem == 0 ? .fillDisplay : .keepSize)
+    }
+
+    @objc private func stopAtEdgesChanged() {
+        store.setResizeStopsAtDisplayEdges(stopAtEdges.state == .on)
     }
 
     @objc private func resetGeneral() {

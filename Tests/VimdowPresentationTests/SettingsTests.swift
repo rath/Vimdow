@@ -21,8 +21,10 @@ extension SearchPanelTests {
         store.setDisplayBehavior(.keepSize)
         store.setDisplayBehavior(.keepSize)
         #expect(resets == 1)
+        store.setResizeStopsAtDisplayEdges(false)
         let recreated = SettingsStore(defaults: defaults)
-        #expect(recreated.preferences == WindowPreferences(moveStep: 7, resizeStep: 31, displayBehavior: .keepSize))
+        #expect(recreated.preferences == WindowPreferences(moveStep: 7, resizeStep: 31, displayBehavior: .keepSize,
+                                                           resizeStopsAtDisplayEdges: false))
         defaults.set("unrelated", forKey: "anotherPreference")
         store.restoreDefaults()
         #expect(resets == 2)
@@ -60,6 +62,18 @@ extension SearchPanelTests {
             await Task.yield()
             #expect(!active)
             #expect(shortcuts.editableBindings.allSatisfy { KeyboardShortcuts.isEnabled(for: $0.name) })
+        }
+    }
+
+    @Test func edgeCheckboxShowsAndSavesTheResizePreference() async throws {
+        try await withSettings { store, _, controller in
+            controller.show()
+            #expect(controller.stopAtEdges.state == .on)
+            controller.stopAtEdges.performClick(nil)
+            #expect(controller.stopAtEdges.state == .off)
+            #expect(!store.preferences.resizeStopsAtDisplayEdges)
+            controller.stopAtEdges.performClick(nil)
+            #expect(store.preferences.resizeStopsAtDisplayEdges)
         }
     }
 

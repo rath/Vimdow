@@ -129,6 +129,13 @@ final class WindowService: WindowControlling {
         }
     }
 
+    func visibleScreenFrames() -> [CGRect] {
+        guard let primary = NSScreen.screens.first else { return [] }
+        return NSScreen.screens.map {
+            WindowGeometry.quartzFrame(from: $0.visibleFrame, primaryHeight: primary.frame.height)
+        }
+    }
+
     private func requirePermission() throws {
         guard AXIsProcessTrusted() else { throw WindowFailure.permissionDenied }
     }

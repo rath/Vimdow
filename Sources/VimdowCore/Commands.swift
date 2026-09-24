@@ -75,6 +75,8 @@ public protocol WindowControlling: AnyObject {
     func focus(_ id: UUID, movePointer: Bool) throws
     func setFrame(_ frame: CGRect, of id: UUID) throws
     func screenFrames() -> [CGRect]
+    /// Display areas outside the menu bar and Dock, in window-frame coordinates.
+    func visibleScreenFrames() -> [CGRect]
 }
 
 @MainActor

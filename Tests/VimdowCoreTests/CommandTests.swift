@@ -105,6 +105,27 @@ import Testing
     #expect(clamped.maxX == frame.maxX)
 }
 
+@Test func growthStopsAtDisplayEdgesWithoutMovingOtherEdges() {
+    let display = CGRect(x: -1440, y: -300, width: 1440, height: 875)
+    let frame = CGRect(x: -1400, y: -250, width: 400, height: 300)
+    func limited(_ direction: Direction, _ anchor: ResizeAnchor, count: Int = 10, from start: CGRect = frame) -> CGRect {
+        let resized = WindowGeometry.apply(direction, to: start, count: count, anchor: anchor)
+        return WindowGeometry.limitGrowth(from: start, to: resized, within: display)
+    }
+    #expect(limited(.left, .bottomRight) == CGRect(x: -1440, y: -250, width: 440, height: 300))
+    #expect(limited(.up, .bottomRight) == CGRect(x: -1400, y: -300, width: 400, height: 350))
+    #expect(limited(.right, .topLeft, count: 100) == CGRect(x: -1400, y: -250, width: 1400, height: 300))
+    #expect(limited(.down, .topLeft, count: 100) == CGRect(x: -1400, y: -250, width: 400, height: 825))
+    // Growth that stays inside the display and shrinking are unchanged.
+    #expect(limited(.left, .bottomRight, count: 1) == CGRect(x: -1420, y: -250, width: 420, height: 300))
+    #expect(limited(.left, .topLeft) == WindowGeometry.apply(.left, to: frame, count: 10, anchor: .topLeft))
+    // An edge already past the display neither grows further nor snaps back,
+    // and shrinking it may cross the display edge.
+    let outside = frame.offsetBy(dx: -100, dy: 0)
+    #expect(limited(.left, .bottomRight, from: outside) == outside)
+    #expect(limited(.right, .bottomRight, from: outside) == CGRect(x: -1300, y: -250, width: 200, height: 300))
+}
+
 @Test func screensUseQuartzCoordinatesIncludingNegativeOrigins() {
     let primary = CGRect(x: 0, y: 0, width: 1440, height: 900)
     let left = CGRect(x: -1920, y: -180, width: 1920, height: 1080)
@@ -117,6 +138,9 @@ import Testing
     #expect(WindowGeometry.screenIndex(for: CGRect(x: -2200, y: 0, width: 200, height: 200),
                                        screens: [primary, left]) == 1)
     #expect(WindowGeometry.appKitFrame(from: left, primaryHeight: 900) == CGRect(x: -1920, y: 0, width: 1920, height: 1080))
+    // A visible frame above a 60-point Dock and below a 25-point menu bar.
+    #expect(WindowGeometry.quartzFrame(from: CGRect(x: 0, y: 60, width: 1440, height: 815), primaryHeight: 900)
+            == CGRect(x: 0, y: 25, width: 1440, height: 815))
 }
 
 @Test func selectionUsesIdentityAndWrapsSearch() {
@@ -207,6 +231,42 @@ import Testing
     #expect(windows.frames.last == windows.screens[0])
 }
 
+@Test @MainActor func resizeStopsAtTheUsableEdgesOfTheWindowsDisplay() {
+    let windows = FakeWindows()
+    windows.visibleScreens.append(CGRect(x: 1920, y: 0, width: 1440, height: 900))
+    let window = windows.list[0]
+    func place(_ frame: CGRect) { windows.list[0] = WindowInfo(id: window.id, name: window.name, frame: frame) }
+    var settings = WindowPreferences()
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation(), preferences: { settings })
+    controller.handle(.enter)
+    place(CGRect(x: 30, y: 40, width: 400, height: 300))
+    controller.handle(.digit(5))
+    controller.handle(.resize(.left, .bottomRight))
+    #expect(windows.frames.last == CGRect(x: 0, y: 40, width: 430, height: 300))
+    // The menu bar stops the top edge, and held keys stay there.
+    for _ in 0..<2 { controller.handle(.resize(.up, .bottomRight)) }
+    #expect(windows.frames.last == CGRect(x: 0, y: 25, width: 430, height: 315))
+    for direction in [Direction.right, .down] {
+        controller.handle(.digit(9))
+        controller.handle(.digit(9))
+        controller.handle(.resize(direction, .topLeft))
+    }
+    #expect(windows.frames.last == windows.visibleScreens[0])
+    // Moves are not limited, and an edge already past the display stays put.
+    controller.handle(.move(.left))
+    controller.handle(.resize(.left, .bottomRight))
+    #expect(windows.frames.last == windows.visibleScreens[0].offsetBy(dx: -20, dy: 0))
+    // The display containing most of the window sets the limits.
+    place(CGRect(x: 2000, y: 100, width: 400, height: 300))
+    controller.handle(.digit(9))
+    controller.handle(.resize(.left, .bottomRight))
+    #expect(windows.frames.last == CGRect(x: 1920, y: 100, width: 480, height: 300))
+    settings = WindowPreferences(resizeStopsAtDisplayEdges: false)
+    controller.handle(.digit(9))
+    controller.handle(.resize(.left, .bottomRight))
+    #expect(windows.frames.last == CGRect(x: 1740, y: 100, width: 660, height: 300))
+}
+
 @MainActor
 private final class FakeWindows: WindowControlling {
     var list = (0..<12).map { index in
@@ -218,6 +278,7 @@ private final class FakeWindows: WindowControlling {
     var frames: [CGRect] = []
     var pointerMoves = 0
     var screens = [CGRect(x: 0, y: 0, width: 1920, height: 1080)]
+    var visibleScreens = [CGRect(x: 0, y: 25, width: 1920, height: 1000)]
     var frameFailure: WindowFailure?
 
     func check() throws { if let failure { throw failure } }
@@ -243,6 +304,7 @@ private final class FakeWindows: WindowControlling {
         }
     }
     func screenFrames() -> [CGRect] { screens }
+    func visibleScreenFrames() -> [CGRect] { visibleScreens }
 }
 
 @MainActor

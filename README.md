@@ -171,9 +171,10 @@ Enter command mode (default **Control–Option–A**), release the keys, then pr
 Vimdow is active, or reopen the running app from `/Applications`.
 
 - **General:** set separate movement and resize steps (1–200 points, default 20),
-  choose **Fill Display** or **Keep Size** for a window's first visit to a display,
-  and check Accessibility permission. Keep Size preserves the offset from the
-  source display, fitting the window within smaller displays when necessary.
+  choose whether resizing stops at display edges (on by default), choose
+  **Fill Display** or **Keep Size** for a window's first visit to a display, and
+  check Accessibility permission. Keep Size preserves the offset from the source
+  display, fitting the window within smaller displays when necessary.
 - **Shortcuts:** customize or clear the five global shortcuts. Command-mode keys
   remain fixed and are listed for reference. Duplicate assignments and detected
   system/menu conflicts are rejected. If you clear the entry shortcut, reopen
@@ -214,6 +215,11 @@ Changing the display-movement option clears that history. Settings use local
 | Control–Option–K / L | Move to the next display; restore its saved window frame, or fill it on the first visit |
 | Escape / . | Exit command mode |
 | X | Quit Vimdow |
+
+By default, enlarging a window with Option or Shift stops at the menu bar, the
+Dock, and the edges of the display containing most of the window; an edge
+already beyond them stays where it is. Turn off **Stop resizing at display
+edges** in Settings to resize across displays. Movement is never limited.
 
 H/J/K/L and the normal-mode focus shortcuts repeat while held, using macOS key
 repeat settings. The key bindings use physical ANSI key positions, as in the

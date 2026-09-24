@@ -21,6 +21,16 @@ public enum WindowGeometry {
         }
     }
 
+    /// Stops edges that a resize moves outward at `bounds`. Edges already
+    /// outside `bounds` stay put, and edges moving inward are unaffected.
+    public static func limitGrowth(from frame: CGRect, to resized: CGRect, within bounds: CGRect) -> CGRect {
+        let minX = max(resized.minX, min(bounds.minX, frame.minX))
+        let minY = max(resized.minY, min(bounds.minY, frame.minY))
+        let maxX = min(resized.maxX, max(bounds.maxX, frame.maxX))
+        let maxY = min(resized.maxY, max(bounds.maxY, frame.maxY))
+        return CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
+    }
+
     public static func transfer(_ frame: CGRect, from source: CGRect, to target: CGRect) -> CGRect {
         let width = min(frame.width, target.width)
         let height = min(frame.height, target.height)
@@ -51,6 +61,11 @@ public enum WindowGeometry {
     /// AX/Quartz uses a top-left origin; AppKit uses the primary display's bottom-left origin.
     public static func appKitFrame(from frame: CGRect, primaryHeight: CGFloat) -> CGRect {
         CGRect(x: frame.minX, y: primaryHeight - frame.maxY, width: frame.width, height: frame.height)
+    }
+
+    /// The inverse of `appKitFrame(from:primaryHeight:)`; the vertical flip undoes itself.
+    public static func quartzFrame(from frame: CGRect, primaryHeight: CGFloat) -> CGRect {
+        appKitFrame(from: frame, primaryHeight: primaryHeight)
     }
 }
 
