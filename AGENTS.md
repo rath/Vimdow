@@ -9,6 +9,9 @@
   `Package.resolved` tracked; generated projects and `DerivedData/` are ignored.
 - Command logic and geometry live in `Sources/VimdowCore/`; Accessibility,
   shortcuts, and UI live in `VimdowManager/`.
+- The app icon comes from `Artwork/launcher.svg` and, for 16 and 32 px,
+  `Artwork/launcher-small.svg`. After editing either, run
+  `./scripts/generate-app-icon.sh`; never edit the asset catalog PNGs by hand.
 
 ## Build and test
 

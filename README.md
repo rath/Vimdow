@@ -39,6 +39,11 @@ the generated `.xcodeproj`. Old ignored `Pods/` and workspace files are unused.
 - Generated Xcode projects, workspaces, and `DerivedData/` stay out of Git.
 - After adding/removing sources or changing project settings, rerun setup.
   Changes made only through Xcode project settings are overwritten.
+- `Artwork/launcher.svg` is the app icon, and `Artwork/launcher-small.svg` its
+  simplified 16 and 32 px rendition. After editing either, run
+  `./scripts/generate-app-icon.sh` to render the PNGs in
+  `VimdowManager/Assets.xcassets`; do not edit those PNGs directly. The script
+  needs `rsvg-convert` from librsvg (`brew install librsvg`).
 
 To deliberately update a dependency, edit its version in `project.yml`, run
 `xcodegen generate`, and resolve it with `xcodebuild -resolvePackageDependencies
