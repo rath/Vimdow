@@ -207,6 +207,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
             ("Option–H / J / K / L", "Resize; keep top-left fixed"),
             ("Shift–H / J / K / L", "Resize; keep bottom-right fixed"),
             ("Digits, then move / resize", "Repeat the action"),
+            ("U / Control–R", "Undo / redo the window’s last change"),
             ("Q, then 1–9", "Select a numbered window; Q pages"),
             ("/", "Search by application name"),
             ("N / Shift–N", "Next / previous search match"),

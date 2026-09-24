@@ -29,6 +29,8 @@ final class ShortcutController {
             add("resize.topLeft.\(key.rawValue)", key, [.option], .resize(direction, .topLeft), repeats: true)
             add("resize.bottomRight.\(key.rawValue)", key, [.shift], .resize(direction, .bottomRight), repeats: true)
         }
+        add("undo", .u, [], .undo)
+        add("redo", .r, [.control], .redo)
         add("escape", .escape, [], .escape)
         add("period", .period, [], .escape)
         add("quickSwitch", .q, [], .quickSwitch)

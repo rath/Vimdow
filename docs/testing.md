@@ -22,6 +22,12 @@ in the relevant PR or issue. Check supported OS versions before a release.
   edges unchanged. Q, focus cycling, and display moves right after a glide land
   on its final frame. With animation off, steps apply at once. Escape or period
   returns ordinary typing to the focused app.
+- [ ] **Undo and redo:** after a held key, `12j`, a resize, and a display move,
+  `u` steps back one change at a time and Control–R steps forward. Repeated
+  taps of one key undo at once like a held key, and `3u` undoes three changes.
+  Each window keeps its own history, and a new change clears redo. Undo glides
+  except across display moves. After dragging a window, undo restores the
+  recorded frame and redo returns it to the dragged position.
 - [ ] **Window selection:** use Q with more than nine windows, page again,
   and select a number. The right window activates and the pointer centers on it.
 - [ ] **Search:** `/` stays open and accepts English and Korean composition.

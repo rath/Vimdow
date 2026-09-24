@@ -153,9 +153,9 @@ xcodebuild -project VimdowManager.xcodeproj -scheme VimdowPresentation \
 
 ### Architecture
 
-- **VimdowCore:** command state, repeat counts, window selection, geometry, and
-  glide motion; tested with Swift Testing and fake window/presentation
-  implementations.
+- **VimdowCore:** command state, repeat counts, undo history, window selection,
+  geometry, and glide motion; tested with Swift Testing and fake
+  window/presentation implementations.
 - **WindowService:** checked Accessibility calls and Quartz window discovery,
   with bounded AX messaging timeouts. Window identity uses AX elements, so equal
   positions and sizes do not confuse focus selection. Its WindowAnimator applies
@@ -210,6 +210,7 @@ Changing the display-movement option clears that history. Settings use local
 | Option–H / J / K / L | Resize, keeping the top-left corner fixed |
 | Shift–H / J / K / L | Resize, keeping the bottom-right corner fixed |
 | Digits, then a movement or resize | Repeat the operation, e.g. `12j` moves down 240 points |
+| U / Control–R | Undo / redo the focused window's last move, resize, or display move |
 | Q, then 1–9 | Focus a numbered window and exit command mode |
 | Q again | Show the next page of up to nine windows, wrapping after the last page |
 | / | Search by application name |
@@ -229,6 +230,16 @@ held key moves or resizes the window continuously at the same speed as its key
 repeat. Every glide ends exactly where the steps put the window. Turn off
 **Animate moving and resizing** in Settings to apply each step at once. Display
 moves are not animated.
+
+U undoes the focused window's last move, resize, or display move, and
+Control–R redoes it. Each window has its own history while Vimdow is running,
+and a count repeats either key, e.g. `3u`. Repeating one move or resize without
+a count, including holding its key, makes a single change. A count, any other
+command, or leaving command mode starts a new change, and a new change clears
+the window's redo history. Undo restores the recorded frame even if the window
+was moved by other means since, and redo then returns it there. Undo and redo
+glide like the steps they pass and jump across display moves. Vimdow keeps the
+last 100 changes for each of the 50 windows changed or restored most recently.
 
 H/J/K/L and the normal-mode focus shortcuts repeat while held, using macOS key
 repeat settings. The key bindings use physical ANSI key positions, as in the

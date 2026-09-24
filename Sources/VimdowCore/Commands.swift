@@ -14,7 +14,7 @@ public enum ResizeAnchor: Sendable {
 }
 
 public enum Command: Sendable {
-    case enter, escape, digit(Int), move(Direction), resize(Direction, ResizeAnchor)
+    case enter, escape, digit(Int), move(Direction), resize(Direction, ResizeAnchor), undo, redo
     case cycle(Int), quickSwitch, search, repeatSearch(Int), nextScreen, settings, quit
 }
 

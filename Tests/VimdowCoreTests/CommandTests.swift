@@ -281,6 +281,230 @@ import Testing
     #expect(windows.animations == [true, true, false, false])
 }
 
+@Test @MainActor func undoRestoresEarlierFramesAndRedoReappliesThem() {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    let original = windows.list[0].frame
+    controller.handle(.enter)
+    controller.handle(.move(.right))
+    let moved = windows.list[0].frame
+    controller.handle(.resize(.down, .topLeft))
+    let resized = windows.list[0].frame
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == moved)
+    // Undo leaves numbered selection like the other window commands.
+    controller.handle(.quickSwitch)
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == original)
+    #expect(controller.mode == .command)
+    #expect(ui.guides.isEmpty)
+    let applied = windows.frames.count
+    controller.handle(.undo)
+    #expect(windows.frames.count == applied)
+    controller.handle(.redo)
+    #expect(windows.list[0].frame == moved)
+    controller.handle(.redo)
+    #expect(windows.list[0].frame == resized)
+    controller.handle(.redo)
+    #expect(windows.frames.count == applied + 2)
+    // Undo and redo wait for command mode.
+    controller.handle(.escape)
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == resized)
+    #expect(ui.errors.isEmpty)
+}
+
+@Test @MainActor func repeatedStepsUndoTogetherUntilACountOrAnotherCommand() {
+    let windows = FakeWindows()
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation())
+    let original = windows.list[0].frame
+    controller.handle(.enter)
+    // Taps or a held key repeating one step form a single change.
+    for _ in 0..<5 { controller.handle(.move(.right)) }
+    let slidRight = windows.list[0].frame
+    for _ in 0..<3 { controller.handle(.move(.down)) }
+    let slidDown = windows.list[0].frame
+    // A count makes its own change, and a later step does not join it.
+    controller.handle(.digit(3))
+    controller.handle(.move(.down))
+    let counted = windows.list[0].frame
+    controller.handle(.move(.down))
+    #expect(windows.list[0].frame == original.offsetBy(dx: 100, dy: 140))
+    for expected in [counted, slidDown, slidRight, original] {
+        controller.handle(.undo)
+        #expect(windows.list[0].frame == expected)
+    }
+    // Leaving command mode ends a change.
+    controller.handle(.move(.left))
+    controller.handle(.escape)
+    controller.handle(.enter)
+    controller.handle(.move(.left))
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == original.offsetBy(dx: -20, dy: 0))
+    // So does any other command in between.
+    controller.handle(.move(.left))
+    controller.handle(.redo)
+    controller.handle(.move(.left))
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == original.offsetBy(dx: -40, dy: 0))
+}
+
+@Test @MainActor func eachWindowKeepsItsOwnHistory() {
+    let windows = FakeWindows()
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation())
+    let first = windows.list[0], second = windows.list[1]
+    controller.handle(.enter)
+    controller.handle(.move(.right))
+    // The same step on another window starts that window's own change.
+    windows.list.swapAt(0, 1)
+    controller.handle(.move(.right))
+    controller.handle(.move(.right))
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == second.frame)
+    #expect(windows.list[1].frame == first.frame.offsetBy(dx: 20, dy: 0))
+    let applied = windows.frames.count
+    controller.handle(.undo)
+    #expect(windows.frames.count == applied)
+    windows.list.swapAt(0, 1)
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == first.frame)
+    windows.list.swapAt(0, 1)
+    controller.handle(.redo)
+    #expect(windows.list[0].frame == second.frame.offsetBy(dx: 40, dy: 0))
+}
+
+@Test @MainActor func countsTravelSeveralChangesAndANewChangeClearsRedo() {
+    let windows = FakeWindows()
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation())
+    let original = windows.list[0].frame
+    controller.handle(.enter)
+    controller.handle(.move(.right))
+    let moved = windows.list[0].frame
+    controller.handle(.move(.down))
+    controller.handle(.resize(.right, .topLeft))
+    let last = windows.list[0].frame
+    controller.handle(.digit(2))
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == moved)
+    // Counts beyond the history stop at its end.
+    controller.handle(.digit(9))
+    controller.handle(.redo)
+    #expect(windows.list[0].frame == last)
+    controller.handle(.digit(9))
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == original)
+    controller.handle(.move(.up))
+    let applied = windows.frames.count
+    controller.handle(.redo)
+    #expect(windows.frames.count == applied)
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == original)
+}
+
+@Test @MainActor func undoGlidesLikeTheChangesItPassesAndFollowsTheSetting() {
+    let windows = FakeWindows()
+    windows.screens.append(CGRect(x: 1920, y: 0, width: 1440, height: 900))
+    var settings = WindowPreferences()
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation(), preferences: { settings })
+    let original = windows.list[0].frame
+    controller.handle(.enter)
+    controller.handle(.move(.right))
+    let moved = windows.list[0].frame
+    controller.handle(.nextScreen)
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == moved)
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == original)
+    // Passing a display move in one count jumps the whole way.
+    controller.handle(.digit(2))
+    controller.handle(.redo)
+    #expect(windows.list[0].frame == windows.screens[1])
+    controller.handle(.digit(2))
+    controller.handle(.undo)
+    controller.handle(.redo)
+    settings = WindowPreferences(animatesSteps: false)
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == original)
+    #expect(windows.animations == [true, false, false, true, false, false, true, false])
+}
+
+@Test @MainActor func rejectedChangesLeaveTheHistoryAlone() {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    let original = windows.list[0].frame
+    controller.handle(.enter)
+    controller.handle(.move(.right))
+    windows.frameFailure = .unsupportedOperation
+    controller.handle(.undo)
+    #expect(ui.errors.last as? WindowFailure == .unsupportedOperation)
+    windows.frameFailure = nil
+    controller.handle(.redo)
+    #expect(windows.frames.count == 1)
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == original)
+    // A move the window rejects is not a change, so redo remains.
+    windows.frameFailure = .unsupportedOperation
+    controller.handle(.move(.left))
+    windows.frameFailure = nil
+    controller.handle(.redo)
+    #expect(windows.list[0].frame == original.offsetBy(dx: 20, dy: 0))
+}
+
+@Test @MainActor func undoAndRedoKeepFramesSetByOtherMeans() {
+    let windows = FakeWindows()
+    let window = windows.list[0]
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation())
+    controller.handle(.enter)
+    controller.handle(.move(.right))
+    let dragged = CGRect(x: 500, y: 400, width: 640, height: 480)
+    windows.list[0] = WindowInfo(id: window.id, name: window.name, frame: dragged)
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == window.frame)
+    controller.handle(.redo)
+    #expect(windows.list[0].frame == dragged)
+}
+
+@Test @MainActor func stepsThatChangeNothingAreNotUndone() {
+    let windows = FakeWindows()
+    let window = windows.list[0]
+    func place(_ frame: CGRect) { windows.list[0] = WindowInfo(id: window.id, name: window.name, frame: frame) }
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation())
+    controller.handle(.enter)
+    controller.handle(.move(.right))
+    // The top edge already touches the menu bar, so this resize changes nothing.
+    let atMenuBar = CGRect(x: 20, y: 25, width: 400, height: 300)
+    place(atMenuBar)
+    controller.handle(.resize(.up, .bottomRight))
+    #expect(windows.list[0].frame == atMenuBar)
+    // Once the window moves away, the same resize is a change of its own.
+    let lowered = atMenuBar.offsetBy(dx: 0, dy: 100)
+    place(lowered)
+    controller.handle(.resize(.up, .bottomRight))
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == lowered)
+    controller.handle(.undo)
+    #expect(windows.list[0].frame == window.frame)
+}
+
+@Test func historyKeepsTheLatestChangesOfRecentlyUsedWindows() {
+    var history = UndoHistory(depth: 2, windowLimit: 2)
+    let ids = (0..<3).map { _ in UUID() }
+    let frames = (0..<4).map { CGRect(x: $0 * 10, y: 0, width: 100, height: 100) }
+    for frame in frames.prefix(3) { history.record(frame, canGlide: true, for: ids[0]) }
+    #expect(history.travel(.undo, count: 9, for: ids[0], from: frames[3])
+            == UndoHistory.Entry(frame: frames[1], canGlide: true))
+    #expect(history.travel(.undo, count: 1, for: ids[0], from: frames[1]) == nil)
+    #expect(history.travel(.redo, count: 9, for: ids[0], from: frames[1])?.frame == frames[3])
+    // A third window forgets the least recently used one.
+    history.record(frames[0], canGlide: false, for: ids[1])
+    #expect(history.travel(.undo, count: 1, for: ids[0], from: frames[3])?.frame == frames[2])
+    history.record(frames[0], canGlide: true, for: ids[2])
+    #expect(history.travel(.undo, count: 1, for: ids[1], from: frames[1]) == nil)
+    #expect(history.travel(.undo, count: 1, for: ids[0], from: frames[2])?.frame == frames[1])
+}
+
 private func glide(from start: CGRect, to target: CGRect, retargets: [Int: CGRect] = [:]) -> [CGRect] {
     var motion = FrameMotion(from: start, to: target, smoothTime: 1.0 / 30)
     var frames: [CGRect] = []

@@ -2,6 +2,13 @@ import Foundation
 
 @MainActor
 public final class CommandCoordinator {
+    /// An uncounted move or resize whose repeats undo as one change.
+    private struct StepRun: Equatable {
+        let window: UUID
+        let direction: Direction
+        let anchor: ResizeAnchor?
+    }
+
     public private(set) var mode: Mode = .normal
     public private(set) var lastQuery: String?
     private var prefix = RepeatPrefix()
@@ -11,6 +18,8 @@ public final class CommandCoordinator {
     private var screenLayout: [CGRect] = []
     private var screenHistory: [UUID: [Int: CGRect]] = [:]
     private var lastDisplayBehavior: DisplayMoveBehavior?
+    private var undoHistory = UndoHistory()
+    private var openRun: StepRun?
     private let preferences: () -> WindowPreferences
     private let windows: any WindowControlling
     private let presentation: any CommandPresenting
@@ -23,6 +32,10 @@ public final class CommandCoordinator {
     }
 
     public func handle(_ command: Command) {
+        switch command {
+        case .move, .resize: break
+        default: openRun = nil // Any other command ends a run of repeated steps.
+        }
         do {
             switch command {
             case .settings:
@@ -42,6 +55,7 @@ public final class CommandCoordinator {
             }
         } catch {
             prefix.reset()
+            openRun = nil
             presentation.hideGuides()
             if mode == .quickSwitch { transition(to: .command) }
             if error as? WindowFailure == .permissionDenied { transition(to: .normal) }
@@ -64,6 +78,10 @@ public final class CommandCoordinator {
             try transform(direction, anchor: nil)
         case .resize(let direction, let anchor):
             try transform(direction, anchor: anchor)
+        case .undo:
+            try restore(.undo)
+        case .redo:
+            try restore(.redo)
         case .quickSwitch:
             let list = try windows.windows()
             pageOffset = WindowSelection.nextPage(after: pageOffset, count: list.count)
@@ -110,6 +128,7 @@ public final class CommandCoordinator {
         // Only record departures after successful moves. Each window maintains
         // independent geometry, including manual edits made on each display.
         screenHistory[window.id, default: [:]][current] = window.frame
+        if target != window.frame { undoHistory.record(window.frame, canGlide: false, for: window.id) }
     }
 
     public func setSettingsActive(_ active: Bool) {
@@ -146,6 +165,7 @@ public final class CommandCoordinator {
     }
 
     private func transform(_ direction: Direction, anchor: ResizeAnchor?) throws {
+        let counted = prefix.value != nil
         let count = prefix.take()
         leaveNumbers()
         let window = try windows.focusedWindow()
@@ -159,6 +179,26 @@ public final class CommandCoordinator {
             }
         }
         try windows.setFrame(target, of: window.id, animated: settings.animatesSteps)
+        // Repeating a step without a count, as a held key does, extends one
+        // undoable change. A count always makes a change of its own.
+        let run = counted ? nil : StepRun(window: window.id, direction: direction, anchor: anchor)
+        if let run, run == openRun { return }
+        openRun = nil
+        guard target != window.frame else { return }
+        undoHistory.record(window.frame, canGlide: true, for: window.id)
+        openRun = run
+    }
+
+    /// Undoes or redoes changes to the focused window, committing the history
+    /// only after the window accepts the frame.
+    private func restore(_ travel: UndoHistory.Travel) throws {
+        let count = prefix.take()
+        leaveNumbers()
+        let window = try windows.focusedWindow()
+        var history = undoHistory
+        guard let target = history.travel(travel, count: count, for: window.id, from: window.frame) else { return }
+        try windows.setFrame(target.frame, of: window.id, animated: target.canGlide && preferences().animatesSteps)
+        undoHistory = history
     }
 
     private func cycle(step: Int, count: Int, query: String? = nil, current: UUID? = nil) throws {
@@ -178,6 +218,7 @@ public final class CommandCoordinator {
         let previous = mode
         mode = next
         prefix.reset()
+        openRun = nil
         pageOffset = nil
         page = []
         presentation.hideGuides()
