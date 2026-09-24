@@ -1,3 +1,5 @@
+<img src="Artwork/launcher.svg" alt="Vimdow app icon" width="128" height="128">
+
 # Vimdow
 
 Vimdow is a keyboard-driven window manager for macOS. Move, resize, and switch
