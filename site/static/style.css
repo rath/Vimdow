@@ -423,7 +423,8 @@ kbd + kbd { margin-inline-start: 2px; }
 .ruler [data-where] { min-width: 3ch; text-align: end; }
 
 @media (max-width: 640px) {
-  .brand span { display: none; }
+  /* Too narrow for the name: hide it visually but keep it as the link's text. */
+  .brand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .demo-steps { columns: 1; }
   .cheat td.keys { white-space: normal; }
   .toc, .chapter { margin-top: 3.5rem; }

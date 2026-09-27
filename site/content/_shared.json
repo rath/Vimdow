@@ -8,7 +8,9 @@
     "download": "https://github.com/rath/Vimdow/releases/latest/download/Vimdow.zip",
     "readme": "https://github.com/rath/Vimdow#readme",
     "readmeDevelopment": "https://github.com/rath/Vimdow#development",
-    "license": "https://github.com/rath/Vimdow/blob/master/LICENSE"
+    "license": "https://github.com/rath/Vimdow/blob/master/LICENSE",
+    "author": "Jang Ho Hwang",
+    "authorUrl": "https://github.com/rath"
   },
   "languages": [
     {

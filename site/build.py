@@ -233,8 +233,7 @@ def font_tags(language: dict) -> str:
 
 def json_ld(shared: dict, language: dict, strings: Strings) -> str:
     site = shared["site"]
-    data = {
-        "@context": "https://schema.org",
+    app = {
         "@type": "SoftwareApplication",
         "name": site["name"],
         "url": f"{site['url']}{language['path']}",
@@ -245,9 +244,16 @@ def json_ld(shared: dict, language: dict, strings: Strings) -> str:
         "license": site["license"],
         "sameAs": site["repo"],
         "downloadUrl": site["download"],
+        "releaseNotes": site["releases"],
+        "author": {"@type": "Person", "name": site["author"], "url": site["authorUrl"]},
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
     }
-    return json_for_html(data)
+    if language["path"] != "/":
+        return json_for_html({"@context": "https://schema.org", **app})
+    # Google takes a subdomain's site name only from WebSite data on its home
+    # page; without it, results may be labelled with the parent domain.
+    website = {"@type": "WebSite", "name": site["name"], "url": f"{site['url']}/"}
+    return json_for_html({"@context": "https://schema.org", "@graph": [website, app]})
 
 
 def json_for_html(data: object) -> str:
