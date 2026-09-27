@@ -209,7 +209,7 @@ def head_tags(shared: dict, language: dict, strings: Strings, og_image_size: tup
             lines.append(f'<meta property="og:locale:alternate" content="{other["ogLocale"]}">')
     lines += [
         '<meta name="twitter:card" content="summary_large_image">',
-        '<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">',
+        '<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13161c">',
         '<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">',
         '<link rel="icon" href="/icon.svg" type="image/svg+xml">',
         '<link rel="icon" href="/favicon.png" type="image/png" sizes="32x32">',

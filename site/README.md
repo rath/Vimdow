@@ -51,11 +51,12 @@ when a root-relative link points at nothing in `dist`.
 
 The page is dressed as a Vim help buffer: a tab line of languages on top, a
 status line with a scroll ruler at the bottom, `*tags*` beside section titles,
-`|links|`, `=` section rules, and the colours of the default gvim highlight
-groups (the tokens in `style.css` name the group each stands in for). Headings
-and keys use Iosevka; body text uses Iosevka Aile, or Pretendard in Korean, with
-native CJK faces for Japanese and Chinese. Keep new elements inside that
-vocabulary rather than adding cards, shadows, or other colours.
+`|links|`, and `=` section rules. The tokens in `style.css` name the Vim
+highlight group each stands in for, but the colours come from the app icon:
+charcoal `#13161C`, its green (darkened to `#177A42` on white), and cool greys.
+Headings and keys use Iosevka; body text uses Iosevka Aile, or Pretendard in
+Korean, with native CJK faces for Japanese and Chinese. Keep new elements inside
+that vocabulary rather than adding cards, shadows, or other colours.
 
 Change all four language files together. `git diff --check` and a successful
 build are enough verification for copy-only changes.

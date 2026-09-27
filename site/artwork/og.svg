@@ -4,29 +4,29 @@
        the CJK tab labels use system fonts. -->
   <defs>
     <pattern id="rule" x="96" y="410" width="13" height="10" patternUnits="userSpaceOnUse">
-      <rect x="1.5" y="0" width="10" height="3" fill="#A020F0"/>
-      <rect x="1.5" y="7" width="10" height="3" fill="#A020F0"/>
+      <rect x="1.5" y="0" width="10" height="3" fill="#177A42"/>
+      <rect x="1.5" y="7" width="10" height="3" fill="#177A42"/>
     </pattern>
   </defs>
   <rect width="1200" height="630" fill="#FFFFFF"/>
 
   <!-- Tab line -->
-  <rect width="1200" height="52" fill="#000000"/>
+  <rect width="1200" height="52" fill="#13161C"/>
   <image x="22" y="12" width="28" height="28" xlink:href="favicon.svg"/>
   <text x="62" y="34" font-family="Iosevka" font-weight="700" font-size="22" fill="#FFFFFF">Vimdow</text>
   <rect x="160" y="0" width="100" height="52" fill="#FFFFFF"/>
-  <text x="210" y="34" font-family="Iosevka" font-weight="700" font-size="22" text-anchor="middle" fill="#000000">English</text>
-  <g fill="#D3D3D3">
+  <text x="210" y="34" font-family="Iosevka" font-weight="700" font-size="22" text-anchor="middle" fill="#13161C">English</text>
+  <g fill="#D5DAE0">
     <rect x="262" y="0" width="92" height="52"/>
     <rect x="356" y="0" width="92" height="52"/>
     <rect x="450" y="0" width="112" height="52"/>
   </g>
-  <g font-size="21" text-anchor="middle" fill="#000000">
+  <g font-size="21" text-anchor="middle" fill="#13161C">
     <text x="308" y="33" font-family="Apple SD Gothic Neo">한국어</text>
     <text x="402" y="33" font-family="Hiragino Sans">日本語</text>
     <text x="506" y="33" font-family="PingFang SC">简体中文</text>
   </g>
-  <g fill="#000000">
+  <g fill="#13161C">
     <rect x="276" y="38" width="64" height="1.5"/>
     <rect x="370" y="38" width="64" height="1.5"/>
     <rect x="464" y="38" width="84" height="1.5"/>
@@ -35,21 +35,21 @@
   <rect x="1112" y="38" width="66" height="1.5" fill="#FFFFFF"/>
 
   <!-- Buffer -->
-  <text x="96" y="124" font-family="Iosevka" font-size="26" fill="#C000C0">*vimdow.txt*</text>
-  <text x="1104" y="124" font-family="Iosevka" font-size="26" text-anchor="end" fill="#000000">For macOS 14 and later</text>
-  <g font-family="Iosevka" font-weight="700" font-size="100" fill="#000000">
+  <text x="96" y="124" font-family="Iosevka" font-size="26" fill="#177A42">*vimdow.txt*</text>
+  <text x="1104" y="124" font-family="Iosevka" font-size="26" text-anchor="end" fill="#13161C">For macOS 14 and later</text>
+  <g font-family="Iosevka" font-weight="700" font-size="100" fill="#13161C">
     <text x="92" y="250">Your windows, in</text>
     <text x="92" y="358">Vim's vocabulary.</text>
   </g>
   <rect x="96" y="410" width="1014" height="10" fill="url(#rule)"/>
-  <text x="96" y="480" font-family="Iosevka" font-size="32" fill="#000000">Vim-style window management for macOS</text>
-  <g fill="none" stroke="#6A5ACD" stroke-width="2">
+  <text x="96" y="480" font-family="Iosevka" font-size="32" fill="#13161C">Vim-style window management for macOS</text>
+  <g fill="none" stroke="#3D4552" stroke-width="2">
     <rect x="97" y="506" width="40" height="44" rx="4"/>
     <rect x="145" y="506" width="40" height="44" rx="4"/>
     <rect x="193" y="506" width="40" height="44" rx="4"/>
     <rect x="241" y="506" width="40" height="44" rx="4"/>
   </g>
-  <g font-family="Iosevka" font-weight="700" font-size="28" text-anchor="middle" fill="#6A5ACD">
+  <g font-family="Iosevka" font-weight="700" font-size="28" text-anchor="middle" fill="#3D4552">
     <text x="117" y="537">h</text>
     <text x="165" y="537">j</text>
     <text x="213" y="537">k</text>
@@ -57,7 +57,7 @@
   </g>
 
   <!-- Status line -->
-  <rect y="578" width="1200" height="52" fill="#000000"/>
+  <rect y="578" width="1200" height="52" fill="#13161C"/>
   <g font-family="Iosevka" font-weight="700" font-size="22" fill="#FFFFFF">
     <text x="22" y="611">vimdow.told.me [Help][RO]</text>
     <text x="1040" y="611" text-anchor="end">1,1</text>

@@ -1,7 +1,8 @@
 /* Vimdow website. The page is dressed as a Vim help buffer: a tab line on top,
-   a status line at the bottom, and the default gvim highlight groups for colour.
-   Each token names the highlight group it stands in for. Two light-mode groups
-   are darkened slightly (Constant, Identifier) to reach 4.5:1 on white. */
+   a status line at the bottom, tags, links, and section rules. Each colour token
+   names the Vim highlight group it stands in for; the colours themselves come
+   from the app icon (charcoal #13161C and green #4CD07D) with cool greys, and
+   every text colour reaches 4.5:1 on its background. */
 
 @font-face {
   font-family: "Iosevka Web";
@@ -44,21 +45,21 @@
 :root {
   color-scheme: light dark;
   --bg: #ffffff;              /* Normal */
-  --fg: #000000;
-  --muted: #595959;
-  --header: #a020f0;          /* PreProc: section rules and headers */
-  --tag: #c000c0;             /* Constant: *tags* */
-  --link: #007878;            /* Identifier: |links| */
-  --special: #6a5acd;         /* Special: keys */
-  --nontext: #0000ff;         /* NonText: ~ and the modeline */
-  --linenr: #a52a2a;          /* LineNr: list numbers */
-  --visual: #d3d3d3;          /* Visual */
-  --status-bg: #000000;       /* StatusLine: reverse bold */
+  --fg: #13161c;
+  --muted: #5c6470;
+  --header: #177a42;          /* PreProc: section rules and headers */
+  --tag: #177a42;             /* Constant: *tags* */
+  --link: #1d62a6;            /* Identifier: |links| */
+  --special: #3d4552;         /* Special: keys */
+  --nontext: #69727e;         /* NonText: ~ and the modeline */
+  --linenr: #5c6470;          /* LineNr: list numbers */
+  --visual: #e4e8ed;          /* Visual */
+  --status-bg: #13161c;       /* StatusLine: reverse bold */
   --status-fg: #ffffff;
-  --tabfill-bg: #000000;      /* TabLineFill: reverse */
+  --tabfill-bg: #13161c;      /* TabLineFill: reverse */
   --tabfill-fg: #ffffff;
-  --tab-bg: #d3d3d3;          /* TabLine */
-  --tab-fg: #000000;
+  --tab-bg: #d5dae0;          /* TabLine */
+  --tab-fg: #13161c;
   --accent: #1f9e55;          /* the app icon's green, used inside the demo */
   --desktop-top: #cfd6df;
   --desktop-bottom: #aeb7c3;
@@ -74,22 +75,22 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #000000;
-    --fg: #e8e8e8;
-    --muted: #a8a8a8;
-    --header: #ff80ff;
-    --tag: #ffa0a0;
-    --link: #40ffff;
-    --special: #ffa500;
-    --nontext: #7b93ff;
-    --linenr: #ffff60;
-    --visual: #3a3a3a;
-    --status-bg: #e8e8e8;
-    --status-fg: #000000;
-    --tabfill-bg: #e8e8e8;
-    --tabfill-fg: #000000;
-    --tab-bg: #a9a9a9;
-    --tab-fg: #000000;
+    --bg: #13161c;
+    --fg: #e6e9ee;
+    --muted: #a3abb6;
+    --header: #4cd07d;
+    --tag: #4cd07d;
+    --link: #7ab8ff;
+    --special: #c3cad3;
+    --nontext: #8a94a1;
+    --linenr: #a3abb6;
+    --visual: #2c323d;
+    --status-bg: #e6e9ee;
+    --status-fg: #13161c;
+    --tabfill-bg: #e6e9ee;
+    --tabfill-fg: #13161c;
+    --tab-bg: #9aa3ad;
+    --tab-fg: #13161c;
     --accent: #4cd07d;
     --desktop-top: #3a4150;
     --desktop-bottom: #1b1f27;
