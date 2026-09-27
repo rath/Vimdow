@@ -4,6 +4,9 @@
 
 **Website:** [vimdow.told.me](https://vimdow.told.me) · English, 한국어, 日本語, 简体中文
 
+**Download:** [Vimdow.zip](https://github.com/rath/Vimdow/releases/latest/download/Vimdow.zip)
+for macOS 14 or later, signed and notarized · [Release notes](https://github.com/rath/Vimdow/releases/latest)
+
 Vimdow is a keyboard-driven window manager for macOS. Press a shortcut to enter
 command mode, then move, resize, snap, and switch windows with `h`, `j`, `k`,
 `l`, counts, and the other Vim habits already in your fingers. The mouse stays
@@ -30,12 +33,18 @@ whose hands have the same habits.
 
 ## Getting started
 
-Vimdow is built from source. Follow [Development](#development) to generate the
-project and build a Release bundle, then copy it to `/Applications` and grant it
-Accessibility permission on first launch; the
-[signing notes](#signing-and-permissions) explain how to keep that permission
-across rebuilds. Press **Control–Option–A** to enter command mode and `,` to open
-Settings.
+1. Download [Vimdow.zip](https://github.com/rath/Vimdow/releases/latest/download/Vimdow.zip)
+   from the [latest release](https://github.com/rath/Vimdow/releases/latest)
+   and move **Vimdow.app** to Applications.
+2. Open it and allow it in **System Settings → Privacy & Security →
+   Accessibility**.
+3. Press **Control–Option–A** to enter command mode, and `,` there to open
+   Settings.
+
+The app is signed with Developer ID and notarized by Apple. To build it
+yourself, follow [Development](#development); the
+[signing notes](#signing-and-permissions) explain how to keep Accessibility
+permission across rebuilds.
 
 ## Controls
 
