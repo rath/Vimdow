@@ -123,8 +123,8 @@
   },
   "footer": {
     "license": "BSD 3-Clause 许可证",
-    "credits": "原始实现：Jang Ho Hwang（2013–2026）。原始命令窗口：Yoo Yong-Ha（2013）。全局快捷键使用 KeyboardShortcuts（MIT）。",
+    "credits": "Vimdow 由 Jang Ho Hwang 从 2013 年开始开发，最初的命令窗口由 Yoo Yong-Ha 在同一年编写。全局快捷键基于 KeyboardShortcuts（MIT 许可证）实现。",
     "issues": "报告问题",
-    "privacy": "本站不设置 Cookie，也不使用任何分析统计。"
+    "privacy": "本站不使用 Cookie，也不做任何访问统计。"
   }
 }

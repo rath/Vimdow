@@ -123,8 +123,8 @@
   },
   "footer": {
     "license": "BSD 3-Clause ライセンス",
-    "credits": "オリジナル実装:Jang Ho Hwang(2013–2026)。オリジナルのコマンドウインドウ:Yoo Yong-Ha(2013)。グローバルショートカットには KeyboardShortcuts(MIT)を使用しています。",
+    "credits": "Vimdow は 2013年から Jang Ho Hwang が開発しています。最初のコマンドウインドウは、同じ年に Yoo Yong-Ha が作りました。グローバルショートカットには KeyboardShortcuts（MIT ライセンス）を使っています。",
     "issues": "問題を報告",
-    "privacy": "このサイトは Cookie を設定せず、解析ツールも使用しません。"
+    "privacy": "このサイトでは Cookie もアクセス解析も使っていません。"
   }
 }
