@@ -324,18 +324,23 @@ One-time setup:
      --apple-id <apple-id-email> --team-id <team-id>
    ```
 
-For each release, raise `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in
-`project.yml`, commit, and run:
+For each release, from a clean `HEAD`, run:
 
 ```sh
-./scripts/release.sh
+./scripts/release.sh patch   # or minor, major, or an explicit version like 1.4.0
 ```
 
-From a clean `HEAD`, it runs the core tests, archives a universal Release
-build, signs it with Developer ID and the hardened runtime, notarizes and
-staples it, writes `build/release/Vimdow.zip`, and tags the commit
-`v<version>`. It publishes nothing; it prints the commands to push the tag and
-create a draft release. Set `NOTARY_PROFILE` to use another keychain profile.
+The argument raises `MARKETING_VERSION` in `project.yml`, adds one to the build
+number `CURRENT_PROJECT_VERSION`, and commits both as
+`chore(release): bump version to <version>`. Without an argument the script
+releases the version already in `project.yml`; use that for the first release or
+to retry after a failure, since a failed run keeps the bump commit.
+
+The script then runs the core tests, archives a universal Release build, signs
+it with Developer ID and the hardened runtime, notarizes and staples it, writes
+`build/release/Vimdow.zip`, and tags the commit `v<version>`. It publishes
+nothing; it prints the commands to push the tag and create a draft release. Set
+`NOTARY_PROFILE` to use another keychain profile.
 
 ### Architecture
 

@@ -3,6 +3,12 @@ set -euo pipefail
 
 # Builds a notarized Vimdow.app from a clean HEAD, zips it as
 # build/release/Vimdow.zip, and tags the commit v<MARKETING_VERSION>.
+#
+#   scripts/release.sh                 release the version in project.yml
+#   scripts/release.sh patch|minor|major|X.Y.Z
+#                                      raise MARKETING_VERSION, add 1 to
+#                                      CURRENT_PROJECT_VERSION, commit, release
+#
 # Needs a Developer ID Application certificate in the keychain and a notarytool
 # keychain profile (NOTARY_PROFILE, default "vimdow-notary"); see README.md.
 # Publishing stays manual: the script prints the push and draft-release commands.
@@ -13,34 +19,75 @@ readonly OUT="$REPO_ROOT/build/release"
 readonly ARCHIVE="$OUT/VimdowManager.xcarchive"
 readonly APP="$OUT/export/Vimdow.app"
 readonly ZIP="$OUT/Vimdow.zip"
+readonly SEMVER='^[0-9]+\.[0-9]+\.[0-9]+$'
+
+fail() {
+  echo "$*" >&2
+  exit 1
+}
+
+setting() {
+  sed -n "s/^ *$1: \"\(.*\)\"\$/\1/p" project.yml
+}
 
 cd "$REPO_ROOT"
 
+if (($# > 1)); then
+  fail "Usage: scripts/release.sh [patch|minor|major|X.Y.Z]"
+fi
 if [[ -n "$(git status --porcelain)" ]]; then
-  echo "The working tree has changes. Release from a clean, committed HEAD." >&2
-  exit 1
+  fail "The working tree has changes. Release from a clean, committed HEAD."
 fi
 
-version="$(sed -n 's/^ *MARKETING_VERSION: "\(.*\)"$/\1/p' project.yml)"
-if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "MARKETING_VERSION in project.yml must look like 1.2.3." >&2
-  exit 1
+version="$(setting MARKETING_VERSION)"
+build="$(setting CURRENT_PROJECT_VERSION)"
+if [[ ! "$version" =~ $SEMVER || ! "$build" =~ ^[1-9][0-9]*$ ]]; then
+  fail "project.yml needs MARKETING_VERSION like 1.2.3 and a positive CURRENT_PROJECT_VERSION."
 fi
+
+bump="${1:-}"
+if [[ -n "$bump" ]]; then
+  IFS=. read -r major minor patch <<<"$version"
+  case "$bump" in
+    major) next="$((major + 1)).0.0" ;;
+    minor) next="$major.$((minor + 1)).0" ;;
+    patch) next="$major.$minor.$((patch + 1))" ;;
+    *)
+      [[ "$bump" =~ $SEMVER ]] || fail "Usage: scripts/release.sh [patch|minor|major|X.Y.Z]"
+      next="$bump"
+      ;;
+  esac
+  if [[ "$next" == "$version" \
+    || "$(printf '%s\n' "$version" "$next" | sort -V | tail -n 1)" != "$next" ]]; then
+    fail "$next is not newer than the current version $version."
+  fi
+  version="$next"
+  build="$((build + 1))"
+fi
+
 readonly TAG="v$version"
 if tagged="$(git rev-parse -q --verify "refs/tags/$TAG^{commit}")" \
-  && [[ "$tagged" != "$(git rev-parse HEAD)" ]]; then
-  echo "$TAG already tags another commit. Raise MARKETING_VERSION and" \
-    "CURRENT_PROJECT_VERSION in project.yml." >&2
-  exit 1
+  && { [[ -n "$bump" ]] || [[ "$tagged" != "$(git rev-parse HEAD)" ]]; }; then
+  fail "$TAG already exists. Pass patch, minor, or major to release a new version."
 fi
 
 identities="$(security find-identity -v -p codesigning \
   | grep '"Developer ID Application: ' || true)"
 if [[ -z "$identities" || "$(wc -l <<<"$identities")" -ne 1 ]]; then
-  echo "Expected exactly one Developer ID Application certificate; see README.md." >&2
-  exit 1
+  fail "Expected exactly one Developer ID Application certificate; see README.md."
 fi
 team_id="$(sed -E 's/.*\(([A-Z0-9]{10})\)".*/\1/' <<<"$identities")"
+
+if [[ -n "$bump" ]]; then
+  sed -i '' -E \
+    -e "s/^( *MARKETING_VERSION: )\".*\"\$/\\1\"$version\"/" \
+    -e "s/^( *CURRENT_PROJECT_VERSION: )\".*\"\$/\\1\"$build\"/" project.yml
+  git commit -q -m "chore(release): bump version to $version" \
+    -m "- Set MARKETING_VERSION to $version and CURRENT_PROJECT_VERSION to $build" \
+    -- project.yml
+  trap '[[ $? -eq 0 ]] || echo "The version bump to $version is committed." \
+    "After fixing the problem, rerun scripts/release.sh without an argument." >&2' EXIT
+fi
 
 ./scripts/setup.sh
 xcodebuild -project VimdowManager.xcodeproj -scheme VimdowCore \
@@ -74,9 +121,10 @@ xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportPath "$OUT/export" \
 
 built_version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' \
   "$APP/Contents/Info.plist")"
-if [[ "$built_version" != "$version" ]]; then
-  echo "The app reports version $built_version, not $version." >&2
-  exit 1
+built_number="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' \
+  "$APP/Contents/Info.plist")"
+if [[ "$built_version" != "$version" || "$built_number" != "$build" ]]; then
+  fail "The app reports $built_version ($built_number), not $version ($build)."
 fi
 if [[ "$(lipo -archs "$APP/Contents/MacOS/Vimdow")" != "x86_64 arm64" ]]; then
   echo "The app is not a universal (x86_64 and arm64) binary." >&2
@@ -113,7 +161,7 @@ fi
 
 cat <<DONE
 
-Built ${ZIP#"$REPO_ROOT/"} for Vimdow $version, notarized and tagged $TAG.
+Built ${ZIP#"$REPO_ROOT/"} for Vimdow $version ($build), notarized and tagged $TAG.
 SHA-256: $checksum
 
 To publish a draft release:
