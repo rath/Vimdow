@@ -9,7 +9,7 @@
     "github": "GitHub"
   },
   "hero": {
-    "tagline": "用 Vim 的词汇，管理你的窗口。",
+    "tagline": "像用 Vim 一样，管理你的窗口。",
     "lead": "Vimdow 是一款由键盘驱动的 macOS 窗口管理器。按一个快捷键进入命令模式，然后用 h、j、k、l、计数和撤销来移动、缩放、贴边和切换窗口。鼠标留在原处。",
     "get": "获取 Vimdow",
     "source": "在 GitHub 查看源码"
