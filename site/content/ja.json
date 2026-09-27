@@ -111,10 +111,13 @@
   },
   "get": {
     "title": "Vimdow を入手",
-    "requirements": "macOS 14 以降と、アクセシビリティの許可が必要です。",
-    "noBinary": "バイナリの配布はまだありません。Vimdow は Xcode 27 と XcodeGen を使ってソースからビルドします。README に、セットアップ、ビルド、そして再ビルド後もアクセシビリティの許可が維持されるよう署名する手順をまとめています。",
-    "readme": "ビルド手順",
-    "releases": "リリース",
+    "intro": "macOS 14 以降の Apple シリコン搭載 Mac と Intel Mac で動作します。Developer ID で署名され、Apple の公証を受けています。",
+    "download": "Vimdow.zip をダウンロード",
+    "releases": "リリースノート",
+    "source": "ソースからビルド",
+    "move": "ダウンロードした zip から Vimdow.app を「アプリケーション」フォルダに移動します。",
+    "allow": "アプリを開き、「システム設定」→「プライバシーとセキュリティ」→「アクセシビリティ」で許可します。",
+    "enter_html": "<kbd>⌃</kbd><kbd>⌥</kbd><kbd>A</kbd> を押してコマンドモードに入ります。",
     "accessibilityTitle": "アクセシビリティの許可について",
     "accessibilityText": "macOS は、他のアプリのウインドウを動かすすべてのアプリにこの許可を求めます。Vimdow はその目的にしか使いません。ネットワークアクセスも解析ツールもなく、Mac の外へ出るものは何もありません。"
   },

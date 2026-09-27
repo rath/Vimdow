@@ -83,9 +83,13 @@
 
   <section id="get" class="chapter">
     <div class="section-head"><h2>{{get.title}}</h2><span class="tag" aria-hidden="true">*vimdow-install*</span></div>
-    <p>{{get.requirements}}</p>
-    <p>{{get.noBinary}}</p>
-    <p class="cta"><a class="button primary" href="{{site.readmeDevelopment}}" rel="noopener">{{get.readme}}</a><a class="jump" href="{{site.releases}}" rel="noopener"><span aria-hidden="true">|</span>{{get.releases}}<span aria-hidden="true">|</span></a></p>
+    <p>{{get.intro}}</p>
+    <p class="cta"><a class="button primary" href="{{site.download}}">{{get.download}}</a><a class="jump" href="{{site.releases}}" rel="noopener"><span aria-hidden="true">|</span>{{get.releases}}<span aria-hidden="true">|</span></a><a class="jump" href="{{site.readmeDevelopment}}" rel="noopener"><span aria-hidden="true">|</span>{{get.source}}<span aria-hidden="true">|</span></a></p>
+    <ol class="how install">
+      <li><p>{{get.move}}</p></li>
+      <li><p>{{get.allow}}</p></li>
+      <li><p>{{{get.enter_html}}}</p></li>
+    </ol>
     <h3>{{get.accessibilityTitle}}</h3>
     <p>{{get.accessibilityText}}</p>
   </section>

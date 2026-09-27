@@ -244,6 +244,7 @@ def json_ld(shared: dict, language: dict, strings: Strings) -> str:
         "operatingSystem": "macOS 14 or later",
         "license": site["license"],
         "sameAs": site["repo"],
+        "downloadUrl": site["download"],
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
     }
     return json_for_html(data)

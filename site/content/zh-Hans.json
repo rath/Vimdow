@@ -111,10 +111,13 @@
   },
   "get": {
     "title": "获取 Vimdow",
-    "requirements": "需要 macOS 14 或更高版本，以及辅助功能权限。",
-    "noBinary": "目前还没有二进制下载。Vimdow 需要用 Xcode 27 和 XcodeGen 从源码构建。README 详细说明了配置、构建，以及如何签名以便重新构建后仍保留辅助功能权限。",
-    "readme": "构建说明",
-    "releases": "发布版本",
+    "intro": "支持 macOS 14 及更高版本，适用于 Apple 芯片和 Intel 芯片的 Mac。已使用 Developer ID 签名并通过 Apple 公证。",
+    "download": "下载 Vimdow.zip",
+    "releases": "发布说明",
+    "source": "从源码构建",
+    "move": "将下载的 zip 中的 Vimdow.app 移到“应用程序”文件夹。",
+    "allow": "打开应用，然后在“系统设置 → 隐私与安全性 → 辅助功能”中允许它。",
+    "enter_html": "按 <kbd>⌃</kbd><kbd>⌥</kbd><kbd>A</kbd> 进入命令模式。",
     "accessibilityTitle": "关于辅助功能权限",
     "accessibilityText": "macOS 要求所有会移动其他应用窗口的应用申请此权限。Vimdow 只用它做这一件事：不访问网络，没有分析统计，没有任何数据离开你的 Mac。"
   },

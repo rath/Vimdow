@@ -111,10 +111,13 @@
   },
   "get": {
     "title": "Vimdow 받기",
-    "requirements": "macOS 14 이상과 손쉬운 사용(Accessibility) 권한이 필요합니다.",
-    "noBinary": "아직 바이너리 다운로드는 없습니다. Vimdow는 Xcode 27과 XcodeGen으로 소스에서 빌드합니다. README에 설정, 빌드, 그리고 다시 빌드해도 손쉬운 사용 권한이 유지되도록 서명하는 방법이 정리되어 있습니다.",
-    "readme": "빌드 안내",
-    "releases": "릴리스",
+    "intro": "macOS 14 이상, Apple silicon과 Intel Mac에서 동작합니다. Developer ID로 서명되었고 Apple의 공증을 받았습니다.",
+    "download": "Vimdow.zip 다운로드",
+    "releases": "릴리스 노트",
+    "source": "소스에서 빌드",
+    "move": "내려받은 zip에서 Vimdow.app을 꺼내 응용 프로그램 폴더로 옮깁니다.",
+    "allow": "앱을 실행한 뒤 시스템 설정 → 개인정보 보호 및 보안 → 손쉬운 사용에서 허용합니다.",
+    "enter_html": "<kbd>⌃</kbd><kbd>⌥</kbd><kbd>A</kbd>를 눌러 명령 모드로 들어갑니다.",
     "accessibilityTitle": "손쉬운 사용 권한에 대해",
     "accessibilityText": "macOS는 다른 앱의 창을 움직이는 모든 앱에 이 권한을 요구합니다. Vimdow는 그 용도로만 사용합니다. 네트워크 접근도, 분석 도구도 없으며, 어떤 것도 Mac 밖으로 나가지 않습니다."
   },

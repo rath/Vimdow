@@ -4,7 +4,8 @@
     "url": "https://vimdow.told.me",
     "repo": "https://github.com/rath/Vimdow",
     "issues": "https://github.com/rath/Vimdow/issues",
-    "releases": "https://github.com/rath/Vimdow/releases",
+    "releases": "https://github.com/rath/Vimdow/releases/latest",
+    "download": "https://github.com/rath/Vimdow/releases/latest/download/Vimdow.zip",
     "readme": "https://github.com/rath/Vimdow#readme",
     "readmeDevelopment": "https://github.com/rath/Vimdow#development",
     "license": "https://github.com/rath/Vimdow/blob/master/LICENSE"
