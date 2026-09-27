@@ -90,7 +90,7 @@
     "intro": "Enter with Control–Option–A (the default). Digits typed before a command repeat it. Two keys shown together are pressed one after the other.",
     "keys": "Keys",
     "action": "Action",
-    "note": "Keys follow physical ANSI positions, as in Vim, so they stay in the same place on JIS, Korean, and other layouts.",
+    "note": "Keys are bound to physical ANSI positions, so they stay in the same place on JIS, Korean, and other layouts.",
     "rows": {
       "move": "Move left, down, up, right by one step",
       "resizeTL": "Resize, keeping the top-left corner fixed",
@@ -104,7 +104,7 @@
       "fill": "Fill the display",
       "numbered": "Focus a numbered window; Q again shows the next nine",
       "search": "Search by application name; next / previous match",
-      "displays": "Move to the previous / next display",
+      "displays": "Move to the next display",
       "settings": "Open Settings",
       "exit": "Exit command mode"
     }
