@@ -389,6 +389,13 @@ kbd + kbd { margin-inline-start: 2px; }
   .feature p { padding-inline-start: 0; }
 }
 
+/* Questions: each one a help-style heading with its answer indented below. */
+.faq { list-style: none; margin: 0; padding: 0; }
+.question { padding: 0.9rem 0; }
+.question + .question { border-top: 1px dashed color-mix(in srgb, var(--fg) 20%, transparent); }
+.question h3 { margin-bottom: 0.3em; }
+.question p { margin: 0; padding-inline-start: 4ch; max-width: calc(var(--measure) + 4ch); }
+
 /* Cheat sheet */
 .table-wrap { overflow-x: auto; margin-bottom: 1rem; }
 .cheat { width: 100%; border-collapse: collapse; font-size: 1rem; }

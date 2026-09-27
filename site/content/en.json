@@ -109,6 +109,33 @@
       "exit": "Exit command mode"
     }
   },
+  "faq": {
+    "title": "Frequently asked questions",
+    "different": {
+      "question": "How is Vimdow different from Rectangle or a tiling window manager?",
+      "answer": "Rectangle and similar apps give each layout its own global shortcut, and tiling window managers such as yabai and AeroSpace arrange windows for you. Vimdow does neither. One shortcut enters command mode, where a handful of Vim keys move, resize, snap, and undo, and no window moves until you ask."
+    },
+    "vim": {
+      "question": "Do I need to know Vim?",
+      "answer": "No. Four keys cover most of it: h, j, k, and l move a window left, down, up, and right. Counts, gg, zz, and the rest are there when you want them, and the cheat sheet above lists every key."
+    },
+    "layouts": {
+      "question": "Does it work with Korean, Japanese, and other keyboard layouts?",
+      "answer": "Yes. Command-mode keys are bound to physical key positions rather than characters, so h, j, k, and l work whatever input source is active. Searching by app name accepts Korean, Japanese, and other input methods."
+    },
+    "shortcuts": {
+      "question": "Can I change the shortcuts?",
+      "answer": "You can rebind or clear the five global shortcuts in Settings, including Control–Option–A for command mode. Keys inside command mode are fixed, so they always mean the same thing."
+    },
+    "apps": {
+      "question": "Does it work with every app?",
+      "answer": "It works with any app whose windows macOS lets other apps move, which is nearly all of them. When an app refuses a move or resize, for example a window with a fixed size, Vimdow beeps instead of forcing it."
+    },
+    "update": {
+      "question": "How do I update Vimdow?",
+      "answer": "Download the latest Vimdow.zip and replace the app in Applications; your settings stay. Vimdow makes no network connections, so it never checks for updates itself. New versions appear on GitHub Releases."
+    }
+  },
   "get": {
     "title": "Get Vimdow",
     "intro": "For macOS 14 or later, on Apple silicon and Intel Macs. The app is signed with Developer ID and notarized by Apple.",

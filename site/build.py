@@ -269,12 +269,24 @@ def json_ld(shared: dict, language: dict, strings: Strings) -> str:
         "author": {"@type": "Person", "name": site["author"], "url": site["authorUrl"]},
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
     }
-    if language["path"] != "/":
-        return json_for_html({"@context": "https://schema.org", **app})
-    # Google takes a subdomain's site name only from WebSite data on its home
-    # page; without it, results may be labelled with the parent domain.
-    website = {"@type": "WebSite", "name": site["name"], "url": f"{site['url']}/"}
-    return json_for_html({"@context": "https://schema.org", "@graph": [website, app]})
+    faq = {
+        "@type": "FAQPage",
+        "inLanguage": language["lang"],
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": strings.data[f"faq.{name}.question"],
+                "acceptedAnswer": {"@type": "Answer", "text": strings.data[f"faq.{name}.answer"]},
+            }
+            for name in shared["faq"]
+        ],
+    }
+    graph = [app, faq]
+    if language["path"] == "/":
+        # Google takes a subdomain's site name only from WebSite data on its home
+        # page; without it, results may be labelled with the parent domain.
+        graph.insert(0, {"@type": "WebSite", "name": site["name"], "url": f"{site['url']}/"})
+    return json_for_html({"@context": "https://schema.org", "@graph": graph})
 
 
 def json_for_html(data: object) -> str:
@@ -324,6 +336,11 @@ def render_page(shared: dict, language: dict, strings: Strings, asset_urls: dict
         feature.substitute(title=strings.text(f"features.{name}.title"), text=strings.text(f"features.{name}.text"))
         for name in shared["features"]
     )
+    faq_item = fragment("faq_item")
+    faq = "\n".join(
+        faq_item.substitute(question=strings.text(f"faq.{name}.question"), answer=strings.text(f"faq.{name}.answer"))
+        for name in shared["faq"]
+    )
     cheat_row = fragment("cheat_row")
     cheats = "\n".join(
         cheat_row.substitute(keys=render_keys(row["keys"]), action=strings.text(f"cheat.rows.{row['id']}"))
@@ -348,6 +365,7 @@ def render_page(shared: dict, language: dict, strings: Strings, asset_urls: dict
         "_.how": how,
         "_.features": features,
         "_.cheats": cheats,
+        "_.faq": faq,
         "_.demoSteps": demo_steps,
         "_.demoConfig": json_for_html(shared["demo"]),
         "_.video": render_video(strings),
