@@ -78,19 +78,19 @@ For documentation-only changes, `git diff --check` is sufficient.
 ## Install for manual testing
 
 1. Build successfully, then verify
-   `DerivedData/Build/Products/Release/VimdowManager.app` with
+   `DerivedData/Build/Products/Release/Vimdow.app` with
    `codesign --verify --deep --strict <app-path>`.
 2. For an existing installation, compare `codesign -dr- <app-path>` for the new
    and installed bundles. An unchanged designated requirement preserves signing
    continuity; investigate an unexpected difference before replacing the app.
 3. Copy the new bundle with `ditto` into a temporary staging directory under
-   `/Applications`. Quit the running `/Applications/VimdowManager.app` and wait
+   `/Applications`. Quit the running `/Applications/Vimdow.app` and wait
    for its process to exit before replacing it.
 4. Move the existing bundle to a temporary backup, then move the staged bundle
-   to `/Applications/VimdowManager.app`. Verify its signature and compare its
+   to `/Applications/Vimdow.app`. Verify its signature and compare its
    executable SHA-256 with the build. Restore the backup if installation fails;
    remove the temporary backup after successful verification.
-5. Run `open /Applications/VimdowManager.app`. Avoid launching a second copy from
+5. Run `open /Applications/Vimdow.app`. Avoid launching a second copy from
    `DerivedData` or Xcode during manual testing. Installation may require sandbox
    approval to write outside the repository.
 

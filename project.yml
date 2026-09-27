@@ -44,6 +44,7 @@ targets:
     settings:
       base:
         INFOPLIST_FILE: VimdowManager/VimdowManager-Info.plist
+        PRODUCT_NAME: Vimdow
         PRODUCT_BUNDLE_IDENTIFIER: rath.toys.VimdowManager
         PROVISIONING_PROFILE_SPECIFIER: ""
     dependencies:

@@ -219,7 +219,7 @@ xcodebuild -project VimdowManager.xcodeproj -scheme VimdowManager \
 ```
 
 Debug builds for the host architecture. Release builds support Apple Silicon
-and Intel. The app bundle is under `DerivedData/Build/Products/<configuration>/`.
+and Intel. The app bundle is `DerivedData/Build/Products/<configuration>/Vimdow.app`.
 
 ### Signing and permissions
 
@@ -252,11 +252,11 @@ this continuity when the binary changes.
 
 Switching from ad-hoc signing may require removing and re-adding the app **once**
 using the steps below. Install and launch successive builds at the same
-`/Applications/VimdowManager.app` path.
+`/Applications/Vimdow.app` path.
 When the certificate expires or is replaced, update the local fingerprint and
 check permission again.
 
-On first launch, enable VimdowManager in **System Settings → Privacy & Security →
+On first launch, enable Vimdow in **System Settings → Privacy & Security →
 Accessibility**. The app can open this pane and recheck permission; denial does
 not terminate it. If you chose Later, enter command mode and try a window command
 to retry, or open Vimdow Settings to check permission. Rebuilding
@@ -265,7 +265,7 @@ the previous binary. If permission is rejected despite the switch being on:
 
 1. Quit Vimdow.
 2. Select its Accessibility entry and remove it with the minus button.
-3. Use the plus button to add `/Applications/VimdowManager.app` and enable it.
+3. Use the plus button to add `/Applications/Vimdow.app` and enable it.
 4. Relaunch that installed app, then enter command mode and try moving a window.
 
 Simply toggling the old entry may not refresh its stored signing requirement.

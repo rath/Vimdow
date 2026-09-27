@@ -97,7 +97,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         let alert = NSAlert()
         permissionAlert = alert
         alert.messageText = "Allow Vimdow to control windows"
-        alert.informativeText = "Enable VimdowManager in System Settings → Privacy & Security → Accessibility. If it is already enabled after an update, remove its entry with the minus button, add this app again, and restart Vimdow.\n\nApp: \(Bundle.main.bundleURL.path)\n\nChoose Retry to check again, or press Control–Option–A after closing this dialog."
+        alert.informativeText = "Enable Vimdow in System Settings → Privacy & Security → Accessibility. If it is already enabled after an update, remove its entry with the minus button, add this app again, and restart Vimdow.\n\nApp: \(Bundle.main.bundleURL.path)\n\nChoose Retry to check again, or press Control–Option–A after closing this dialog."
         alert.addButton(withTitle: "Open System Settings")
         alert.addButton(withTitle: "Retry")
         alert.addButton(withTitle: "Later")
