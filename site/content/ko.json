@@ -123,8 +123,8 @@
   },
   "footer": {
     "license": "BSD 3-Clause 라이선스",
-    "credits": "원 구현: 황장호 (2013–2026). 원 명령 창 구현: 유용하 (2013). 전역 단축키는 KeyboardShortcuts (MIT)를 사용합니다.",
+    "credits": "Vimdow는 2013년부터 황장호가 만들고 있습니다. 명령 창은 같은 해 유용하가 처음 만들었습니다. 전역 단축키에는 KeyboardShortcuts(MIT 라이선스)를 사용합니다.",
     "issues": "문제 신고",
-    "privacy": "이 사이트는 쿠키를 설정하지 않고 분석 도구를 사용하지 않습니다."
+    "privacy": "이 사이트는 쿠키도, 분석 도구도 쓰지 않습니다."
   }
 }
