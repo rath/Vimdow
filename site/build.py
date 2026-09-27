@@ -25,7 +25,7 @@ TEMPLATES = SITE / "templates"
 STATIC = SITE / "static"
 MEDIA = SITE / "media"
 DIST = SITE / "dist"
-ICON_SOURCE = ROOT / "Artwork" / "launcher.svg"
+ICON_SOURCE = SITE / "artwork" / "favicon.svg"
 
 HASHED_ASSETS = {"css": "style.css", "js": "demo.js", "statusline": "statusline.js"}
 VOID_ELEMENTS = {

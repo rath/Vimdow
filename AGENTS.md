@@ -22,10 +22,11 @@
   and the other languages must mirror it exactly. Change all four together.
   Language-neutral structure (demo steps, cheat-sheet keys, URLs) is in
   `site/content/_shared.json`.
-- After editing `site/artwork/og.svg` or the app icon, run
-  `./scripts/generate-site-images.sh`. Web fonts in `site/static/fonts/` come
-  from `./scripts/generate-site-fonts.sh`; never edit them by hand. Details are
-  in `site/README.md`.
+- After editing an SVG in `site/artwork/`, run
+  `./scripts/generate-site-images.sh`. The site's favicons are simplified
+  copies of the app icon; when the app icon changes, update them too. Web fonts
+  in `site/static/fonts/` come from `./scripts/generate-site-fonts.sh`; never
+  edit them by hand. Details are in `site/README.md`.
 - For copy-only changes, a successful build and `git diff --check` suffice.
 
 ## Build and test

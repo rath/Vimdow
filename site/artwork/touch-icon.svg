@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="824" height="824" viewBox="100 100 824 824">
+<title>Vimdow (home screen)</title>
+<!-- Derived from Artwork/launcher-small.svg for the website: no shadow or rim, and the
+     body fills the canvas so the mark stays legible at 16 px. -->
+<defs>
+<linearGradient id="night" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#2C323D"/><stop offset="1" stop-color="#13161C"/>
+</linearGradient>
+<linearGradient id="pane" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#F3F5F8"/><stop offset="1" stop-color="#D6DCE4"/>
+</linearGradient>
+<clipPath id="frameClip"><path d="M351.97,340.00L672.03,340.00C686.99,340.00 694.47,340.00 702.53,342.55C711.32,345.75 718.25,352.68 721.45,361.47C724.00,369.53 724.00,377.01 724.00,391.97L724.00,632.03C724.00,646.99 724.00,654.47 721.45,662.53C718.25,671.32 711.32,678.25 702.53,681.45C694.47,684.00 686.99,684.00 672.03,684.00L351.97,684.00C337.01,684.00 329.53,684.00 321.47,681.45C312.68,678.25 305.75,671.32 302.55,662.53C300.00,654.47 300.00,646.99 300.00,632.03L300.00,391.97C300.00,377.01 300.00,369.53 302.55,361.47C305.75,352.68 312.68,345.75 321.47,342.55C329.53,340.00 337.01,340.00 351.97,340.00Z"/></clipPath>
+</defs>
+<rect x="100" y="100" width="824" height="824" fill="url(#night)"/>
+<g fill="none" stroke="#4CD07D" stroke-width="56" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="236,452 180,512 236,572"/>
+  <polyline points="788,452 844,512 788,572"/>
+  <polyline points="452,276 512,220 572,276"/>
+  <polyline points="452,748 512,804 572,748"/>
+</g>
+<path d="M351.97,340.00L672.03,340.00C686.99,340.00 694.47,340.00 702.53,342.55C711.32,345.75 718.25,352.68 721.45,361.47C724.00,369.53 724.00,377.01 724.00,391.97L724.00,632.03C724.00,646.99 724.00,654.47 721.45,662.53C718.25,671.32 711.32,678.25 702.53,681.45C694.47,684.00 686.99,684.00 672.03,684.00L351.97,684.00C337.01,684.00 329.53,684.00 321.47,681.45C312.68,678.25 305.75,671.32 302.55,662.53C300.00,654.47 300.00,646.99 300.00,632.03L300.00,391.97C300.00,377.01 300.00,369.53 302.55,361.47C305.75,352.68 312.68,345.75 321.47,342.55C329.53,340.00 337.01,340.00 351.97,340.00Z" fill="url(#pane)"/>
+<g clip-path="url(#frameClip)">
+<rect x="300" y="340" width="424" height="66" fill="#DCE1E8"/>
+<rect x="300" y="405" width="424" height="3" fill="#C3CAD4"/>
+<rect x="300" y="626" width="424" height="58" fill="#AEB7C3"/>
+<rect x="300" y="626" width="132" height="58" fill="#4CD07D"/>
+</g>
+</svg>

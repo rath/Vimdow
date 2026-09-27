@@ -13,7 +13,7 @@ python3 -m http.server -d site/dist 8000
 
 The output in `site/dist/` is ignored by Git. Pages are written to `/`, `/ko/`,
 `/ja/`, and `/zh/`, with `sitemap.xml`, `404.html`, and the static files. The
-app icon is copied from `Artwork/launcher.svg` at build time.
+favicon is copied from `artwork/favicon.svg` to `icon.svg` at build time.
 
 The build fails when a language file is missing or has extra keys compared with
 `content/en.json`, when a key is never used, when a page has unbalanced tags, or
@@ -37,8 +37,14 @@ when a root-relative link points at nothing in `dist`.
   modifier-key symbols; Pretendard's upstream dynamic subsets are kept unmodified
   and load on the Korean page only, through the language's `fonts` entry in
   `content/_shared.json`. All three are under the SIL Open Font License.
-- `artwork/og.svg`: source for `static/og.png`. After editing it or the app
-  icon, run `./scripts/generate-site-images.sh` (needs `rsvg-convert`).
+- `artwork/`: SVG sources for the images. `og.svg` is the social preview;
+  its Iosevka text is outlined by `scripts/outline-svg-text.py` before
+  rendering, because librsvg on macOS cannot load fonts from a directory.
+  `favicon.svg` and `touch-icon.svg` are simplified copies of
+  `Artwork/launcher-small.svg` without the shadow and margin, so they stay
+  legible at 16 px and fill the iOS home-screen mask; update them by hand if the
+  app icon changes. After editing any of them, run
+  `./scripts/generate-site-images.sh` (needs `rsvg-convert` and fonttools).
 - `media/`: drop the real recording here (see below).
 
 ## Design
@@ -98,7 +104,7 @@ The hero currently plays an animated mock-up. To add a real screen recording:
 
 ## Deployment
 
-Pushes to `master` that touch `site/`, `Artwork/`, or the workflow build and
+Pushes to `master` that touch `site/` or the workflow build and
 deploy the site. One-time setup, in this order:
 
 1. DNS at the `told.me` registrar: `CNAME vimdow → rath.github.io.` Do this
