@@ -6,9 +6,11 @@
   "nav": {
     "skip": "本文へ移動",
     "languages": "言語",
+    "contents": "目次",
     "github": "GitHub"
   },
   "hero": {
+    "helpLine": "macOS 14 以降に対応",
     "tagline": "ウインドウ操作を、Vim 流に。",
     "lead": "Vimdow はキーボードで操る macOS 用ウインドウマネージャです。ショートカット一つでコマンドモードに入り、h、j、k、l と回数指定、アンドゥでウインドウを移動、リサイズ、整列、切り替えします。マウスはそのままの場所に。",
     "get": "Vimdow を入手",

@@ -7,29 +7,33 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <style>
-  :root { color-scheme: dark light; --bg: #13161c; --text: #e6eaf0; --muted: #9aa3b0; --link: #7fe0a3; }
-  @media (prefers-color-scheme: light) { :root { --bg: #f3f5f8; --text: #1b2028; --muted: #5a6472; --link: #17804a; } }
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--text);
-         font: 1.0625rem/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; padding: 16px; box-sizing: border-box; }
-  main { text-align: center; max-width: 36rem; }
-  img { width: 96px; height: 96px; }
-  h1 { font-size: 1.75rem; margin: 16px 0 8px; }
-  p { color: var(--muted); margin: 0 0 20px; }
-  ul { list-style: none; padding: 0; margin: 0; display: flex; gap: 8px 20px; flex-wrap: wrap; justify-content: center; }
+  @font-face { font-family: "Iosevka Web"; src: url("/fonts/iosevka-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Iosevka Web"; src: url("/fonts/iosevka-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+  :root { color-scheme: light dark; --bg: #ffffff; --fg: #000000; --link: #007878; --nontext: #0000ff; --error-bg: #d70000; --error-fg: #ffffff; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #000000; --fg: #e8e8e8; --link: #40ffff; --nontext: #7b93ff; } }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--fg);
+         font: 1rem/1.6 "Iosevka Web", ui-monospace, "SF Mono", Menlo, monospace; }
+  main { flex: 1; width: min(100% - 32px, 46rem); margin: 0 auto; padding-top: 3rem; }
+  h1 { font-size: 1rem; margin: 0 0 1.5rem; }
+  ul { list-style: none; margin: 0 0 1.5rem; padding: 0; }
   a { color: var(--link); }
+  .tildes { color: var(--nontext); font-weight: 700; }
+  .error { display: inline; padding: 0.1em 1ch; background: var(--error-bg); color: var(--error-fg); font-weight: 700; }
+  .command { padding: 0.25rem 1ch 0.5rem; }
 </style>
 </head>
 <body>
 <main>
-  <img src="/icon.svg" alt="">
   <h1>Page not found</h1>
-  <p>Vimdow lives at one of these pages.</p>
+  <p>Vimdow's pages:</p>
   <ul>
     <li><a href="/" hreflang="en" lang="en">English</a></li>
     <li><a href="/ko/" hreflang="ko" lang="ko">한국어</a></li>
     <li><a href="/ja/" hreflang="ja" lang="ja">日本語</a></li>
     <li><a href="/zh/" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
   </ul>
+  <div class="tildes" aria-hidden="true">~<br>~<br>~</div>
 </main>
+<p class="command"><span class="error">E149: Sorry, no help for this page</span></p>
 </body>
 </html>

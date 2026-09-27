@@ -6,9 +6,11 @@
   "nav": {
     "skip": "Skip to content",
     "languages": "Languages",
+    "contents": "Contents",
     "github": "GitHub"
   },
   "hero": {
+    "helpLine": "For macOS 14 and later",
     "tagline": "Your windows, in Vim's vocabulary.",
     "lead": "Vimdow is a keyboard-driven window manager for macOS. Press one shortcut to enter command mode, then move, resize, snap, and switch windows with h, j, k, l, counts, and undo. The mouse stays where it is.",
     "get": "Get Vimdow",

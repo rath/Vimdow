@@ -6,21 +6,23 @@
 <title>{{meta.title}}</title>
 <meta name="description" content="{{meta.description}}">
 {{{_.head}}}
+{{{_.fonts}}}
 <link rel="stylesheet" href="{{_.css}}">
 <script type="application/ld+json">{{{_.jsonld}}}</script>
 </head>
 <body>
 <a class="skip" href="#main">{{nav.skip}}</a>
-<header class="site-header">
-  <a class="brand" href="{{_.path}}"><img src="/icon.svg" alt="" width="36" height="36">{{site.name}}</a>
-  <nav class="lang-nav" aria-label="{{nav.languages}}">{{{_.langLinks}}}</nav>
-  <a class="gh" href="{{site.repo}}" rel="noopener">{{nav.github}}</a>
+<header class="tabline">
+  <a class="brand" href="{{_.path}}"><img src="/icon.svg" alt="" width="20" height="20"><span>{{site.name}}</span></a>
+  <nav class="tabs" aria-label="{{nav.languages}}">{{{_.langLinks}}}</nav>
+  <a class="tab-end" href="{{site.repo}}" rel="noopener">{{nav.github}}</a>
 </header>
-<main id="main">
+<main id="main" class="buffer">
   <section class="hero">
+    <p class="help-line"><span class="tag" aria-hidden="true">*{{_.helpFile}}*</span><span>{{hero.helpLine}}</span></p>
     <h1>{{hero.tagline}}</h1>
     <p class="lead">{{hero.lead}}</p>
-    <p class="cta"><a class="button primary" href="#get">{{hero.get}}</a><a class="button" href="{{site.repo}}" rel="noopener">{{hero.source}}</a></p>
+    <p class="cta"><a class="button primary" href="#get">{{hero.get}}</a><a class="jump" href="{{site.repo}}" rel="noopener"><span aria-hidden="true">|</span>{{hero.source}}<span aria-hidden="true">|</span></a></p>
     <div class="demo" id="demo">
       <script type="application/json" id="demo-config">{{{_.demoConfig}}}</script>
       <div class="stage" role="img" aria-label="{{demo.aria}}">
@@ -39,25 +41,36 @@
     </div>
   </section>
 
-  <section id="why" class="prose">
-    <h2>{{why.title}}</h2>
+  <nav class="toc" aria-labelledby="contents">
+    <div class="section-head"><h2 id="contents">{{nav.contents}}</h2><span class="tag" aria-hidden="true">*vimdow-contents*</span></div>
+    <ol>
+      <li><a href="#why"><span>{{why.title}}</span><span class="leader" aria-hidden="true"></span><span class="jump-tag" aria-hidden="true">|vimdow-why|</span></a></li>
+      <li><a href="#how"><span>{{how.title}}</span><span class="leader" aria-hidden="true"></span><span class="jump-tag" aria-hidden="true">|vimdow-how|</span></a></li>
+      <li><a href="#features"><span>{{features.title}}</span><span class="leader" aria-hidden="true"></span><span class="jump-tag" aria-hidden="true">|vimdow-features|</span></a></li>
+      <li><a href="#cheat"><span>{{cheat.title}}</span><span class="leader" aria-hidden="true"></span><span class="jump-tag" aria-hidden="true">|vimdow-keys|</span></a></li>
+      <li><a href="#get"><span>{{get.title}}</span><span class="leader" aria-hidden="true"></span><span class="jump-tag" aria-hidden="true">|vimdow-install|</span></a></li>
+    </ol>
+  </nav>
+
+  <section id="why" class="chapter prose">
+    <div class="section-head"><h2>{{why.title}}</h2><span class="tag" aria-hidden="true">*vimdow-why*</span></div>
     <p>{{why.p1}}</p>
     <p>{{why.p2}}</p>
     <p>{{why.p3}}</p>
   </section>
 
-  <section id="how">
-    <h2>{{how.title}}</h2>
+  <section id="how" class="chapter">
+    <div class="section-head"><h2>{{how.title}}</h2><span class="tag" aria-hidden="true">*vimdow-how*</span></div>
     <ol class="how">{{{_.how}}}</ol>
   </section>
 
-  <section id="features">
-    <h2>{{features.title}}</h2>
+  <section id="features" class="chapter">
+    <div class="section-head"><h2>{{features.title}}</h2><span class="tag" aria-hidden="true">*vimdow-features*</span></div>
     <ul class="features">{{{_.features}}}</ul>
   </section>
 
-  <section id="cheat">
-    <h2>{{cheat.title}}</h2>
+  <section id="cheat" class="chapter">
+    <div class="section-head"><h2>{{cheat.title}}</h2><span class="tag" aria-hidden="true">*vimdow-keys*</span></div>
     <p>{{cheat.intro}}</p>
     <div class="table-wrap">
       <table class="cheat">
@@ -68,20 +81,24 @@
     <p class="note">{{cheat.note}}</p>
   </section>
 
-  <section id="get">
-    <h2>{{get.title}}</h2>
+  <section id="get" class="chapter">
+    <div class="section-head"><h2>{{get.title}}</h2><span class="tag" aria-hidden="true">*vimdow-install*</span></div>
     <p>{{get.requirements}}</p>
     <p>{{get.noBinary}}</p>
-    <p class="cta"><a class="button primary" href="{{site.readmeDevelopment}}" rel="noopener">{{get.readme}}</a><a class="button" href="{{site.releases}}" rel="noopener">{{get.releases}}</a></p>
+    <p class="cta"><a class="button primary" href="{{site.readmeDevelopment}}" rel="noopener">{{get.readme}}</a><a class="jump" href="{{site.releases}}" rel="noopener"><span aria-hidden="true">|</span>{{get.releases}}<span aria-hidden="true">|</span></a></p>
     <h3>{{get.accessibilityTitle}}</h3>
     <p>{{get.accessibilityText}}</p>
   </section>
 </main>
 <footer class="site-footer">
-  <p><a rel="license" href="{{site.license}}">{{footer.license}}</a> · <a href="{{site.issues}}" rel="noopener">{{footer.issues}}</a></p>
+  <p class="links"><a class="jump" rel="license" href="{{site.license}}"><span aria-hidden="true">|</span>{{footer.license}}<span aria-hidden="true">|</span></a><a class="jump" href="{{site.issues}}" rel="noopener"><span aria-hidden="true">|</span>{{footer.issues}}<span aria-hidden="true">|</span></a></p>
   <p>{{footer.credits}}</p>
   <p>{{footer.privacy}}</p>
+  <p class="modeline" aria-hidden="true">vim:tw=78:ts=8:noet:ft=help:norl:</p>
+  <div class="tildes" aria-hidden="true"><span>~</span><span>~</span><span>~</span></div>
 </footer>
+<div class="statusline" aria-hidden="true"><span class="file">{{_.helpFile}} [Help][RO]</span><span class="ruler"><span data-line>1,1</span><span data-where>Top</span></span></div>
 <script src="{{_.js}}" defer></script>
+<script src="{{_.statuslineJs}}" defer></script>
 </body>
 </html>

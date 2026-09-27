@@ -15,28 +15,61 @@
       "lang": "en",
       "path": "/",
       "ogLocale": "en_US",
-      "label": "English"
+      "label": "English",
+      "helpFile": "vimdow.txt",
+      "fonts": {
+        "preload": [
+          "/fonts/iosevka-700.woff2",
+          "/fonts/iosevka-aile-400.woff2"
+        ],
+        "stylesheets": []
+      }
     },
     {
       "file": "ko",
       "lang": "ko",
       "path": "/ko/",
       "ogLocale": "ko_KR",
-      "label": "한국어"
+      "label": "한국어",
+      "helpFile": "vimdow.kox",
+      "fonts": {
+        "preload": [
+          "/fonts/iosevka-700.woff2"
+        ],
+        "stylesheets": [
+          "/fonts/pretendard/pretendardvariable-dynamic-subset.css"
+        ]
+      }
     },
     {
       "file": "ja",
       "lang": "ja",
       "path": "/ja/",
       "ogLocale": "ja_JP",
-      "label": "日本語"
+      "label": "日本語",
+      "helpFile": "vimdow.jax",
+      "fonts": {
+        "preload": [
+          "/fonts/iosevka-700.woff2",
+          "/fonts/iosevka-aile-400.woff2"
+        ],
+        "stylesheets": []
+      }
     },
     {
       "file": "zh-Hans",
       "lang": "zh-Hans",
       "path": "/zh/",
       "ogLocale": "zh_CN",
-      "label": "简体中文"
+      "label": "简体中文",
+      "helpFile": "vimdow.cnx",
+      "fonts": {
+        "preload": [
+          "/fonts/iosevka-700.woff2",
+          "/fonts/iosevka-aile-400.woff2"
+        ],
+        "stylesheets": []
+      }
     }
   ],
   "demo": {

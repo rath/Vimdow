@@ -23,7 +23,9 @@
   Language-neutral structure (demo steps, cheat-sheet keys, URLs) is in
   `site/content/_shared.json`.
 - After editing `site/artwork/og.svg` or the app icon, run
-  `./scripts/generate-site-images.sh`. Details are in `site/README.md`.
+  `./scripts/generate-site-images.sh`. Web fonts in `site/static/fonts/` come
+  from `./scripts/generate-site-fonts.sh`; never edit them by hand. Details are
+  in `site/README.md`.
 - For copy-only changes, a successful build and `git diff --check` suffice.
 
 ## Build and test
