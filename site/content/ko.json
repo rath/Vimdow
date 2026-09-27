@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Vimdow — macOS를 위한 Vim 스타일 윈도 관리",
+    "title": "Vimdow — macOS를 위한 Vim 스타일 창 관리",
     "description": "Vim의 hjkl, 숫자 반복, 실행 취소로 macOS 창을 키보드만으로 옮기고, 크기를 바꾸고, 정렬하고, 전환합니다. 무료 오픈 소스."
   },
   "nav": {

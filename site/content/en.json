@@ -12,7 +12,7 @@
   "hero": {
     "helpLine": "For macOS 14 and later",
     "tagline": "Your windows, in Vim's vocabulary.",
-    "lead": "Vimdow is a keyboard-driven window manager for macOS. Press one shortcut to enter command mode, then move, resize, snap, and switch windows with h, j, k, l, counts, and undo. The mouse stays where it is.",
+    "lead": "Vimdow is a keyboard-driven window manager for macOS. Press one shortcut to enter command mode, then move, resize, snap, and switch windows with h, j, k, l, counts, and the other Vim habits already in your fingers. The mouse stays where it is.",
     "get": "Get Vimdow",
     "source": "Source on GitHub"
   },
@@ -32,16 +32,16 @@
       "down": "12j moves it down twelve steps.",
       "grow": "Option–l widens it, keeping the top-left corner in place.",
       "center": "zz centers it on the display.",
-      "half": "Control–W, then H fills the left half.",
+      "half": "Control–W, then H, fills the left half.",
       "undo": "u undoes the last change.",
       "exit": "Escape returns to normal mode."
     }
   },
   "why": {
     "title": "Why Vimdow",
-    "p1": "Vimdow was written by someone who has used Vim since 1998 and would rather not reach for the mouse. Most of a Mac can be driven from the keyboard, but window management could not: nudging a window a few points, or moving it to another display, always meant leaving the home row.",
-    "p2": "The first version, in 2013, was a small Objective-C app that fixed exactly that for one user. Instead of new shortcuts to learn, it mapped window operations onto the Vim vocabulary: hjkl to move, a count to repeat, 0 and $ for the edges, gg and G for top and bottom, zz to center, u to undo, / to search. In 2026 it was rewritten in Swift 6 with a tested command engine.",
-    "p3": "Vimdow is modal, like Vim. It is not a tiling window manager and does not arrange windows for you; it makes arranging them yourself fast. It is one person's preference, shared for anyone whose hands have the same habits."
+    "p1": "Vimdow was written by someone who has used Vim since 1998 and would rather not reach for the mouse. Almost everything on a Mac could be done from the keyboard except managing windows: nudging one a few points, or sending it to another display, always meant leaving the home row.",
+    "p2": "The first version, in 2013, was a small Objective-C app that fixed exactly that for one user. Instead of new shortcuts to learn, it mapped window operations onto the Vim vocabulary: hjkl to move, a count to repeat, 0 and $ for the edges, gg and G for the top and bottom, zz to center, u to undo, / to search. In 2026 it was rewritten in Swift 6 with a tested command engine.",
+    "p3": "Vimdow is modal, like Vim. It is not a tiling window manager and does not arrange windows for you; it makes arranging them yourself fast. It is one person's preference, published for anyone whose hands have the same habits."
   },
   "how": {
     "title": "How it works",
@@ -51,7 +51,7 @@
     },
     "move": {
       "title": "Move and resize",
-      "text_html": "<kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd> move the focused window by a configurable step. Type a count to repeat, hold a key to glide, add Option or Shift to resize."
+      "text_html": "<kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd> move the focused window by a configurable step. Type a count to repeat, hold a key to glide, and add Option or Shift to resize."
     },
     "leave": {
       "title": "Leave",
@@ -66,15 +66,15 @@
     },
     "snap": {
       "title": "Snap and tile",
-      "text": "0, $, gg, G, and zz put a window at an edge or the center, keeping its size. Control–W with H, J, K, L, or O fills a half or the whole display."
+      "text": "0, $, gg, G, and zz put a window at an edge or the center, keeping its size. Control–W followed by H, J, K, or L fills half the display; followed by O, all of it."
     },
     "undo": {
       "title": "Undo and redo, per window",
-      "text": "u and Control–R step through each window's own history of moves, resizes, snaps, and display changes, even after you dragged it by hand."
+      "text": "u and Control–R step through each window's own history of moves, resizes, snaps, and display changes, even if you have since dragged it by hand."
     },
     "displays": {
       "title": "Displays that remember",
-      "text": "Control–Option–K and L send a window to the next display. Coming back restores the frame it had there."
+      "text": "Control–Option–K or L sends a window to the next display. Bring it back and it lands exactly where it was."
     },
     "switch": {
       "title": "Switch without hunting",
