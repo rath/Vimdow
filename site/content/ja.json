@@ -150,7 +150,7 @@
   },
   "footer": {
     "license": "BSD 3-Clause ライセンス",
-    "credits": "Vimdow は 2013年から Jang Ho Hwang が開発しています。最初のコマンドウインドウは、同じ年に Yoo Yong-Ha が作りました。グローバルショートカットには KeyboardShortcuts（MIT ライセンス）を使っています。",
+    "credits_html": "Vimdow は 2013年から <a href=\"https://xrath.com\">Jang Ho Hwang</a> が開発しています。最初のコマンドウインドウは、同じ年に Yoo Yong-Ha が作りました。グローバルショートカットには KeyboardShortcuts（MIT ライセンス）を使っています。",
     "issues": "問題を報告",
     "privacy": "このサイトでは Cookie もアクセス解析も使っていません。"
   }

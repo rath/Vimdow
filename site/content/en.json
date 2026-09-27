@@ -150,7 +150,7 @@
   },
   "footer": {
     "license": "BSD 3-Clause License",
-    "credits": "Jang Ho Hwang has been building Vimdow since 2013. Yoo Yong-Ha wrote its first command window the same year. Global shortcuts use the KeyboardShortcuts library (MIT License).",
+    "credits_html": "<a href=\"https://xrath.com\">Jang Ho Hwang</a> has been building Vimdow since 2013. Yoo Yong-Ha wrote its first command window the same year. Global shortcuts use the KeyboardShortcuts library (MIT License).",
     "issues": "Report an issue",
     "privacy": "This site sets no cookies and runs no analytics."
   }
