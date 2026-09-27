@@ -26,6 +26,7 @@ STATIC = SITE / "static"
 MEDIA = SITE / "media"
 DIST = SITE / "dist"
 ICON_SOURCE = SITE / "artwork" / "favicon.svg"
+OG_COPY = SITE / "artwork" / "og.json"
 
 HASHED_ASSETS = {"css": "style.css", "js": "demo.js", "statusline": "statusline.js"}
 VOID_ELEMENTS = {
@@ -189,6 +190,7 @@ def check_language_keys(reference: Strings, strings: Strings) -> None:
 def head_tags(shared: dict, language: dict, strings: Strings, og_image_size: tuple[int, int]) -> str:
     site = shared["site"]
     base = site["url"]
+    image_alt = f'{html.escape(site["name"])} — {strings.text("hero.tagline")}'
     lines = [f'<link rel="canonical" href="{base}{language["path"]}">']
     for other in shared["languages"]:
         lines.append(f'<link rel="alternate" hreflang="{other["lang"]}" href="{base}{other["path"]}">')
@@ -199,9 +201,10 @@ def head_tags(shared: dict, language: dict, strings: Strings, og_image_size: tup
         f'<meta property="og:title" content="{strings.text("meta.title")}">',
         f'<meta property="og:description" content="{strings.text("meta.description")}">',
         f'<meta property="og:url" content="{base}{language["path"]}">',
-        f'<meta property="og:image" content="{base}/og.png">',
+        f'<meta property="og:image" content="{base}{language["ogImage"]}">',
         f'<meta property="og:image:width" content="{og_image_size[0]}">',
         f'<meta property="og:image:height" content="{og_image_size[1]}">',
+        f'<meta property="og:image:alt" content="{image_alt}">',
         f'<meta property="og:locale" content="{language["ogLocale"]}">',
     ]
     for other in shared["languages"]:
@@ -209,6 +212,7 @@ def head_tags(shared: dict, language: dict, strings: Strings, og_image_size: tup
             lines.append(f'<meta property="og:locale:alternate" content="{other["ogLocale"]}">')
     lines += [
         '<meta name="twitter:card" content="summary_large_image">',
+        f'<meta name="twitter:image:alt" content="{image_alt}">',
         '<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13161c">',
         '<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">',
         '<link rel="icon" href="/icon.svg" type="image/svg+xml">',
@@ -217,6 +221,23 @@ def head_tags(shared: dict, language: dict, strings: Strings, og_image_size: tup
         f'<link rel="license" href="{site["license"]}">',
     ]
     return "\n".join(lines)
+
+
+def check_og_headline(og_copy: dict, language: dict, strings: Strings) -> None:
+    """The language's social preview must spell its tagline, only broken into lines."""
+    lines = og_copy.get(language["file"], {}).get("headline", {}).get("lines", [])
+    if "".join(lines).replace(" ", "") != strings.data["hero.tagline"].replace(" ", ""):
+        raise BuildError(
+            f"{OG_COPY.relative_to(ROOT)}: the {language['file']} headline no longer matches hero.tagline; "
+            "update it and run ./scripts/generate-site-images.sh"
+        )
+
+
+def og_image_dimensions(language: dict) -> tuple[int, int]:
+    image = STATIC / language["ogImage"].lstrip("/")
+    if not image.is_file():
+        raise BuildError(f"missing {image.relative_to(ROOT)}; run ./scripts/generate-site-images.sh")
+    return png_size(image)
 
 
 def font_tags(language: dict) -> str:
@@ -384,7 +405,7 @@ def build() -> None:
     reference = Strings(reference_file, load_json(CONTENT / f"{reference_file}.json"))
     if not ICON_SOURCE.is_file():
         raise BuildError(f"missing icon source {ICON_SOURCE.relative_to(ROOT)}")
-    og_image_size = png_size(STATIC / "og.png")
+    og_copy = load_json(OG_COPY)
 
     if DIST.exists():
         shutil.rmtree(DIST)
@@ -400,7 +421,8 @@ def build() -> None:
             language["file"], load_json(CONTENT / f"{language['file']}.json")
         )
         check_language_keys(reference, strings)
-        markup = render_page(shared, language, strings, asset_urls, og_image_size)
+        check_og_headline(og_copy, language, strings)
+        markup = render_page(shared, language, strings, asset_urls, og_image_dimensions(language))
         unused = strings.unused()
         if unused:
             raise BuildError(f"{strings.name}: unused keys: {', '.join(unused)}")

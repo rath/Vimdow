@@ -15,6 +15,7 @@
   "languages": [
     {
       "file": "en",
+      "ogImage": "/og.png",
       "lang": "en",
       "path": "/",
       "ogLocale": "en_US",
@@ -30,6 +31,7 @@
     },
     {
       "file": "ko",
+      "ogImage": "/og-ko.png",
       "lang": "ko",
       "path": "/ko/",
       "ogLocale": "ko_KR",
@@ -46,6 +48,7 @@
     },
     {
       "file": "ja",
+      "ogImage": "/og-ja.png",
       "lang": "ja",
       "path": "/ja/",
       "ogLocale": "ja_JP",
@@ -61,6 +64,7 @@
     },
     {
       "file": "zh-Hans",
+      "ogImage": "/og-zh.png",
       "lang": "zh-Hans",
       "path": "/zh/",
       "ogLocale": "zh_CN",

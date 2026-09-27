@@ -1,0 +1,26 @@
+{
+  "en": {
+    "font": "Iosevka",
+    "tab": { "width": 100, "size": 22, "baseline": 34 },
+    "headline": { "x": 92, "size": 100, "lines": ["Your windows, in", "Vim's vocabulary."] },
+    "subtitle": "Vim-style window management for macOS"
+  },
+  "ko": {
+    "font": "Pretendard",
+    "tab": { "width": 92, "size": 21, "baseline": 33 },
+    "headline": { "x": 94, "size": 100, "lines": ["창 관리를", "Vim 스타일로"] },
+    "subtitle": "키보드만으로 하는 macOS 창 관리"
+  },
+  "ja": {
+    "font": "Hiragino Sans",
+    "tab": { "width": 92, "size": 21, "baseline": 33 },
+    "headline": { "x": 94, "size": 100, "letterSpacing": [-7, 0], "lines": ["ウインドウ操作を、", "Vim 流に。"] },
+    "subtitle": "キーボードだけでできる Mac のウインドウ管理"
+  },
+  "zh-Hans": {
+    "font": "PingFang SC",
+    "tab": { "width": 112, "size": 21, "baseline": 33 },
+    "headline": { "x": 94, "size": 100, "lines": ["像用 Vim 一样，", "管理你的窗口。"] },
+    "subtitle": "纯键盘操作的 macOS 窗口管理"
+  }
+}

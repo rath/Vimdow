@@ -16,8 +16,10 @@ The output in `site/dist/` is ignored by Git. Pages are written to `/`, `/ko/`,
 favicon is copied from `artwork/favicon.svg` to `icon.svg` at build time.
 
 The build fails when a language file is missing or has extra keys compared with
-`content/en.json`, when a key is never used, when a page has unbalanced tags, or
-when a root-relative link points at nothing in `dist`.
+`content/en.json`, when a key is never used, when a page has unbalanced tags,
+when a root-relative link points at nothing in `dist`, or when a language's
+social preview is missing or its headline in `artwork/og.json` no longer spells
+the page's `hero.tagline`.
 
 ## Layout
 
@@ -37,14 +39,20 @@ when a root-relative link points at nothing in `dist`.
   modifier-key symbols; Pretendard's upstream dynamic subsets are kept unmodified
   and load on the Korean page only, through the language's `fonts` entry in
   `content/_shared.json`. All three are under the SIL Open Font License.
-- `artwork/`: SVG sources for the images. `og.svg` is the social preview;
-  its Iosevka text is outlined by `scripts/outline-svg-text.py` before
-  rendering, because librsvg on macOS cannot load fonts from a directory.
-  `favicon.svg` and `touch-icon.svg` are simplified copies of
-  `Artwork/launcher-small.svg` without the shadow and margin, so they stay
-  legible at 16 px and fill the iOS home-screen mask; update them by hand if the
-  app icon changes. After editing any of them, run
-  `./scripts/generate-site-images.sh` (needs `rsvg-convert` and fonttools).
+- `artwork/`: sources for the images. `og.svg` is the template for the social
+  previews, one per language, saved under each language's `ogImage` name
+  (`og.png`, `og-ko.png`, `og-ja.png`, `og-zh.png`). `scripts/fill-og-template.py`
+  fills it from the language's help file name, help line, and tagline, and from
+  `og.json`, which holds each language's font, tab width, headline line breaks
+  and tracking, and subtitle. Iosevka and Pretendard text is then outlined from
+  the site's own font files by `scripts/outline-svg-text.py`, because librsvg on
+  macOS cannot load fonts from a directory; Japanese and Chinese text uses the
+  system fonts Hiragino Sans and PingFang SC. `favicon.svg` and `touch-icon.svg`
+  are simplified copies of `Artwork/launcher-small.svg` without the shadow and
+  margin, so they stay legible at 16 px and fill the iOS home-screen mask;
+  update them by hand if the app icon changes. After editing any of them or
+  `og.json`, run `./scripts/generate-site-images.sh` (needs `rsvg-convert` and
+  fonttools).
 - `media/`: drop the real recording here (see below).
 
 ## Design
@@ -74,9 +82,11 @@ every language, and keep the `_html` strings' `<kbd>` markup intact.
    URL `path` (trailing slash), `ogLocale`, and a label written in that language.
 2. Copy `content/en.json` to `content/<file>.json` and translate every value.
 3. Give it a `helpFile` (Vim's translated help files use `.kox`, `.jax`, and
-   so on) and a `fonts` entry, and add a `:lang()` font stack in
+   so on), an `ogImage`, and a `fonts` entry, and add a `:lang()` font stack in
    `static/style.css` if the script needs one.
-4. Add the link to `static/404.html`. Build; the checks report anything missed.
+4. Add its social preview to `artwork/og.json` and run
+   `./scripts/generate-site-images.sh`.
+5. Add the link to `static/404.html`. Build; the checks report anything missed.
 
 ## Real recording
 

@@ -10,3 +10,4 @@ Config/Signing.local.xcconfig
 site/dist/
 __pycache__/
 /build/
+site/artwork/.og-*.svg
