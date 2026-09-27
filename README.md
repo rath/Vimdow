@@ -241,8 +241,8 @@ project regeneration. Later edits to the local file do not require regeneration.
 
 `Config/Signing.local.xcconfig` is ignored by Git. Keep personal signing settings
 out of the tracked template and `project.yml`. Remove the local file to restore
-ad-hoc signing. Signed public distribution and notarization are separate from
-this development build.
+ad-hoc signing. Public releases are signed with Developer ID instead; see
+[Releasing](#releasing).
 
 **To avoid re-registering Accessibility permission after each rebuild, sign
 every build with the same Apple Development certificate and keep the bundle
@@ -304,6 +304,38 @@ xcodebuild -project VimdowManager.xcodeproj -scheme VimdowPresentation \
   -destination 'platform=macOS' -derivedDataPath DerivedData \
   -onlyUsePackageVersionsFromResolvedFile test
 ```
+
+### Releasing
+
+Releases are built on the maintainer's Mac and published as a notarized
+`Vimdow.zip` on [GitHub Releases](https://github.com/rath/Vimdow/releases).
+`releases/latest/download/Vimdow.zip` always points at the newest one.
+
+One-time setup:
+
+1. Create a **Developer ID Application** certificate (Xcode → Settings →
+   Accounts → Manage Certificates → + ). Only the team's Account Holder can.
+   Back up the certificate with its private key as a `.p12`.
+2. Create an app-specific password at [account.apple.com](https://account.apple.com)
+   (Sign-In and Security → App-Specific Passwords), then store it for notarytool:
+
+   ```sh
+   xcrun notarytool store-credentials vimdow-notary \
+     --apple-id <apple-id-email> --team-id <team-id>
+   ```
+
+For each release, raise `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in
+`project.yml`, commit, and run:
+
+```sh
+./scripts/release.sh
+```
+
+From a clean `HEAD`, it runs the core tests, archives a universal Release
+build, signs it with Developer ID and the hardened runtime, notarizes and
+staples it, writes `build/release/Vimdow.zip`, and tags the commit
+`v<version>`. It publishes nothing; it prints the commands to push the tag and
+create a draft release. Set `NOTARY_PROFILE` to use another keychain profile.
 
 ### Architecture
 

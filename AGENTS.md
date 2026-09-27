@@ -74,6 +74,8 @@ For documentation-only changes, `git diff --check` is sufficient.
   Select the certificate by SHA-1 fingerprint; names can match expired certificates.
 - Never commit personal certificate fingerprints, Team IDs, or the local signing
   file. Public defaults and the example configuration must remain generic.
+- Releases come from `./scripts/release.sh` (Developer ID, notarized); README's
+  Releasing section covers setup. Never push tags or publish releases yourself.
 
 ## Install for manual testing
 

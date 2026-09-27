@@ -16,6 +16,8 @@ configFiles:
 settings:
   base:
     SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
   configs:
     Debug:
       ONLY_ACTIVE_ARCH: YES
@@ -46,6 +48,7 @@ targets:
         INFOPLIST_FILE: VimdowManager/VimdowManager-Info.plist
         PRODUCT_NAME: Vimdow
         PRODUCT_BUNDLE_IDENTIFIER: rath.toys.VimdowManager
+        ENABLE_HARDENED_RUNTIME: YES
         PROVISIONING_PROFILE_SPECIFIER: ""
     dependencies:
       - target: VimdowCore
