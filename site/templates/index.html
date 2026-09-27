@@ -25,14 +25,25 @@
     <p class="cta"><a class="button primary" href="#get">{{hero.get}}</a><a class="jump" href="{{site.repo}}" rel="noopener"><span aria-hidden="true">|</span>{{hero.source}}<span aria-hidden="true">|</span></a></p>
     <div class="demo" id="demo">
       <script type="application/json" id="demo-config">{{{_.demoConfig}}}</script>
-      <div class="stage" role="img" aria-label="{{demo.aria}}">
+      <div class="stage" role="img" aria-label="{{demo.aria}}" data-focus="{{_.demoFocus}}">
         <div class="desktop" aria-hidden="true">
           <div class="menubar"><span class="apple"></span><span class="menu"></span><span class="menu"></span><span class="menu"></span><span class="mode" data-mode data-normal="{{demo.modeNormal}}" data-command="{{demo.modeCommand}}">{{demo.modeNormal}}</span></div>
-          <div class="window"><div class="titlebar"><i></i><i></i><i></i></div><div class="pane"><span class="cursor"></span></div></div>
-          <div class="keycaps" data-keys></div>
+          <div class="window terminal" data-window="a" style="{{_.demoStyleA}}">
+            <div class="titlebar"><i></i><i></i><i></i><span>~/work — zsh</span></div>
+            <div class="pane"><p><b>~/work $</b> git status</p><p>On branch main</p><p>nothing to commit, working tree clean</p><p><b>~/work $</b> <span class="cursor"></span></p></div>
+            <span class="guide" data-guide></span>
+          </div>
+          <div class="window document" data-window="b" style="{{_.demoStyleB}}">
+            <div class="titlebar"><i></i><i></i><i></i><span>README.md</span></div>
+            <div class="pane"><span class="line heading"></span><span class="line"></span><span class="line"></span><span class="line short"></span><span class="line"></span><span class="line"></span><span class="line short"></span></div>
+            <span class="guide" data-guide></span>
+          </div>
+          <div class="ghost" data-ghost></div>
+          <div class="hud" data-hud><div class="hud-keys" data-keys></div></div>
         </div>
       </div>
       <div class="demo-controls">
+        <p class="demo-caption" data-caption aria-hidden="true"></p>
         <button type="button" class="button small" data-play aria-pressed="true" data-play-label="{{demo.play}}" data-pause-label="{{demo.pause}}" data-next-label="{{demo.next}}">{{demo.pause}}</button>
       </div>
       <h2 class="visually-hidden">{{demo.stepsHeading}}</h2>

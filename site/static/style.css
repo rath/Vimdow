@@ -60,13 +60,6 @@
   --tabfill-fg: #ffffff;
   --tab-bg: #d5dae0;          /* TabLine */
   --tab-fg: #13161c;
-  --accent: #1f9e55;          /* the app icon's green, used inside the demo */
-  --desktop-top: #cfd6df;
-  --desktop-bottom: #aeb7c3;
-  --window-top: #ffffff;
-  --window-bottom: #e9edf2;
-  --window-title: #e3e8ee;
-  --window-dot: #b8c0ca;
   --font-mono: "Iosevka Web", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --font-body: "Iosevka Aile Web", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --page: 46rem;
@@ -91,13 +84,6 @@
     --tabfill-fg: #13161c;
     --tab-bg: #9aa3ad;
     --tab-fg: #13161c;
-    --accent: #4cd07d;
-    --desktop-top: #3a4150;
-    --desktop-bottom: #1b1f27;
-    --window-top: #f3f5f8;
-    --window-bottom: #d6dce4;
-    --window-title: #dce1e8;
-    --window-dot: #a3abb6;
   }
 }
 
@@ -276,79 +262,147 @@ kbd + kbd { margin-inline-start: 2px; }
 .toc .leader { flex: 1; min-width: 2ch; margin: 0 1ch; border-bottom: 2px dotted var(--muted); opacity: 0.5; }
 .jump-tag { color: var(--link); }
 
-/* Demo */
+/* Demo: a dark macOS desktop drawn at a fixed 640 × 400 scale. Sizes use container
+   units so the whole scene scales with the stage; colours are the icon's own and do
+   not follow the page theme. */
 .demo { margin-top: 3rem; }
 .stage {
+  --demo-accent: #4cd07d;
   position: relative;
   aspect-ratio: 16 / 10;
+  container-type: inline-size;
   border-radius: 10px;
   overflow: hidden;
-  background: linear-gradient(180deg, var(--desktop-top), var(--desktop-bottom));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fg) 25%, transparent);
+  background:
+    radial-gradient(120% 90% at 85% 115%, rgba(76, 208, 125, 0.3), transparent 60%),
+    linear-gradient(160deg, #3a4150, #13161c 72%);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fg) 20%, transparent);
 }
-.desktop { position: absolute; inset: 0; }
+.desktop { position: absolute; inset: 0; transition: opacity 250ms; }
+.desktop.is-resetting { opacity: 0; }
 .menubar {
-  position: absolute; left: 0; right: 0; top: 0; height: 6%;
-  display: flex; align-items: center; gap: 3%;
-  padding: 0 2.5%;
-  background: rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(6px);
+  position: absolute; left: 0; right: 0; top: 0; height: 3.75cqw;
+  display: flex; align-items: center; gap: 2.4cqw;
+  padding: 0 2cqw;
+  background: rgba(0, 0, 0, 0.3);
 }
-.menubar .apple { width: 2%; aspect-ratio: 1; border-radius: 50%; background: rgba(255, 255, 255, 0.7); }
-.menubar .menu { width: 6%; height: 28%; border-radius: 2px; background: rgba(255, 255, 255, 0.35); }
+.menubar .apple { width: 1.3cqw; aspect-ratio: 1; border-radius: 50%; background: rgba(255, 255, 255, 0.75); }
+.menubar .menu { width: 4.5cqw; height: 0.9cqw; border-radius: 2px; background: rgba(255, 255, 255, 0.3); }
 .menubar .mode {
   margin-inline-start: auto;
-  padding: 0 1.2%;
-  border-radius: 4px;
+  padding: 0 0.9cqw;
+  border-radius: 0.5cqw;
   background: rgba(255, 255, 255, 0.14);
   color: rgba(255, 255, 255, 0.75);
-  font: 700 clamp(8px, 1.7vw, 12px) / 1.6 var(--font-mono);
+  font: 700 max(8px, 1.6cqw) / 1.6 var(--font-mono);
   letter-spacing: 0.06em;
-  transition: background 200ms, color 200ms;
+  transition: background 150ms, color 150ms;
 }
-.stage.is-command .mode { background: var(--accent); color: #0b1f14; }
+.stage.is-command .mode { background: var(--demo-accent); color: #0b1f14; }
 
 .window {
   position: absolute;
-  border-radius: 8px;
+  z-index: 1;
+  display: flex; flex-direction: column;
+  border-radius: 1.1cqw;
   overflow: hidden;
-  background: linear-gradient(180deg, var(--window-top), var(--window-bottom));
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.18);
-  transition: left 450ms cubic-bezier(0.25, 0.1, 0.25, 1), top 450ms cubic-bezier(0.25, 0.1, 0.25, 1),
-              width 450ms cubic-bezier(0.25, 0.1, 0.25, 1), height 450ms cubic-bezier(0.25, 0.1, 0.25, 1),
-              box-shadow 200ms;
+  box-shadow: 0 1.6cqw 4cqw rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  transition: left 320ms cubic-bezier(0.22, 1, 0.36, 1), top 320ms cubic-bezier(0.22, 1, 0.36, 1),
+              width 320ms cubic-bezier(0.22, 1, 0.36, 1), height 320ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 150ms;
 }
-.stage.is-command .window { box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 0 2px var(--accent); }
-.titlebar { display: flex; gap: 5px; align-items: center; height: 22px; padding: 0 8px; background: var(--window-title); }
-.titlebar i { width: 8px; height: 8px; border-radius: 50%; background: var(--window-dot); }
-.pane { position: relative; padding: 10px; }
-.cursor { display: block; width: 8px; height: 14px; background: var(--accent); }
+.stage[data-focus="a"] [data-window="a"], .stage[data-focus="b"] [data-window="b"] { z-index: 2; }
+.stage.is-instant .window { transition: none; }
+.stage.is-command[data-focus="a"] [data-window="a"],
+.stage.is-command[data-focus="b"] [data-window="b"] {
+  box-shadow: 0 1.6cqw 4cqw rgba(0, 0, 0, 0.45), 0 0 0 2px var(--demo-accent);
+}
+.titlebar {
+  flex: none;
+  display: flex; align-items: center; gap: 0.8cqw;
+  height: 3.6cqw; padding: 0 1.2cqw;
+  font: 500 max(6px, 1.45cqw) / 1 var(--font-body);
+  white-space: nowrap;
+}
+.titlebar i { flex: none; width: 1.1cqw; aspect-ratio: 1; border-radius: 50%; background: rgba(128, 128, 128, 0.45); }
+.titlebar span { flex: 1; overflow: hidden; text-overflow: ellipsis; margin-inline-end: 3.8cqw; text-align: center; opacity: 0.7; }
+.stage[data-focus="a"] [data-window="a"] .titlebar i:nth-child(1),
+.stage[data-focus="b"] [data-window="b"] .titlebar i:nth-child(1) { background: #ff5f57; }
+.stage[data-focus="a"] [data-window="a"] .titlebar i:nth-child(2),
+.stage[data-focus="b"] [data-window="b"] .titlebar i:nth-child(2) { background: #febc2e; }
+.stage[data-focus="a"] [data-window="a"] .titlebar i:nth-child(3),
+.stage[data-focus="b"] [data-window="b"] .titlebar i:nth-child(3) { background: #28c840; }
+.pane { flex: 1; min-height: 0; overflow: hidden; padding: 1.2cqw 1.6cqw; }
 
-.keycaps {
-  position: absolute; left: 50%; bottom: 5%;
-  display: flex; gap: 6px;
-  transform: translateX(-50%);
-  pointer-events: none;
+.terminal { background: #1b1f27; color: #c3cad3; }
+.terminal .titlebar { background: #262b35; color: #e6e9ee; }
+.terminal .pane p { margin: 0; font: max(5px, 1.5cqw) / 1.55 var(--font-mono); white-space: nowrap; }
+.terminal .pane b { color: var(--demo-accent); font-weight: 400; }
+.cursor { display: inline-block; width: 0.9cqw; height: 1.7cqw; vertical-align: -0.3cqw; background: #c3cad3; }
+.stage.is-command[data-focus="a"] .cursor { background: var(--demo-accent); }
+
+.document { background: #f6f7f9; color: #13161c; }
+.document .titlebar { background: #e4e8ed; }
+.document .line { display: block; height: 0.9cqw; margin: 0 0 1.1cqw; border-radius: 0.45cqw; background: #d5dae0; }
+.document .line.heading { width: 45%; height: 1.5cqw; margin-bottom: 1.6cqw; background: #aeb7c3; }
+.document .line.short { width: 60%; }
+
+/* Numbered guides, as the app draws them: a translucent black square in the corner. */
+.guide {
+  position: absolute; top: 0.8cqw; left: 0.8cqw;
+  display: none; place-items: center;
+  width: 5.6cqw; aspect-ratio: 1;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font: max(10px, 4.2cqw) / 1 system-ui, -apple-system, sans-serif;
 }
-.keycaps kbd {
+.stage.show-guides .guide { display: grid; }
+
+/* Where the window was before the last key, fading out. */
+.ghost {
+  position: absolute; z-index: 3;
+  border: 1.5px dashed var(--demo-accent);
+  border-radius: 1.1cqw;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms ease-out;
+}
+.ghost.is-visible { opacity: 0.85; transition: none; }
+
+.hud {
+  position: absolute; z-index: 4; left: 50%; bottom: 3.2cqw;
+  display: flex; gap: 0.9cqw;
+  padding: 1cqw;
+  border-radius: 1.6cqw;
+  background: rgba(12, 14, 18, 0.78);
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 200ms;
+}
+.hud.is-visible { opacity: 1; }
+.hud kbd {
   min-width: 2.2em;
-  padding: 0.25em 0.6em;
-  border: 1px solid #3a414d;
+  padding: 0.2em 0.55em;
+  border: 1px solid #4a5260;
   border-bottom-width: 2px;
-  border-radius: 5px;
-  background: #1b2028;
+  border-radius: 0.35em;
+  background: #262b35;
   color: #f3f5f8;
-  font-size: clamp(11px, 2.4vw, 17px);
-  line-height: 1.5;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-  animation: key-pop 180ms ease-out;
+  /* Not Iosevka, whose bold l passes for a 1, nor a sans face, whose l passes for an I:
+     the demo types l, 1, and 2 in a row. These faces all give l a curled foot. */
+  font: 600 max(12px, 2.6cqw) / 1.45 "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+  text-align: center;
+  animation: key-pop 160ms ease-out;
 }
 @keyframes key-pop {
-  from { transform: translateY(8px) scale(0.9); opacity: 0; }
+  from { transform: translateY(0.4em) scale(0.9); opacity: 0; }
   to { transform: none; opacity: 1; }
 }
 
-.demo-controls { display: flex; justify-content: flex-end; margin: 12px 0 8px; }
+.demo-controls { display: flex; align-items: flex-start; gap: 2ch; margin: 12px 0 8px; }
+.demo-caption { flex: 1; min-height: 3.2em; margin: 0; font-size: 0.9375rem; }
+.demo-caption .count { margin-inline-end: 1.5ch; color: var(--linenr); font-family: var(--font-mono); }
+.demo-controls .button { margin-inline-start: auto; }
 .demo-steps {
   margin: 0; padding: 0 0 0 3ch;
   columns: 2; column-gap: 3ch;
@@ -357,6 +411,8 @@ kbd + kbd { margin-inline-start: 2px; }
 .demo-steps li { padding: 2px 0.5ch; margin: 0 0 2px -0.5ch; break-inside: avoid; }
 .demo-steps li::marker { color: var(--linenr); font-family: var(--font-mono); }
 .demo-steps li.is-active { background: var(--visual); }
+/* While the demo plays, the caption under the stage carries the steps; the list stays for screen readers. */
+.demo.is-live .demo-steps { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .real-video { margin-top: 20px; }
 .real-video summary { cursor: pointer; color: var(--link); font-family: var(--font-mono); }
 .real-video video { display: block; width: 100%; margin-top: 12px; border-radius: 10px; background: #000; }
@@ -440,6 +496,7 @@ kbd + kbd { margin-inline-start: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .window, .menubar .mode { transition: none; }
-  .keycaps kbd { animation: none; }
+  .window, .menubar .mode, .desktop, .hud { transition: none; }
+  .hud kbd { animation: none; }
+  .ghost { display: none; }
 }

@@ -1,5 +1,6 @@
-/* Animated command-mode demo. Reads its steps from #demo-config (language-neutral)
-   and highlights the localized step list rendered by the build. */
+/* Animated command-mode demo. Reads its windows and keys from #demo-config
+   (language-neutral) and takes each step's caption from the localized step list
+   rendered by the build. Every key applies its own effect as it is pressed. */
 (function () {
   'use strict';
 
@@ -9,106 +10,170 @@
 
   var config = JSON.parse(configElement.textContent);
   var stage = root.querySelector('.stage');
-  var windowElement = root.querySelector('.window');
+  var desktop = root.querySelector('.desktop');
+  var ghost = root.querySelector('[data-ghost]');
+  var hud = root.querySelector('[data-hud]');
   var keysElement = root.querySelector('[data-keys]');
+  var caption = root.querySelector('[data-caption]');
   var modeElement = root.querySelector('[data-mode]');
   var button = root.querySelector('[data-play]');
   var stepItems = Array.prototype.slice.call(root.querySelectorAll('[data-step]'));
   var steps = config.steps;
+  var names = Object.keys(config.windows);
+  var windows = {};
+  names.forEach(function (name) { windows[name] = root.querySelector('[data-window="' + name + '"]'); });
 
-  var KEY_DELAY = 260;   // ms between key caps appearing
-  var MOVE_TIME = 500;   // matches the CSS transition on .window
-  var HOLD_TIME = 1100;  // pause after each step
-  var LOOP_PAUSE = 1800; // pause before the loop restarts
+  var LEAD_TIME = 300;   // ms between a step's caption and its first key
+  var KEY_DELAY = 360;   // ms between keys; each key's motion fits inside it
+  var HOLD_TIME = 1000;  // pause after each step
+  var LOOP_PAUSE = 2200; // time on the last frame before the loop restarts
+  var FADE_TIME = 250;   // matches the opacity transition on .desktop
 
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var state;
 
-  function applyFrame(frame) {
-    var stageSize = config.stage;
-    windowElement.style.left = (frame.x / stageSize.width * 100) + '%';
-    windowElement.style.top = (frame.y / stageSize.height * 100) + '%';
-    windowElement.style.width = (frame.w / stageSize.width * 100) + '%';
-    windowElement.style.height = (frame.h / stageSize.height * 100) + '%';
+  function place(element, frame) {
+    var size = config.stage;
+    element.style.left = (frame.x / size.width * 100) + '%';
+    element.style.top = (frame.y / size.height * 100) + '%';
+    element.style.width = (frame.w / size.width * 100) + '%';
+    element.style.height = (frame.h / size.height * 100) + '%';
   }
 
   function setMode(mode) {
+    state.mode = mode;
     var command = mode === 'command';
     modeElement.textContent = command ? modeElement.dataset.command : modeElement.dataset.normal;
     stage.classList.toggle('is-command', command);
   }
 
-  function showKeys(keys, count) {
-    var caps = keys.slice(0, count).map(function (key) {
-      var cap = document.createElement('kbd');
-      cap.textContent = key;
-      return cap;
-    });
-    keysElement.replaceChildren.apply(keysElement, caps);
+  function setFocus(name) {
+    state.focus = name;
+    stage.dataset.focus = name;
   }
 
-  function highlight(index) {
+  /* Like the app, number windows front to back: the focused one is 1. */
+  function setGuides(visible) {
+    var order = [state.focus].concat(names.filter(function (name) { return name !== state.focus; }));
+    order.forEach(function (name, index) {
+      windows[name].querySelector('[data-guide]').textContent = String(index + 1);
+    });
+    stage.classList.toggle('show-guides', visible);
+  }
+
+  function showGhost(frame) {
+    place(ghost, frame);
+    ghost.classList.add('is-visible');
+    void ghost.offsetWidth;  // commit the visible state so removing the class fades it out
+    ghost.classList.remove('is-visible');
+  }
+
+  function press(key, animate) {
+    if (key.focus) { setFocus(key.focus); }
+    if (key.mode) { setMode(key.mode); }
+    if ('guides' in key) { setGuides(key.guides); }
+    if (key.frame) {
+      var previous = state.frames[state.focus];
+      var next = Object.assign({}, previous, key.frame);
+      if (animate) { showGhost(previous); }
+      state.frames[state.focus] = next;
+      place(windows[state.focus], next);
+    }
+  }
+
+  function showKeys(step, count) {
+    var caps = step ? step.keys.slice(0, count).map(function (key) {
+      var cap = document.createElement('kbd');
+      cap.textContent = key.key;
+      return cap;
+    }) : [];
+    keysElement.replaceChildren.apply(keysElement, caps);
+    hud.classList.toggle('is-visible', caps.length > 0);
+  }
+
+  function showCaption(index) {
     stepItems.forEach(function (item, position) {
       item.classList.toggle('is-active', position === index);
     });
+    if (index < 0) { caption.replaceChildren(); return; }
+    var count = document.createElement('span');
+    count.className = 'count';
+    count.textContent = (index + 1) + '/' + steps.length;
+    caption.replaceChildren(count, stepItems[index].textContent);
   }
 
+  /* Jump to the state before any key, without animating the windows back. */
   function reset() {
-    applyFrame(config.initialFrame);
+    state = { frames: {}, focus: names[0], mode: 'normal' };
+    stage.classList.add('is-instant');
+    names.forEach(function (name) {
+      state.frames[name] = Object.assign({}, config.windows[name]);
+      place(windows[name], state.frames[name]);
+    });
+    setFocus(names[0]);
     setMode('normal');
-    showKeys([], 0);
-    highlight(-1);
+    setGuides(false);
+    void stage.offsetWidth;
+    stage.classList.remove('is-instant');
+    showKeys(null, 0);
+    showCaption(-1);
   }
 
-  function applyStep(step) {
-    if (step.frame) { applyFrame(step.frame); }
-    setMode(step.mode);
+  /* The state after the given number of steps, applied at once. */
+  function jumpTo(stepCount) {
+    reset();
+    stage.classList.add('is-instant');
+    steps.slice(0, stepCount).forEach(function (step) {
+      step.keys.forEach(function (key) { press(key, false); });
+    });
+    void stage.offsetWidth;
+    stage.classList.remove('is-instant');
   }
 
-  /* Build one loop as a list of timed events. */
+  /* One loop as a list of timed events. */
   function timeline() {
     var events = [];
-    var cursor = 400;
+    var cursor = 600;
     steps.forEach(function (step, index) {
-      step.keys.forEach(function (_, keyIndex) {
-        events.push({ at: cursor + keyIndex * KEY_DELAY, run: function () {
-          if (keyIndex === 0) { highlight(index); }
-          showKeys(step.keys, keyIndex + 1);
+      events.push({ at: cursor, run: function () { showCaption(index); showKeys(step, 0); } });
+      var at = cursor + LEAD_TIME;
+      step.keys.forEach(function (key, keyIndex) {
+        events.push({ at: at, run: function () {
+          showKeys(step, keyIndex + 1);
+          press(key, true);
         } });
+        at += KEY_DELAY + (key.hold || 0);  // hold: extra time to look before the next key
       });
-      cursor += step.keys.length * KEY_DELAY;
-      events.push({ at: cursor, run: function () { applyStep(step); } });
-      cursor += (step.frame ? MOVE_TIME : 150) + HOLD_TIME;
+      cursor = at + HOLD_TIME;
     });
-    events.push({ at: cursor, run: function () { showKeys([], 0); highlight(-1); } });
-    return { events: events, duration: cursor + LOOP_PAUSE };
+    events.push({ at: cursor, run: function () { showKeys(null, 0); showCaption(-1); } });
+    cursor += LOOP_PAUSE;
+    events.push({ at: cursor, run: function () { desktop.classList.add('is-resetting'); } });
+    return { events: events, duration: cursor + FADE_TIME };
   }
 
-  /* Reduced motion: no autoplay; the button steps through the sequence. */
+  /* Reduced motion: no autoplay. The page shows the last frame, the step list
+     stays visible, and the button steps through the sequence. */
   if (reducedMotion.matches) {
     var position = -1;
-    reset();
-    var lastFrame = config.initialFrame;
-    steps.forEach(function (step) { if (step.frame) { lastFrame = step.frame; } });
-    applyFrame(lastFrame);
+    jumpTo(steps.length);
     button.textContent = button.dataset.nextLabel;
     button.removeAttribute('aria-pressed');
     button.addEventListener('click', function () {
       position += 1;
       if (position >= steps.length) {
         position = -1;
-        reset();
-        applyFrame(lastFrame);
+        jumpTo(steps.length);
         return;
       }
-      if (position === 0) { reset(); }
-      var step = steps[position];
-      showKeys(step.keys, step.keys.length);
-      applyStep(step);
-      highlight(position);
+      jumpTo(position + 1);
+      showKeys(steps[position], steps[position].keys.length);
+      showCaption(position);
     });
     return;
   }
 
+  root.classList.add('is-live');
   var loop = timeline();
   var wantsPlay = true;   // the visitor's choice
   var pageVisible = !document.hidden;
@@ -133,6 +198,7 @@
       elapsed = 0;
       nextEvent = 0;
       reset();
+      desktop.classList.remove('is-resetting');
     }
     frameRequest = window.requestAnimationFrame(tick);
   }

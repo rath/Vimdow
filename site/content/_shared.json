@@ -83,121 +83,184 @@
   "demo": {
     "stage": {
       "width": 640,
-      "height": 400,
-      "menuBar": 24
+      "height": 400
     },
-    "initialFrame": {
-      "x": 72,
-      "y": 64,
-      "w": 272,
-      "h": 196
+    "windows": {
+      "a": {
+        "x": 56,
+        "y": 60,
+        "w": 240,
+        "h": 160
+      },
+      "b": {
+        "x": 360,
+        "y": 124,
+        "w": 224,
+        "h": 196
+      }
     },
     "steps": [
       {
         "id": "enter",
         "keys": [
-          "⌃",
-          "⌥",
-          "A"
-        ],
-        "mode": "command",
-        "frame": null
+          {
+            "key": "⌃⌥A",
+            "mode": "command"
+          }
+        ]
       },
       {
         "id": "right",
         "keys": [
-          "l",
-          "l",
-          "l"
-        ],
-        "mode": "command",
-        "frame": {
-          "x": 132,
-          "y": 64,
-          "w": 272,
-          "h": 196
-        }
+          {
+            "key": "l",
+            "frame": {
+              "x": 76
+            }
+          },
+          {
+            "key": "l",
+            "frame": {
+              "x": 96
+            }
+          },
+          {
+            "key": "l",
+            "frame": {
+              "x": 116
+            }
+          }
+        ]
       },
       {
         "id": "down",
         "keys": [
-          "1",
-          "2",
-          "j"
-        ],
-        "mode": "command",
-        "frame": {
-          "x": 132,
-          "y": 160,
-          "w": 272,
-          "h": 196
-        }
+          {
+            "key": "1"
+          },
+          {
+            "key": "2"
+          },
+          {
+            "key": "j",
+            "frame": {
+              "y": 156
+            }
+          }
+        ]
       },
       {
         "id": "grow",
         "keys": [
-          "⌥",
-          "l",
-          "l",
-          "l"
-        ],
-        "mode": "command",
-        "frame": {
-          "x": 132,
-          "y": 160,
-          "w": 332,
-          "h": 196
-        }
+          {
+            "key": "⌥l",
+            "frame": {
+              "w": 260
+            }
+          },
+          {
+            "key": "⌥l",
+            "frame": {
+              "w": 280
+            }
+          },
+          {
+            "key": "⌥l",
+            "frame": {
+              "w": 300
+            }
+          }
+        ]
       },
       {
         "id": "center",
         "keys": [
-          "z",
-          "z"
-        ],
-        "mode": "command",
-        "frame": {
-          "x": 154,
-          "y": 126,
-          "w": 332,
-          "h": 196
-        }
-      },
-      {
-        "id": "half",
-        "keys": [
-          "⌃",
-          "w",
-          "H"
-        ],
-        "mode": "command",
-        "frame": {
-          "x": 0,
-          "y": 24,
-          "w": 320,
-          "h": 376
-        }
+          {
+            "key": "z"
+          },
+          {
+            "key": "z",
+            "frame": {
+              "x": 170,
+              "y": 132
+            }
+          }
+        ]
       },
       {
         "id": "undo",
         "keys": [
-          "u"
-        ],
-        "mode": "command",
-        "frame": {
-          "x": 154,
-          "y": 126,
-          "w": 332,
-          "h": 196
-        }
+          {
+            "key": "u",
+            "frame": {
+              "x": 116,
+              "y": 156
+            }
+          }
+        ]
+      },
+      {
+        "id": "half",
+        "keys": [
+          {
+            "key": "⌃W"
+          },
+          {
+            "key": "H",
+            "frame": {
+              "x": 0,
+              "y": 24,
+              "w": 320,
+              "h": 376
+            }
+          }
+        ]
+      },
+      {
+        "id": "switch",
+        "keys": [
+          {
+            "key": "Q",
+            "guides": true,
+            "hold": 1000
+          },
+          {
+            "key": "2",
+            "guides": false,
+            "focus": "b",
+            "mode": "normal"
+          }
+        ]
+      },
+      {
+        "id": "tile",
+        "keys": [
+          {
+            "key": "⌃⌥A",
+            "mode": "command"
+          },
+          {
+            "key": "⌃W"
+          },
+          {
+            "key": "L",
+            "frame": {
+              "x": 320,
+              "y": 24,
+              "w": 320,
+              "h": 376
+            }
+          }
+        ]
       },
       {
         "id": "exit",
         "keys": [
-          "esc"
-        ],
-        "mode": "normal",
-        "frame": null
+          {
+            "key": "esc",
+            "mode": "normal"
+          }
+        ]
       }
     ]
   },

@@ -301,6 +301,39 @@ def png_size(path: Path) -> tuple[int, int]:
     return int.from_bytes(header[16:20], "big"), int.from_bytes(header[20:24], "big")
 
 
+DEMO_KEY_FIELDS = {"key", "mode", "frame", "focus", "guides", "hold"}
+
+
+def demo_final_state(demo: dict) -> tuple[dict[str, dict], str]:
+    """Replays the demo's keys to find where it ends, which is also its static frame
+    without JavaScript or with reduced motion. Rejects keys the script would ignore."""
+    frames = {name: dict(frame) for name, frame in demo["windows"].items()}
+    focus = next(iter(frames))
+    for step in demo["steps"]:
+        for key in step["keys"]:
+            where = f"demo step {step['id']}, key {key.get('key')!r}"
+            if unknown := set(key) - DEMO_KEY_FIELDS:
+                raise BuildError(f"{where}: unknown fields {sorted(unknown)}")
+            if key.get("mode", "command") not in ("command", "normal"):
+                raise BuildError(f"{where}: mode must be command or normal")
+            if "focus" in key:
+                if key["focus"] not in frames:
+                    raise BuildError(f"{where}: no window {key['focus']!r}")
+                focus = key["focus"]
+            if unknown := set(key.get("frame", {})) - {"x", "y", "w", "h"}:
+                raise BuildError(f"{where}: unknown frame fields {sorted(unknown)}")
+            frames[focus].update(key.get("frame", {}))
+    return frames, focus
+
+
+def frame_style(frame: dict, stage: dict) -> str:
+    def percent(value: float, total: float) -> str:
+        return f"{value / total * 100:.4g}%"
+
+    return (f"left:{percent(frame['x'], stage['width'])};top:{percent(frame['y'], stage['height'])};"
+            f"width:{percent(frame['w'], stage['width'])};height:{percent(frame['h'], stage['height'])}")
+
+
 def render_video(strings: Strings) -> str:
     """The real recording, shown only when site/media/demo.mp4 exists."""
     label = strings.text("demo.watchReal")
@@ -351,6 +384,7 @@ def render_page(shared: dict, language: dict, strings: Strings, asset_urls: dict
         demo_step.substitute(id=html.escape(step["id"]), text=strings.text(f"demo.steps.{step['id']}"))
         for step in shared["demo"]["steps"]
     )
+    demo_frames, demo_focus = demo_final_state(shared["demo"])
     extras = {
         "_.lang": language["lang"],
         "_.path": language["path"],
@@ -368,6 +402,9 @@ def render_page(shared: dict, language: dict, strings: Strings, asset_urls: dict
         "_.faq": faq,
         "_.demoSteps": demo_steps,
         "_.demoConfig": json_for_html(shared["demo"]),
+        "_.demoFocus": demo_focus,
+        "_.demoStyleA": frame_style(demo_frames["a"], shared["demo"]["stage"]),
+        "_.demoStyleB": frame_style(demo_frames["b"], shared["demo"]["stage"]),
         "_.video": render_video(strings),
     }
     extras.update({f"site.{key}": value for key, value in site.items()})

@@ -20,13 +20,15 @@ The build fails when a language file is missing or has extra keys compared with
 `content/en.json`, when a key is never used, when a page has unbalanced tags,
 when a root-relative link points at nothing in `dist`, or when a language's
 social preview is missing or its headline in `artwork/og.json` no longer spells
-the page's `hero.tagline`.
+the page's `hero.tagline`, or when a demo key names an unknown window or field.
+The build replays the demo's keys and draws its last frame into the page, which
+is what visitors see without JavaScript or with reduced motion.
 
 ## Layout
 
 - `content/_shared.json`: language-neutral structure. Site URLs, the language
-  list, demo steps with their key caps and window frames, and the cheat-sheet
-  rows with their keys. Key caps are never translated.
+  list, the demo's two windows and its keys with what each one does, and the
+  cheat-sheet rows with their keys. Key caps are never translated.
 - `content/en.json`: all copy, and the source of truth for keys. `ko.json`,
   `ja.json`, and `zh-Hans.json` mirror it exactly.
 - `templates/index.html`: the page. `{{key}}` inserts escaped text; `{{{key}}}`
@@ -93,13 +95,14 @@ every language, and keep the `_html` strings' `<kbd>` markup intact.
 
 The hero currently plays an animated mock-up. To add a real screen recording:
 
-1. Use one display at 1440×900 with a plain wallpaper and a single window, for
-   example TextEdit. Install KeyCastr (`brew install --cask keycastr`) so
-   keystrokes appear on screen.
+1. Use one display at 1440×900 with a plain wallpaper and two windows, for
+   example Terminal and TextEdit. Install KeyCastr
+   (`brew install --cask keycastr`) so keystrokes appear on screen.
 2. Record with QuickTime Player (File → New Screen Recording) or
    `screencapture -v recording.mov`, following the demo's sequence:
-   Control–Option–A, `lll`, `12j`, Option–`lll`, `zz`, Control–W then `H`, `u`,
-   Escape. Keep it under 30 seconds.
+   Control–Option–A, `lll`, `12j`, Option–`lll`, `zz`, `u`, Control–W then `H`,
+   `Q` then `2`, Control–Option–A, Control–W then `L`, Escape. Keep it under
+   30 seconds.
 3. Encode with ffmpeg (external tool, `brew install ffmpeg`), aiming for under 5 MB:
 
    ```sh

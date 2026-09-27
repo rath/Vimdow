@@ -17,7 +17,7 @@
     "source": "Source on GitHub"
   },
   "demo": {
-    "aria": "Animated demo: in command mode a window is moved, widened, centered, snapped to the left half, and restored with Vim keys.",
+    "aria": "Animated demo: in command mode, Vim keys move a window, widen it, center it, undo that, and snap it to the left half. A second window is then picked by number and snapped to the right half.",
     "play": "Play",
     "pause": "Pause",
     "next": "Next step",
@@ -29,11 +29,13 @@
     "steps": {
       "enter": "Control–Option–A enters command mode.",
       "right": "l moves the window right, one step per press.",
-      "down": "12j moves it down twelve steps.",
+      "down": "12j moves it down twelve steps at once.",
       "grow": "Option–l widens it, keeping the top-left corner in place.",
       "center": "zz centers it on the display.",
-      "half": "Control–W, then H, fills the left half.",
       "undo": "u undoes the last change.",
+      "half": "Control–W, then H, fills the left half.",
+      "switch": "Q numbers the windows; 2 switches to the second one and leaves command mode.",
+      "tile": "Back in command mode, Control–W, then L, fills the right half with it.",
       "exit": "Escape returns to normal mode."
     }
   },
