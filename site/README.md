@@ -12,8 +12,9 @@ python3 -m http.server -d site/dist 8000
 ```
 
 The output in `site/dist/` is ignored by Git. Pages are written to `/`, `/ko/`,
-`/ja/`, and `/zh/`, with `sitemap.xml`, `404.html`, and the static files. The
-favicon is copied from `artwork/favicon.svg` to `icon.svg` at build time.
+`/ja/`, and `/zh/`, with `sitemap.xml`, `404.html`, the IndexNow key file, and
+the static files. The favicon is copied from `artwork/favicon.svg` to `icon.svg`
+at build time.
 
 The build fails when a language file is missing or has extra keys compared with
 `content/en.json`, when a key is never used, when a page has unbalanced tags,
@@ -133,6 +134,13 @@ deploy the site. One-time setup, in this order:
    gh api -X PUT repos/rath/Vimdow/pages -f cname=vimdow.told.me
    gh api -X PUT repos/rath/Vimdow/pages -F https_enforced=true
    ```
+
+After each deploy, the workflow's `indexnow` job runs `site/indexnow.py`, which
+tells the IndexNow search engines (Bing, Naver, Yandex, and others) that the
+four pages changed. Its key is `site.indexNowKey` in `content/_shared.json`; the
+build publishes it at `/<key>.txt` so the engines can confirm the site owns it.
+The key is public by design. Google does not use IndexNow and relies on
+`sitemap.xml`. Run `python3 site/indexnow.py --dry-run` to see the submission.
 
 Optionally verify the domain under Settings → Pages → Verified domains so no
 other repository can claim it. There is no `CNAME` file in the site: with

@@ -431,6 +431,10 @@ def build() -> None:
     copy_tree(STATIC, DIST)
     copy_tree(MEDIA, DIST / "media")
     shutil.copy2(ICON_SOURCE, DIST / "icon.svg")
+    key = shared["site"]["indexNowKey"]
+    if not re.fullmatch(r"[A-Za-z0-9-]{8,128}", key):
+        raise BuildError("site.indexNowKey must be 8 to 128 letters, digits, or hyphens")
+    (DIST / f"{key}.txt").write_text(key, encoding="utf-8")
     asset_urls = {key: f"/{name}?v={content_hash(STATIC / name)}" for key, name in HASHED_ASSETS.items()}
 
     pages: dict[Path, PageChecker] = {}
