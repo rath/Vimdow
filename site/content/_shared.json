@@ -1,0 +1,347 @@
+{
+  "site": {
+    "name": "Vimdow",
+    "url": "https://vimdow.told.me",
+    "repo": "https://github.com/rath/Vimdow",
+    "issues": "https://github.com/rath/Vimdow/issues",
+    "releases": "https://github.com/rath/Vimdow/releases",
+    "readme": "https://github.com/rath/Vimdow#readme",
+    "readmeDevelopment": "https://github.com/rath/Vimdow#development",
+    "license": "https://github.com/rath/Vimdow/blob/master/LICENSE"
+  },
+  "languages": [
+    {
+      "file": "en",
+      "lang": "en",
+      "path": "/",
+      "ogLocale": "en_US",
+      "label": "English"
+    },
+    {
+      "file": "ko",
+      "lang": "ko",
+      "path": "/ko/",
+      "ogLocale": "ko_KR",
+      "label": "한국어"
+    },
+    {
+      "file": "ja",
+      "lang": "ja",
+      "path": "/ja/",
+      "ogLocale": "ja_JP",
+      "label": "日本語"
+    },
+    {
+      "file": "zh-Hans",
+      "lang": "zh-Hans",
+      "path": "/zh/",
+      "ogLocale": "zh_CN",
+      "label": "简体中文"
+    }
+  ],
+  "demo": {
+    "stage": {
+      "width": 640,
+      "height": 400,
+      "menuBar": 24
+    },
+    "initialFrame": {
+      "x": 72,
+      "y": 64,
+      "w": 272,
+      "h": 196
+    },
+    "steps": [
+      {
+        "id": "enter",
+        "keys": [
+          "⌃",
+          "⌥",
+          "A"
+        ],
+        "mode": "command",
+        "frame": null
+      },
+      {
+        "id": "right",
+        "keys": [
+          "l",
+          "l",
+          "l"
+        ],
+        "mode": "command",
+        "frame": {
+          "x": 132,
+          "y": 64,
+          "w": 272,
+          "h": 196
+        }
+      },
+      {
+        "id": "down",
+        "keys": [
+          "1",
+          "2",
+          "j"
+        ],
+        "mode": "command",
+        "frame": {
+          "x": 132,
+          "y": 160,
+          "w": 272,
+          "h": 196
+        }
+      },
+      {
+        "id": "grow",
+        "keys": [
+          "⌥",
+          "l",
+          "l",
+          "l"
+        ],
+        "mode": "command",
+        "frame": {
+          "x": 132,
+          "y": 160,
+          "w": 332,
+          "h": 196
+        }
+      },
+      {
+        "id": "center",
+        "keys": [
+          "z",
+          "z"
+        ],
+        "mode": "command",
+        "frame": {
+          "x": 154,
+          "y": 126,
+          "w": 332,
+          "h": 196
+        }
+      },
+      {
+        "id": "half",
+        "keys": [
+          "⌃",
+          "w",
+          "H"
+        ],
+        "mode": "command",
+        "frame": {
+          "x": 0,
+          "y": 24,
+          "w": 320,
+          "h": 376
+        }
+      },
+      {
+        "id": "undo",
+        "keys": [
+          "u"
+        ],
+        "mode": "command",
+        "frame": {
+          "x": 154,
+          "y": 126,
+          "w": 332,
+          "h": 196
+        }
+      },
+      {
+        "id": "exit",
+        "keys": [
+          "esc"
+        ],
+        "mode": "normal",
+        "frame": null
+      }
+    ]
+  },
+  "how": [
+    "enter",
+    "move",
+    "leave"
+  ],
+  "features": [
+    "move",
+    "snap",
+    "undo",
+    "displays",
+    "switch",
+    "settings"
+  ],
+  "cheats": [
+    {
+      "id": "move",
+      "keys": [
+        [
+          "h",
+          "j",
+          "k",
+          "l"
+        ]
+      ]
+    },
+    {
+      "id": "resizeTL",
+      "keys": [
+        [
+          "⌥",
+          "h",
+          "j",
+          "k",
+          "l"
+        ]
+      ]
+    },
+    {
+      "id": "resizeBR",
+      "keys": [
+        [
+          "⇧",
+          "h",
+          "j",
+          "k",
+          "l"
+        ]
+      ]
+    },
+    {
+      "id": "count",
+      "keys": [
+        [
+          "1",
+          "2",
+          "j"
+        ]
+      ]
+    },
+    {
+      "id": "undo",
+      "keys": [
+        [
+          "u"
+        ],
+        [
+          "⌃",
+          "r"
+        ]
+      ]
+    },
+    {
+      "id": "edges",
+      "keys": [
+        [
+          "0"
+        ],
+        [
+          "$"
+        ]
+      ]
+    },
+    {
+      "id": "topBottom",
+      "keys": [
+        [
+          "g",
+          "g"
+        ],
+        [
+          "G"
+        ]
+      ]
+    },
+    {
+      "id": "center",
+      "keys": [
+        [
+          "z",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "halves",
+      "keys": [
+        [
+          "⌃",
+          "w",
+          "H",
+          "J",
+          "K",
+          "L"
+        ]
+      ]
+    },
+    {
+      "id": "fill",
+      "keys": [
+        [
+          "⌃",
+          "w",
+          "o"
+        ]
+      ]
+    },
+    {
+      "id": "numbered",
+      "keys": [
+        [
+          "q",
+          "1–9"
+        ]
+      ]
+    },
+    {
+      "id": "search",
+      "keys": [
+        [
+          "/"
+        ],
+        [
+          "n"
+        ],
+        [
+          "N"
+        ]
+      ]
+    },
+    {
+      "id": "displays",
+      "keys": [
+        [
+          "⌃",
+          "⌥",
+          "k"
+        ],
+        [
+          "⌃",
+          "⌥",
+          "l"
+        ]
+      ]
+    },
+    {
+      "id": "settings",
+      "keys": [
+        [
+          ","
+        ]
+      ]
+    },
+    {
+      "id": "exit",
+      "keys": [
+        [
+          "esc"
+        ],
+        [
+          "."
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "meta": {
+    "title": "Vimdow — Vim-style window management for macOS",
+    "description": "Move, resize, snap, and switch macOS windows from the keyboard with Vim's hjkl, counts, and undo. Free and open source."
+  },
+  "nav": {
+    "skip": "Skip to content",
+    "languages": "Languages",
+    "github": "GitHub"
+  },
+  "hero": {
+    "tagline": "Your windows, in Vim's vocabulary.",
+    "lead": "Vimdow is a keyboard-driven window manager for macOS. Press one shortcut to enter command mode, then move, resize, snap, and switch windows with h, j, k, l, counts, and undo. The mouse stays where it is.",
+    "get": "Get Vimdow",
+    "source": "Source on GitHub"
+  },
+  "demo": {
+    "aria": "Animated demo: in command mode a window is moved, widened, centered, snapped to the left half, and restored with Vim keys.",
+    "play": "Play",
+    "pause": "Pause",
+    "next": "Next step",
+    "modeNormal": "NORMAL",
+    "modeCommand": "COMMAND",
+    "stepsHeading": "What the demo shows",
+    "watchReal": "Watch a real recording",
+    "videoUnsupported": "Your browser cannot play this video.",
+    "steps": {
+      "enter": "Control–Option–A enters command mode.",
+      "right": "l moves the window right, one step per press.",
+      "down": "12j moves it down twelve steps.",
+      "grow": "Option–l widens it, keeping the top-left corner in place.",
+      "center": "zz centers it on the display.",
+      "half": "Control–W, then H fills the left half.",
+      "undo": "u undoes the last change.",
+      "exit": "Escape returns to normal mode."
+    }
+  },
+  "why": {
+    "title": "Why Vimdow",
+    "p1": "Vimdow was written by someone who has used Vim since 1998 and would rather not reach for the mouse. Most of a Mac can be driven from the keyboard, but window management could not: nudging a window a few points, or moving it to another display, always meant leaving the home row.",
+    "p2": "The first version, in 2013, was a small Objective-C app that fixed exactly that for one user. Instead of new shortcuts to learn, it mapped window operations onto the Vim vocabulary: hjkl to move, a count to repeat, 0 and $ for the edges, gg and G for top and bottom, zz to center, u to undo, / to search. In 2026 it was rewritten in Swift 6 with a tested command engine.",
+    "p3": "Vimdow is modal, like Vim. It is not a tiling window manager and does not arrange windows for you; it makes arranging them yourself fast. It is one person's preference, shared for anyone whose hands have the same habits."
+  },
+  "how": {
+    "title": "How it works",
+    "enter": {
+      "title": "Enter command mode",
+      "text_html": "Press <kbd>⌃</kbd><kbd>⌥</kbd><kbd>A</kbd> and release. Until you leave, keys go to Vimdow instead of the frontmost app."
+    },
+    "move": {
+      "title": "Move and resize",
+      "text_html": "<kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd> move the focused window by a configurable step. Type a count to repeat, hold a key to glide, add Option or Shift to resize."
+    },
+    "leave": {
+      "title": "Leave",
+      "text_html": "Press <kbd>esc</kbd> or <kbd>.</kbd> to return to normal mode. Your typing goes back to the app."
+    }
+  },
+  "features": {
+    "title": "What it does",
+    "move": {
+      "title": "Move and resize with counts",
+      "text": "Steps are configurable, keys repeat while held, and every change glides into place. 12j moves twelve steps; Option and Shift resize from opposite corners."
+    },
+    "snap": {
+      "title": "Snap and tile",
+      "text": "0, $, gg, G, and zz put a window at an edge or the center, keeping its size. Control–W with H, J, K, L, or O fills a half or the whole display."
+    },
+    "undo": {
+      "title": "Undo and redo, per window",
+      "text": "u and Control–R step through each window's own history of moves, resizes, snaps, and display changes, even after you dragged it by hand."
+    },
+    "displays": {
+      "title": "Displays that remember",
+      "text": "Control–Option–K and L send a window to the next display. Coming back restores the frame it had there."
+    },
+    "switch": {
+      "title": "Switch without hunting",
+      "text": "Q shows up to nine numbered windows; type a digit to focus one. / searches by application name, and n and N cycle through the matches."
+    },
+    "settings": {
+      "title": "Yours to tune",
+      "text": "Set separate move and resize steps, choose whether resizing stops at display edges, turn the glide off, and rebind the five global shortcuts."
+    }
+  },
+  "cheat": {
+    "title": "Command mode at a glance",
+    "intro": "Enter with Control–Option–A (the default). Digits typed before a command repeat it. Two keys shown together are pressed one after the other.",
+    "keys": "Keys",
+    "action": "Action",
+    "note": "Keys follow physical ANSI positions, as in Vim, so they stay in the same place on JIS, Korean, and other layouts.",
+    "rows": {
+      "move": "Move left, down, up, right by one step",
+      "resizeTL": "Resize, keeping the top-left corner fixed",
+      "resizeBR": "Resize, keeping the bottom-right corner fixed",
+      "count": "Repeat: 12j moves down twelve steps",
+      "undo": "Undo / redo the focused window's last change",
+      "edges": "Move to the left / right edge of the display",
+      "topBottom": "Move to the top / bottom edge",
+      "center": "Center on the display",
+      "halves": "Fill the left / bottom / top / right half",
+      "fill": "Fill the display",
+      "numbered": "Focus a numbered window; Q again shows the next nine",
+      "search": "Search by application name; next / previous match",
+      "displays": "Move to the previous / next display",
+      "settings": "Open Settings",
+      "exit": "Exit command mode"
+    }
+  },
+  "get": {
+    "title": "Get Vimdow",
+    "requirements": "Requires macOS 14 or later and Accessibility permission.",
+    "noBinary": "There is no binary download yet. Vimdow is built from source with Xcode 27 and XcodeGen. The README walks through setup, building, and signing so that Accessibility permission survives rebuilds.",
+    "readme": "Build instructions",
+    "releases": "Releases",
+    "accessibilityTitle": "About Accessibility permission",
+    "accessibilityText": "macOS requires it for any app that moves another app's windows. Vimdow uses it for that and nothing else: no network access, no analytics, nothing leaves your Mac."
+  },
+  "footer": {
+    "license": "BSD 3-Clause License",
+    "credits": "Original implementation by Jang Ho Hwang (2013–2026). Original command window by Yoo Yong-Ha (2013). Global shortcuts use KeyboardShortcuts (MIT).",
+    "issues": "Report an issue",
+    "privacy": "This site sets no cookies and runs no analytics."
+  }
+}

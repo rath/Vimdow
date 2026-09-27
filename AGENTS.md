@@ -13,6 +13,19 @@
   `Artwork/launcher-small.svg`. After editing either, run
   `./scripts/generate-app-icon.sh`; never edit the asset catalog PNGs by hand.
 
+## Website
+
+- `site/` holds the static website for <https://vimdow.told.me>, built by
+  `python3 site/build.py` (standard library only) into the ignored `site/dist/`
+  and deployed by `.github/workflows/site.yml`.
+- Copy lives in `site/content/*.json`; `en.json` is the source of truth for keys
+  and the other languages must mirror it exactly. Change all four together.
+  Language-neutral structure (demo steps, cheat-sheet keys, URLs) is in
+  `site/content/_shared.json`.
+- After editing `site/artwork/og.svg` or the app icon, run
+  `./scripts/generate-site-images.sh`. Details are in `site/README.md`.
+- For copy-only changes, a successful build and `git diff --check` suffice.
+
 ## Build and test
 
 Run commands from the repository root. On a fresh checkout, after adding/removing

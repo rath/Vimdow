@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2C323D"/>
+      <stop offset="1" stop-color="#13161C"/>
+    </linearGradient>
+    <linearGradient id="pane" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F3F5F8"/>
+      <stop offset="1" stop-color="#D6DCE4"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Simplified app icon: a window with hjkl chevrons -->
+  <g transform="translate(120 155)">
+    <rect x="0" y="0" width="320" height="320" rx="72" fill="#13161C" stroke="#3A414D" stroke-width="2"/>
+    <g fill="none" stroke="#4CD07D" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+      <g filter="url(#glow)" opacity="0.6">
+        <path d="M58 142 L36 160 L58 178"/>
+        <path d="M262 142 L284 160 L262 178"/>
+        <path d="M142 58 L160 36 L178 58"/>
+        <path d="M142 262 L160 284 L178 262"/>
+      </g>
+      <path d="M58 142 L36 160 L58 178"/>
+      <path d="M262 142 L284 160 L262 178"/>
+      <path d="M142 58 L160 36 L178 58"/>
+      <path d="M142 262 L160 284 L178 262"/>
+    </g>
+    <g transform="translate(94 94)">
+      <rect width="132" height="132" rx="14" fill="url(#pane)"/>
+      <path d="M0 14 A14 14 0 0 1 14 0 H118 A14 14 0 0 1 132 14 V30 H0 Z" fill="#DCE1E8"/>
+      <circle cx="16" cy="15" r="4.5" fill="#A3ABB6"/>
+      <circle cx="30" cy="15" r="4.5" fill="#A3ABB6"/>
+      <circle cx="44" cy="15" r="4.5" fill="#A3ABB6"/>
+      <rect x="14" y="44" width="12" height="20" fill="#4CD07D"/>
+      <rect x="0" y="112" width="132" height="20" fill="#AEB7C3"/>
+      <path d="M0 112 H44 V132 H14 A14 14 0 0 1 0 118 Z" fill="#4CD07D"/>
+    </g>
+  </g>
+
+  <g font-family="SF Pro Display, Helvetica Neue, Helvetica, Arial, sans-serif" fill="#E6EAF0">
+    <text x="520" y="290" font-size="112" font-weight="700" letter-spacing="-3">Vimdow</text>
+    <text x="522" y="358" font-size="33" fill="#9AA3B0">Vim-style window management for macOS</text>
+    <g font-family="SF Mono, Menlo, Consolas, monospace" font-size="34" font-weight="600">
+      <g fill="#2C323D" stroke="#3A414D" stroke-width="2">
+        <rect x="522" y="404" width="56" height="60" rx="10"/>
+        <rect x="590" y="404" width="56" height="60" rx="10"/>
+        <rect x="658" y="404" width="56" height="60" rx="10"/>
+        <rect x="726" y="404" width="56" height="60" rx="10"/>
+      </g>
+      <g fill="#F3F5F8" text-anchor="middle">
+        <text x="550" y="446">h</text>
+        <text x="618" y="446">j</text>
+        <text x="686" y="446">k</text>
+        <text x="754" y="446">l</text>
+      </g>
+    </g>
+    <text x="522" y="540" font-size="30" fill="#4CD07D">vimdow.told.me</text>
+  </g>
+</svg>

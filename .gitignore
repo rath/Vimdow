@@ -7,3 +7,5 @@ Pods/
 VimdowManager.xcodeproj/
 VimdowManager.xcworkspace/
 Config/Signing.local.xcconfig
+site/dist/
+__pycache__/

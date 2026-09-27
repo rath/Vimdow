@@ -1,0 +1,125 @@
+{
+  "meta": {
+    "title": "Vimdow — macOS 上的 Vim 风格窗口管理",
+    "description": "用 Vim 的 hjkl、计数和撤销，只靠键盘移动、缩放、贴边和切换 macOS 窗口。免费开源。"
+  },
+  "nav": {
+    "skip": "跳到正文",
+    "languages": "语言",
+    "github": "GitHub"
+  },
+  "hero": {
+    "tagline": "用 Vim 的词汇，管理你的窗口。",
+    "lead": "Vimdow 是一款由键盘驱动的 macOS 窗口管理器。按一个快捷键进入命令模式，然后用 h、j、k、l、计数和撤销来移动、缩放、贴边和切换窗口。鼠标留在原处。",
+    "get": "获取 Vimdow",
+    "source": "在 GitHub 查看源码"
+  },
+  "demo": {
+    "aria": "动画演示：在命令模式下，用 Vim 按键移动窗口、加宽、居中、贴到左半屏，再撤销恢复。",
+    "play": "播放",
+    "pause": "暂停",
+    "next": "下一步",
+    "modeNormal": "NORMAL",
+    "modeCommand": "COMMAND",
+    "stepsHeading": "演示内容",
+    "watchReal": "观看真实录屏",
+    "videoUnsupported": "你的浏览器无法播放此视频。",
+    "steps": {
+      "enter": "Control–Option–A 进入命令模式。",
+      "right": "每按一次 l，窗口向右移动一步。",
+      "down": "12j 向下移动十二步。",
+      "grow": "Option–l 固定左上角，向右加宽窗口。",
+      "center": "zz 让窗口在显示器上居中。",
+      "half": "Control–W 之后按 H，填满左半屏。",
+      "undo": "u 撤销上一次更改。",
+      "exit": "Escape 回到普通模式。"
+    }
+  },
+  "why": {
+    "title": "为什么做 Vimdow",
+    "p1": "写 Vimdow 的人从 1998 年起就一直用 Vim，能不碰鼠标就不碰。Mac 上的大多数操作都能靠键盘完成，唯独窗口管理不行：把窗口挪几个点，或者送到另一台显示器，总得把手从主键位上移开。",
+    "p2": "2013 年的第一版是一个小小的 Objective-C 应用，只为一个用户解决这一个问题。它没有发明一套新快捷键，而是把窗口操作映射到 Vim 已有的词汇上：hjkl 移动，数字重复，0 和 $ 到左右边缘，gg 和 G 到顶部和底部，zz 居中，u 撤销，/ 搜索。2026 年，它用 Swift 6 重写，并配上了经过测试的命令引擎。",
+    "p3": "Vimdow 和 Vim 一样是模式化的。它不是平铺式窗口管理器，也不会替你排列窗口，只是让你自己排列得更快。它出自一个人的偏好，也分享给所有手上有同样习惯的人。"
+  },
+  "how": {
+    "title": "使用方式",
+    "enter": {
+      "title": "进入命令模式",
+      "text_html": "按下 <kbd>⌃</kbd><kbd>⌥</kbd><kbd>A</kbd> 然后松开。在退出之前，按键会发给 Vimdow，而不是最前面的应用。"
+    },
+    "move": {
+      "title": "移动与缩放",
+      "text_html": "<kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd> 按设定的步长移动当前窗口。先输入数字可以重复，按住不放会平滑连续移动，加上 Option 或 Shift 则变为缩放。"
+    },
+    "leave": {
+      "title": "退出",
+      "text_html": "按 <kbd>esc</kbd> 或 <kbd>.</kbd> 回到普通模式，按键重新发给应用。"
+    }
+  },
+  "features": {
+    "title": "它能做什么",
+    "move": {
+      "title": "带计数的移动与缩放",
+      "text": "步长可配置，按住按键会重复，每次更改都平滑滑入到位。12j 移动十二步；Option 和 Shift 分别以相对的角为基准缩放。"
+    },
+    "snap": {
+      "title": "贴边与平铺",
+      "text": "0、$、gg、G 和 zz 在保持大小的前提下把窗口放到边缘或中央。Control–W 之后按 H、J、K、L 或 O，填满半屏或整个显示器。"
+    },
+    "undo": {
+      "title": "按窗口独立的撤销与重做",
+      "text": "u 和 Control–R 沿着每个窗口自己的历史前后移动，涵盖移动、缩放、贴边和跨显示器操作，即使你中途用手拖动过也一样有效。"
+    },
+    "displays": {
+      "title": "会记忆的显示器",
+      "text": "Control–Option–K 和 L 把窗口送到下一台显示器。回来时，会恢复它在那台显示器上原有的位置和大小。"
+    },
+    "switch": {
+      "title": "不用找的切换",
+      "text": "Q 最多显示九个带编号的窗口，按数字即可聚焦。/ 按应用名称搜索，n 和 N 在结果之间循环。"
+    },
+    "settings": {
+      "title": "随你调整",
+      "text": "分别设置移动和缩放的步长，选择缩放是否在显示器边缘停下，关闭动画，并重新绑定五个全局快捷键。"
+    }
+  },
+  "cheat": {
+    "title": "命令模式速查",
+    "intro": "默认用 Control–Option–A 进入。在命令前输入数字即可重复。并排显示的两个键依次按下。",
+    "keys": "按键",
+    "action": "操作",
+    "note": "按键和 Vim 一样遵循 ANSI 物理键位，因此在 JIS 等其他布局上位置不变。",
+    "rows": {
+      "move": "向左、下、上、右移动一步",
+      "resizeTL": "固定左上角缩放",
+      "resizeBR": "固定右下角缩放",
+      "count": "重复：12j 向下移动十二步",
+      "undo": "撤销 / 重做当前窗口的上一次更改",
+      "edges": "移到显示器的左 / 右边缘",
+      "topBottom": "移到顶部 / 底部边缘",
+      "center": "在显示器上居中",
+      "halves": "填满左 / 下 / 上 / 右半屏",
+      "fill": "填满整个显示器",
+      "numbered": "聚焦带编号的窗口；再按 Q 显示下九个",
+      "search": "按应用名称搜索；下一个 / 上一个结果",
+      "displays": "移到上一台 / 下一台显示器",
+      "settings": "打开设置",
+      "exit": "退出命令模式"
+    }
+  },
+  "get": {
+    "title": "获取 Vimdow",
+    "requirements": "需要 macOS 14 或更高版本，以及辅助功能权限。",
+    "noBinary": "目前还没有二进制下载。Vimdow 需要用 Xcode 27 和 XcodeGen 从源码构建。README 详细说明了配置、构建，以及如何签名以便重新构建后仍保留辅助功能权限。",
+    "readme": "构建说明",
+    "releases": "发布版本",
+    "accessibilityTitle": "关于辅助功能权限",
+    "accessibilityText": "macOS 要求所有会移动其他应用窗口的应用申请此权限。Vimdow 只用它做这一件事：不访问网络，没有分析统计，没有任何数据离开你的 Mac。"
+  },
+  "footer": {
+    "license": "BSD 3-Clause 许可证",
+    "credits": "原始实现：Jang Ho Hwang（2013–2026）。原始命令窗口：Yoo Yong-Ha（2013）。全局快捷键使用 KeyboardShortcuts（MIT）。",
+    "issues": "报告问题",
+    "privacy": "本站不设置 Cookie，也不使用任何分析统计。"
+  }
+}

@@ -2,6 +2,8 @@
 
 # Vimdow
 
+**Website:** [vimdow.told.me](https://vimdow.told.me) · English, 한국어, 日本語, 简体中文
+
 Vimdow is a keyboard-driven window manager for macOS. Press a shortcut to enter
 command mode, then move, resize, snap, and switch windows with `h`, `j`, `k`,
 `l`, counts, and the other Vim habits already in your fingers. The mouse stays

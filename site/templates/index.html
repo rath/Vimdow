@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="{{_.lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{meta.title}}</title>
+<meta name="description" content="{{meta.description}}">
+{{{_.head}}}
+<link rel="stylesheet" href="{{_.css}}">
+<script type="application/ld+json">{{{_.jsonld}}}</script>
+</head>
+<body>
+<a class="skip" href="#main">{{nav.skip}}</a>
+<header class="site-header">
+  <a class="brand" href="{{_.path}}"><img src="/icon.svg" alt="" width="36" height="36">{{site.name}}</a>
+  <nav class="lang-nav" aria-label="{{nav.languages}}">{{{_.langLinks}}}</nav>
+  <a class="gh" href="{{site.repo}}" rel="noopener">{{nav.github}}</a>
+</header>
+<main id="main">
+  <section class="hero">
+    <h1>{{hero.tagline}}</h1>
+    <p class="lead">{{hero.lead}}</p>
+    <p class="cta"><a class="button primary" href="#get">{{hero.get}}</a><a class="button" href="{{site.repo}}" rel="noopener">{{hero.source}}</a></p>
+    <div class="demo" id="demo">
+      <script type="application/json" id="demo-config">{{{_.demoConfig}}}</script>
+      <div class="stage" role="img" aria-label="{{demo.aria}}">
+        <div class="desktop" aria-hidden="true">
+          <div class="menubar"><span class="apple"></span><span class="menu"></span><span class="menu"></span><span class="menu"></span><span class="mode" data-mode data-normal="{{demo.modeNormal}}" data-command="{{demo.modeCommand}}">{{demo.modeNormal}}</span></div>
+          <div class="window"><div class="titlebar"><i></i><i></i><i></i></div><div class="pane"><span class="cursor"></span></div></div>
+          <div class="keycaps" data-keys></div>
+        </div>
+      </div>
+      <div class="demo-controls">
+        <button type="button" class="button small" data-play aria-pressed="true" data-play-label="{{demo.play}}" data-pause-label="{{demo.pause}}" data-next-label="{{demo.next}}">{{demo.pause}}</button>
+      </div>
+      <h2 class="visually-hidden">{{demo.stepsHeading}}</h2>
+      <ol class="demo-steps">{{{_.demoSteps}}}</ol>
+      {{{_.video}}}
+    </div>
+  </section>
+
+  <section id="why" class="prose">
+    <h2>{{why.title}}</h2>
+    <p>{{why.p1}}</p>
+    <p>{{why.p2}}</p>
+    <p>{{why.p3}}</p>
+  </section>
+
+  <section id="how">
+    <h2>{{how.title}}</h2>
+    <ol class="how">{{{_.how}}}</ol>
+  </section>
+
+  <section id="features">
+    <h2>{{features.title}}</h2>
+    <ul class="features">{{{_.features}}}</ul>
+  </section>
+
+  <section id="cheat">
+    <h2>{{cheat.title}}</h2>
+    <p>{{cheat.intro}}</p>
+    <div class="table-wrap">
+      <table class="cheat">
+        <thead><tr><th scope="col">{{cheat.keys}}</th><th scope="col">{{cheat.action}}</th></tr></thead>
+        <tbody>{{{_.cheats}}}</tbody>
+      </table>
+    </div>
+    <p class="note">{{cheat.note}}</p>
+  </section>
+
+  <section id="get">
+    <h2>{{get.title}}</h2>
+    <p>{{get.requirements}}</p>
+    <p>{{get.noBinary}}</p>
+    <p class="cta"><a class="button primary" href="{{site.readmeDevelopment}}" rel="noopener">{{get.readme}}</a><a class="button" href="{{site.releases}}" rel="noopener">{{get.releases}}</a></p>
+    <h3>{{get.accessibilityTitle}}</h3>
+    <p>{{get.accessibilityText}}</p>
+  </section>
+</main>
+<footer class="site-footer">
+  <p><a rel="license" href="{{site.license}}">{{footer.license}}</a> · <a href="{{site.issues}}" rel="noopener">{{footer.issues}}</a></p>
+  <p>{{footer.credits}}</p>
+  <p>{{footer.privacy}}</p>
+</footer>
+<script src="{{_.js}}" defer></script>
+</body>
+</html>
