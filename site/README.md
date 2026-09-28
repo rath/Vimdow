@@ -91,6 +91,12 @@ every language, and keep the `_html` strings' `<kbd>` markup intact.
    `./scripts/generate-site-images.sh`.
 5. Add the link to `static/404.html`. Build; the checks report anything missed.
 
+## README animation
+
+`docs/demo.gif` in the repository README is the English hero demo, recorded by
+`./scripts/generate-readme-demo.py` in headless Chrome on a simulated clock and
+encoded with ffmpeg. Rerun it whenever the demo changes.
+
 ## Real recording
 
 The hero currently plays an animated mock-up. To add a real screen recording:

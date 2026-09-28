@@ -28,6 +28,10 @@
   copies of the app icon; when the app icon changes, update them too. Web fonts
   in `site/static/fonts/` come from `./scripts/generate-site-fonts.sh`; never
   edit them by hand. Details are in `site/README.md`.
+- README's `docs/demo.gif` is recorded from the site's hero demo by
+  `./scripts/generate-readme-demo.py` (Chrome and ffmpeg). Rerun it after changing
+  the demo's steps, captions in `en.json`, styles, or script, and only then: runs
+  can differ invisibly, so an unneeded rerun churns a 2 MB binary.
 - For copy-only changes, a successful build and `git diff --check` suffice.
 
 ## Build and test
