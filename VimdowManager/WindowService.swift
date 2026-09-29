@@ -101,12 +101,13 @@ final class WindowService: WindowControlling {
 
     func setFrame(_ desired: CGRect, of id: UUID, animated: Bool) throws {
         try requirePermission()
-        let element = try handle(for: id).window
+        let handle = try handle(for: id)
+        let element = handle.window
         guard desired.minX.isFinite, desired.minY.isFinite, desired.width.isFinite, desired.height.isFinite,
               desired.width > 0, desired.height > 0 else { throw WindowFailure.unsupportedOperation }
         guard animated else {
             animator.cancel(id)
-            try place(element, at: desired)
+            try withoutEnhancedUserInterface(of: handle.app) { try place(element, at: desired) }
             return
         }
         let current = try animator.presentedFrame(of: id) ?? frame(of: element)
@@ -118,13 +119,35 @@ final class WindowService: WindowControlling {
     /// Applies one glide frame. Intermediate frames set only what changed, back to
     /// back, so that edges meant to stay put barely shift between the two calls.
     private func applyGlide(_ frame: CGRect, previous: CGRect, isFinal: Bool, of id: UUID) throws {
-        guard let element = handles[id]?.window else { throw WindowFailure.unavailableWindow }
-        if isFinal {
-            try place(element, at: frame)
-            return
+        guard let handle = handles[id] else { throw WindowFailure.unavailableWindow }
+        let element = handle.window
+        try withoutEnhancedUserInterface(of: handle.app) {
+            if isFinal {
+                try place(element, at: frame)
+                return
+            }
+            if frame.origin != previous.origin { try setPosition(frame.origin, of: element) }
+            if frame.size != previous.size { try setSize(frame.size, of: element) }
         }
-        if frame.origin != previous.origin { try setPosition(frame.origin, of: element) }
-        if frame.size != previous.size { try setSize(frame.size, of: element) }
+    }
+
+    /// Runs `change` with the app's enhanced user interface off. Assistive apps
+    /// turn it on, and AppKit then animates every frame change made through
+    /// Accessibility: one step takes about 80 ms to land, and steps repeated
+    /// faster than that stall the window until they stop. Keeping it off only
+    /// for the change itself leaves those apps unaffected.
+    private func withoutEnhancedUserInterface(of app: AXUIElement, _ change: () throws -> Void) throws {
+        let attribute = "AXEnhancedUserInterface" as CFString
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(app, attribute, &value) == .success, value as? Bool == true else {
+            return try change()
+        }
+        // Chrome applies both values yet reports kAXErrorNotImplemented, so the
+        // results cannot tell whether a call took effect. Always restore it, even
+        // when the change fails.
+        AXUIElementSetAttributeValue(app, attribute, kCFBooleanFalse)
+        defer { AXUIElementSetAttributeValue(app, attribute, kCFBooleanTrue) }
+        try change()
     }
 
     private func place(_ element: AXUIElement, at desired: CGRect) throws {
