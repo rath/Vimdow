@@ -12,6 +12,7 @@ final class WindowService: WindowControlling {
     }
 
     private var handles: [UUID: Handle] = [:]
+    private var retainedWindows: Set<UUID> = []
     private lazy var animator = WindowAnimator { [unowned self] id, frame, previous, isFinal in
         try self.applyGlide(frame, previous: previous, isFinal: isFinal, of: id)
     }
@@ -55,7 +56,7 @@ final class WindowService: WindowControlling {
                 result.append((WindowInfo(id: id, name: name, frame: frame, isFocused: focused?.id == id), pid, index))
             }
         }
-        handles = handles.filter { live.contains($0.key) }
+        handles = handles.filter { live.contains($0.key) || retainedWindows.contains($0.key) }
         // Permission may have been revoked during the scan. Never silently treat that as an empty desktop.
         try requirePermission()
         return result.sorted {
@@ -85,6 +86,25 @@ final class WindowService: WindowControlling {
         // A gliding window reports its destination so that repeated steps add up.
         let bounds = try animator.destination(of: id) ?? frame(of: element)
         return WindowInfo(id: id, name: running.localizedName ?? "Application", frame: bounds, isFocused: true)
+    }
+
+    func retainWindows(_ ids: Set<UUID>) {
+        retainedWindows = ids
+        // The next scan releases off-screen, unmarked handles. Keep visible identities
+        // intact on unmark so that per-window undo and display history still work.
+    }
+
+    func isWindowAlive(_ id: UUID) throws -> Bool {
+        try requirePermission()
+        guard let handle = handles[id],
+              let running = NSRunningApplication(processIdentifier: handle.pid), !running.isTerminated else {
+            return false
+        }
+        var value: CFTypeRef?
+        let result = AXUIElementCopyAttributeValue(handle.window, kAXRoleAttribute as CFString, &value)
+        if result == .invalidUIElement { return false }
+        try check(result)
+        return true
     }
 
     func focus(_ id: UUID, movePointer: Bool) throws {

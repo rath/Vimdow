@@ -8,6 +8,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
     private let service = WindowService()
     private let guides = GuideWindows()
     private let search = SearchPanel()
+    private let notice = StatusNotice()
+    private let focusFlash = FocusFlash()
     private let settingsStore = SettingsStore()
     private var settingsWindow: SettingsWindowController?
     private let logger = Logger(subsystem: "rath.toys.VimdowManager", category: "WindowControl")
@@ -36,6 +38,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
             }
             coordinator.handle(command)
         }
+        shortcuts?.onInput = { [weak self] in self?.coordinator.recordInput() }
         setMode(.normal)
         if !AXIsProcessTrusted() { showPermissionAlert() }
     }
@@ -49,6 +52,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         shortcuts?.stop()
         guides.hide()
         search.hide()
+        notice.hide()
+        focusFlash.hide()
     }
 
     func setMode(_ mode: Mode) {
@@ -72,6 +77,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
     func hideGuides() { guides.hide() }
     func showSearch() { search.show() }
     func hideSearch() { search.hide() }
+    func showNotice(_ text: String, near frame: CGRect?) { notice.show(text, near: frame) }
+    func flashWindow(_ frame: CGRect) { focusFlash.show(frame) }
     func showSettings() {
         guard let shortcuts else { return }
         if settingsWindow == nil {

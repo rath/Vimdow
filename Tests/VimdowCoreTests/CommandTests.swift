@@ -776,6 +776,8 @@ private final class FakeWindows: WindowControlling {
 
     func check() throws { if let failure { throw failure } }
     func windows() throws -> [WindowInfo] { try check(); return list }
+    func retainWindows(_ ids: Set<UUID>) {}
+    func isWindowAlive(_ id: UUID) throws -> Bool { try check(); return list.contains { $0.id == id } }
     func focusedWindow() throws -> WindowInfo {
         try check()
         guard let window = list.first else { throw WindowFailure.noFocusedWindow }
@@ -814,6 +816,8 @@ private final class FakePresentation: CommandPresenting {
     func showSearch() { searchVisible = true }
     func hideSearch() { searchVisible = false }
     func showSettings() {}
+    func showNotice(_ text: String, near frame: CGRect?) {}
+    func flashWindow(_ frame: CGRect) {}
     func showFailure(_ error: any Error) { errors.append(error) }
     func quit() { didQuit = true }
 }
@@ -857,6 +861,91 @@ private final class FakePresentation: CommandPresenting {
     controller.handle(.enter)
     for _ in 0..<3 { controller.handle(.quickSwitch) }
     #expect(ui.guides.first?.id == windows.list[0].id)
+}
+
+@Test @MainActor func idleNumberSelectionExitsAndClearsThePageWithoutFocusing() async throws {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    controller.handle(.enter)
+    controller.handle(.quickSwitch)
+    controller.handle(.quickSwitch)
+    try await Task.sleep(for: .milliseconds(3300))
+    #expect(controller.mode == .normal)
+    #expect(ui.modes.last == .normal)
+    #expect(ui.guides.isEmpty && windows.focused.isEmpty)
+    controller.handle(.digit(1))
+    #expect(windows.focused.isEmpty)
+    controller.handle(.enter)
+    controller.handle(.quickSwitch)
+    #expect(ui.guides.first?.id == windows.list.first?.id)
+    controller.handle(.escape)
+}
+
+@Test(arguments: ["page", "unavailableDigit", "unboundKey", "reenter"])
+@MainActor func inputRestartsTheNumberSelectionTimeout(_ input: String) async throws {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    controller.handle(.enter)
+    controller.handle(.quickSwitch)
+    try await Task.sleep(for: .milliseconds(1800))
+    switch input {
+    case "page": controller.handle(.quickSwitch)
+    case "unavailableDigit": controller.handle(.digit(0))
+    case "unboundKey": controller.recordInput()
+    default:
+        controller.handle(.escape)
+        controller.handle(.enter)
+        controller.handle(.quickSwitch)
+    }
+    try await Task.sleep(for: .milliseconds(1600))
+    #expect(controller.mode == .quickSwitch)
+    #expect(!ui.guides.isEmpty)
+    try await Task.sleep(for: .milliseconds(1700))
+    #expect(controller.mode == .normal)
+    #expect(ui.guides.isEmpty)
+}
+
+@Test(arguments: ["search", "settings", "command", "select"])
+@MainActor func numberSelectionTimeoutDoesNotCancelSubsequentModes(_ next: String) async throws {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    controller.handle(.enter)
+    controller.handle(.quickSwitch)
+    let expected: Mode
+    switch next {
+    case "search":
+        controller.handle(.search)
+        expected = .search
+    case "settings":
+        controller.setSettingsActive(true)
+        expected = .settings
+    case "command":
+        controller.handle(.move(.right))
+        expected = .command
+    default:
+        controller.handle(.digit(1))
+        controller.handle(.enter)
+        expected = .command
+    }
+    controller.recordInput() // Activity outside numbered selection must not start a timer.
+    try await Task.sleep(for: .milliseconds(3300))
+    #expect(controller.mode == expected)
+    #expect(ui.guides.isEmpty)
+    #expect(ui.searchVisible == (next == "search"))
+}
+
+@Test @MainActor func numberSelectionTimerDoesNotRetainItsCoordinator() {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    var controller: CommandCoordinator? = CommandCoordinator(windows: windows, presentation: ui)
+    weak var weakController = controller
+    controller?.handle(.enter)
+    controller?.handle(.quickSwitch)
+    controller = nil
+    #expect(weakController == nil)
 }
 
 @Test @MainActor func emptyAndDisappearingWindowsAreSafe() {

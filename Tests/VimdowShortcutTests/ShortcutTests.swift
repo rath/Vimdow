@@ -7,6 +7,56 @@ import VimdowCore
 @Suite(.serialized)
 @MainActor
 struct ShortcutTests {
+    @Test func unboundKeysReportActivityOnlyDuringNumberSelection() throws {
+        _ = NSApplication.shared
+        let controller = ShortcutController(namespace: "test_\(UUID().uuidString)") { _ in }
+        defer { cleanUp(controller) }
+        var activity = 0
+        controller.onInput = { activity += 1 }
+        let event = try #require(NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: [],
+            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: 0, context: nil,
+            characters: "b", charactersIgnoringModifiers: "b", isARepeat: false, keyCode: 11))
+        controller.setMode(.command)
+        NSApp.sendEvent(event)
+        #expect(activity == 0)
+        controller.setMode(.quickSwitch)
+        controller.setMode(.quickSwitch) // Paging must not duplicate observers.
+        NSApp.sendEvent(event)
+        #expect(activity == 1)
+        for mode in [Mode.normal, .search, .settings] {
+            controller.setMode(mode)
+            NSApp.sendEvent(event)
+        }
+        #expect(activity == 1)
+        controller.setMode(.quickSwitch)
+        controller.stop()
+        NSApp.sendEvent(event)
+        #expect(activity == 1)
+    }
+
+    @Test func markedWindowShortcutsAreSinglePressAndTheGlobalBindingPersists() throws {
+        let namespace = "test_\(UUID().uuidString)"
+        let controller = ShortcutController(namespace: namespace) { _ in }
+        defer { cleanUp(controller) }
+        let cycle = try #require(controller.bindings.first { if case .cycleMarked = $0.command { true } else { false } })
+        let toggle = try #require(controller.bindings.first { if case .toggleMark = $0.command { true } else { false } })
+        #expect(cycle.isGlobal && !cycle.repeats)
+        #expect(!toggle.isGlobal && !toggle.repeats)
+        #expect(cycle.name.shortcut == KeyboardShortcuts.Shortcut(.tab, modifiers: [.control, .option]))
+        #expect(toggle.name.shortcut == KeyboardShortcuts.Shortcut(.m))
+        let replacement = KeyboardShortcuts.Shortcut(.tab, modifiers: [.control, .shift])
+        cycle.name.shortcut = replacement
+        controller.stop()
+        let recreated = ShortcutController(namespace: namespace) { _ in }
+        defer { recreated.stop() }
+        #expect(recreated.bindings.first { $0.name == cycle.name }?.name.shortcut == replacement)
+        cycle.name.shortcut = nil
+        #expect(recreated.setMode(.normal).isEmpty)
+        #expect(!KeyboardShortcuts.isEnabled(for: cycle.name))
+        recreated.restoreDefaults()
+        #expect(cycle.name.shortcut == KeyboardShortcuts.Shortcut(.tab, modifiers: [.control, .option]))
+    }
+
     @Test func modalKeysRegisterAndAreReleasedOnExitAndSearch() async {
         _ = NSApplication.shared
         let controller = ShortcutController(namespace: "test_\(UUID().uuidString)") { _ in }

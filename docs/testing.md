@@ -41,9 +41,46 @@ in the relevant PR or issue. Check supported OS versions before a release.
   active.
 - [ ] **Window selection:** use Q with more than nine windows, page again,
   and select a number. The right window activates and the pointer centers on it.
+  Each number is large, white, and centered in a 160-point translucent black
+  badge. Check bright/dark windows, small windows, mixed display scales, and
+  displays above/left of primary. Overlapping badges form a readable grid near
+  their windows' centers, including nine windows sharing a center and windows
+  partly off screen. Isolated badges stay centered; all badges stay on their
+  assigned display when there is room. Q replaces the previous page; selection
+  and Escape remove every badge without the overlays taking focus or clicks.
+  With no keyboard input for three seconds, every badge disappears and normal
+  typing resumes. Q, an unavailable digit, or an unbound key restarts the idle
+  timeout while selection remains active. Select, cancel and re-enter, or open
+  search/Settings before the timeout; the old timer must not cancel the new mode.
 - [ ] **Search:** `/` stays open and accepts English and Korean composition.
   Enter submits after composition; Escape cancels composition before cancelling
   search. Check focus restoration, no matches, and N/Shift–N navigation.
+- [ ] **Marked windows:** with Ghostty, two Chrome windows, and another app open,
+  enter command mode then M in Ghostty and one Chrome window. Each shows Marked
+  briefly without taking focus and returns to normal typing. Control–Option–Tab
+  alternates only those two, leaves the pointer in place, and fires once when
+  held. From an unmarked window it selects the first mark. Add a third mark and
+  verify registration order, wraparound, and unmark/re-mark appending to the end.
+  Ordinary Control–Shift focus shortcuts still include all windows.
+- [ ] **Marked focus flash:** each successful marked switch briefly outlines
+  and tints only the destination window, pulsing twice over 0.36 seconds without
+  taking focus or blocking clicks. Rapid switching replaces the previous pulse.
+  Check light/dark mode, full-screen windows, and displays above/left of primary.
+  Reduce Motion uses one gentle outline fade without tint. A failed switch or already-focused single mark
+  has no flash; ordinary full-window switching has no flash.
+- [ ] **Mark lifetime:** minimize a marked window, hide its app, or move it to
+  another Space; it is skipped and rejoins on return, even after using Q or search.
+  Marks on another visible display participate. Closing a window or quitting its
+  app removes that mark on the next operation; reopening does not recreate it.
+  One visible mark is a no-op when already focused; zero marks and all-hidden
+  marks show distinct notices. Restarting Vimdow clears all marks. Unmarking a
+  visible window preserves its undo and display history.
+- [ ] **Mark input and feedback:** M uses the physical key with Korean input
+  active. Marked switching exits command mode and Q selection, ignores counts,
+  and is suspended in search and Settings. Changing or clearing its shortcut
+  persists across restart. Rapid mark changes replace the notice and reset its
+  0.8-second timer; notices remain readable in light/dark mode and at display
+  edges, never intercept typing or clicks, and are announced by VoiceOver.
 - [ ] **Displays:** move small-to-large and back, including displays above/left
   of primary. First visits follow Fill Display/Keep Size; return visits restore
   each window's last frame. A single display is unchanged; layout changes clear

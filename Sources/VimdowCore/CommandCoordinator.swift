@@ -11,6 +11,7 @@ public final class CommandCoordinator {
 
     public private(set) var mode: Mode = .normal
     public private(set) var lastQuery: String?
+    public private(set) var markedWindows: [UUID] = []
     private var prefix = RepeatPrefix()
     private var pageOffset: Int?
     private var page: [WindowInfo] = []
@@ -21,6 +22,7 @@ public final class CommandCoordinator {
     private var undoHistory = UndoHistory()
     private var openRun: StepRun?
     private var pendingKey: SequenceKey?
+    private var quickSwitchDismissal: Task<Void, Never>?
     private let preferences: () -> WindowPreferences
     private let windows: any WindowControlling
     private let presentation: any CommandPresenting
@@ -33,6 +35,7 @@ public final class CommandCoordinator {
     }
 
     public func handle(_ command: Command) {
+        defer { recordInput() }
         // A key waiting for a second one is settled by the very next command, whatever it is.
         let pending = pendingKey
         pendingKey = nil
@@ -53,6 +56,10 @@ public final class CommandCoordinator {
             case .cycle(let step):
                 guard mode != .search && mode != .settings else { return }
                 try cycle(step: step, count: prefix.take())
+            case .cycleMarked:
+                guard mode != .search && mode != .settings else { return }
+                transition(to: .normal)
+                try cycleMarked()
             default:
                 guard mode == .command || mode == .quickSwitch else { return }
                 if let pending { try complete(pending, with: command) } else { try handleModal(command) }
@@ -66,6 +73,19 @@ public final class CommandCoordinator {
             presentation.showFailure(error)
         }
     }
+
+    /// Unbound keys also extend numbered selection without consuming the input.
+    public func recordInput() {
+        guard mode == .quickSwitch else { return }
+        quickSwitchDismissal?.cancel()
+        quickSwitchDismissal = Task { @MainActor [weak self] in
+            do { try await Task.sleep(for: .seconds(3)) } catch { return }
+            guard !Task.isCancelled, let self, self.mode == .quickSwitch else { return }
+            self.transition(to: .normal)
+        }
+    }
+
+    deinit { quickSwitchDismissal?.cancel() }
 
     private func handleModal(_ command: Command) throws {
         switch command {
@@ -114,6 +134,15 @@ public final class CommandCoordinator {
             leaveNumbers()
             prefix.reset()
             try moveToNextScreen(window)
+        case .toggleMark:
+            try pruneMarks()
+            let window = try windows.focusedWindow()
+            let removing = markedWindows.contains(window.id)
+            if removing { markedWindows.removeAll { $0 == window.id } }
+            else { markedWindows.append(window.id) }
+            windows.retainWindows(Set(markedWindows))
+            transition(to: .normal)
+            presentation.showNotice(removing ? "Unmarked" : "Marked", near: window.frame)
         case .quit:
             transition(to: .normal)
             presentation.quit()
@@ -251,11 +280,56 @@ public final class CommandCoordinator {
         }
     }
 
+    private func pruneMarks() throws {
+        var closed: Set<UUID> = []
+        for id in markedWindows {
+            do {
+                if try !windows.isWindowAlive(id) { closed.insert(id) }
+            } catch WindowFailure.permissionDenied {
+                throw WindowFailure.permissionDenied
+            } catch {
+                // A timeout or unsupported attribute does not prove a window closed.
+            }
+        }
+        markedWindows.removeAll { closed.contains($0) }
+        windows.retainWindows(Set(markedWindows))
+    }
+
+    private func cycleMarked() throws {
+        let visible = try windows.windows()
+        try pruneMarks()
+        let visibleIDs = Set(visible.map(\.id))
+        let available = markedWindows.filter { visibleIDs.contains($0) }
+        let current = visible.first(where: \.isFocused)?.id
+        let start = current.flatMap { available.firstIndex(of: $0) }.map { $0 + 1 } ?? 0
+        let candidates = Array(available.dropFirst(start)) + Array(available.prefix(start))
+        for id in candidates {
+            if id == current { return }
+            do {
+                try windows.focus(id, movePointer: false)
+                if let target = visible.first(where: { $0.id == id }) {
+                    presentation.flashWindow(target.frame)
+                }
+                return
+            } catch WindowFailure.unavailableWindow {
+                // An unavailable attribute is not proof of closure. Confirm before
+                // dropping the mark, then try the next target this same press.
+                if try windows.isWindowAlive(id) { throw WindowFailure.unavailableWindow }
+                markedWindows.removeAll { $0 == id }
+                windows.retainWindows(Set(markedWindows))
+            }
+        }
+        presentation.showNotice(markedWindows.isEmpty ? "No marked windows" : "No marked windows on this desktop",
+                                near: nil)
+    }
+
     private func leaveNumbers() {
         if mode == .quickSwitch { transition(to: .command) }
     }
 
     private func transition(to next: Mode) {
+        quickSwitchDismissal?.cancel()
+        quickSwitchDismissal = nil
         let previous = mode
         mode = next
         prefix.reset()

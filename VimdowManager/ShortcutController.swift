@@ -13,6 +13,8 @@ final class ShortcutController {
     }
 
     private(set) var bindings: [Binding] = []
+    var onInput: (() -> Void)?
+    private var inputMonitors: [Any] = []
     private var tasks: [Task<Void, Never>] = []
     private let onCommand: (Command) -> Void
     private let namespace: String
@@ -21,6 +23,8 @@ final class ShortcutController {
         self.onCommand = onCommand
         self.namespace = namespace
         add("enter", .a, [.control, .option], .enter, global: true, title: "Enter command mode")
+        add("marks.next", .tab, [.control, .option], .cycleMarked, global: true, title: "Next marked window")
+        add("marks.toggle", .m, [], .toggleMark)
         for (key, direction) in [(KeyboardShortcuts.Key.h, Direction.left), (.j, .down), (.k, .up), (.l, .right)] {
             let step = direction == .left || direction == .down ? -1 : 1
             add("cycle.\(key.rawValue)", key, [.control, .shift], .cycle(step), global: true, repeats: true,
@@ -55,6 +59,7 @@ final class ShortcutController {
     /// Returns conflicts instead of silently pretending a shortcut was registered.
     @discardableResult
     func setMode(_ mode: Mode) -> [String] {
+        monitorInput(mode == .quickSwitch)
         let enabled = bindings.filter { binding in
             switch mode {
             case .normal: binding.isGlobal
@@ -91,10 +96,33 @@ final class ShortcutController {
     }
 
     func stop() {
+        monitorInput(false)
         KeyboardShortcuts.disable(bindings.map(\.name))
         tasks.forEach { $0.cancel() }
         tasks.removeAll()
         bindings.forEach { KeyboardShortcuts.removeHandler(for: $0.name) }
+    }
+
+    private func monitorInput(_ enabled: Bool) {
+        if !enabled {
+            inputMonitors.forEach { NSEvent.removeMonitor($0) }
+            inputMonitors.removeAll()
+            return
+        }
+        guard inputMonitors.isEmpty else { return }
+        // Event monitors run on the main thread. They observe unbound keys;
+        // registered Carbon shortcuts refresh the timer through handle(_:).
+        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown, handler: { [weak self] _ in
+            MainActor.assumeIsolated { self?.onInput?() }
+        }) {
+            inputMonitors.append(monitor)
+        }
+        if let monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { [weak self] event in
+            MainActor.assumeIsolated { self?.onInput?() }
+            return event
+        }) {
+            inputMonitors.append(monitor)
+        }
     }
 
     private func add(

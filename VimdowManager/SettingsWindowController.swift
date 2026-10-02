@@ -214,6 +214,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
             ("Control–W, then Shift–H / J / K / L", "Fill the left / bottom / top / right half"),
             ("Control–W, then O", "Fill the display"),
             ("Q, then 1–9", "Select a numbered window; Q pages"),
+            ("M", "Mark / unmark this window and exit command mode"),
             ("/", "Search by application name"),
             ("N / Shift–N", "Next / previous search match"),
             ("Control–Option–K / L", "Move to the next display"),

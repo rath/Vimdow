@@ -35,6 +35,7 @@ public enum Command: Sendable {
     case enter, escape, digit(Int), move(Direction), resize(Direction, ResizeAnchor), undo, redo
     case place(Placement), sequence(SequenceKey)
     case cycle(Int), quickSwitch, search, repeatSearch(Int), nextScreen, settings, quit
+    case toggleMark, cycleMarked
 }
 
 public struct RepeatPrefix: Sendable {
@@ -92,6 +93,10 @@ public protocol WindowControlling: AnyObject {
     func windows() throws -> [WindowInfo]
     func focusedWindow() throws -> WindowInfo
     func focus(_ id: UUID, movePointer: Bool) throws
+    /// Keep these identities even while their windows are off screen.
+    func retainWindows(_ ids: Set<UUID>)
+    /// False only for a closed window or terminated app. Temporary AX failures throw.
+    func isWindowAlive(_ id: UUID) throws -> Bool
     /// Animated changes return immediately. Until the window arrives,
     /// `focusedWindow()` reports the destination so that repeated steps add up.
     func setFrame(_ frame: CGRect, of id: UUID, animated: Bool) throws
@@ -108,6 +113,8 @@ public protocol CommandPresenting: AnyObject {
     func showSearch()
     func hideSearch()
     func showSettings()
+    func showNotice(_ text: String, near frame: CGRect?)
+    func flashWindow(_ frame: CGRect)
     func showFailure(_ error: any Error)
     func quit()
 }
