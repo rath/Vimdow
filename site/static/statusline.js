@@ -31,3 +31,31 @@
   window.addEventListener('resize', schedule);
   update();
 })();
+
+/* The install command stays selectable even without JavaScript or Clipboard API. */
+(function () {
+  'use strict';
+  var button = document.querySelector('[data-copy-command]');
+  var command = document.querySelector('[data-install-command]');
+  var status = document.querySelector('[data-copy-status]');
+  if (!button || !command || !status || !navigator.clipboard || !window.isSecureContext) { return; }
+  var label = button.textContent;
+  var reset;
+  button.hidden = false;
+  button.addEventListener('click', async function () {
+    clearTimeout(reset);
+    try {
+      await navigator.clipboard.writeText(command.textContent);
+      button.textContent = button.dataset.copied;
+      status.textContent = button.dataset.copied;
+    } catch (_) {
+      var range = document.createRange();
+      range.selectNodeContents(command);
+      var selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      status.textContent = button.dataset.copyFailed;
+    }
+    reset = setTimeout(function () { button.textContent = label; status.textContent = ''; }, 2000);
+  });
+})();

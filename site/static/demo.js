@@ -52,9 +52,9 @@
     stage.dataset.focus = name;
   }
 
-  /* Like the app, number windows front to back: the focused one is 1. */
+  /* Like the app, number windows by their horizontal position. */
   function setGuides(visible) {
-    var order = [state.focus].concat(names.filter(function (name) { return name !== state.focus; }));
+    var order = names.slice().sort(function (a, b) { return state.frames[a].x - state.frames[b].x; });
     order.forEach(function (name, index) {
       windows[name].querySelector('[data-guide]').textContent = String(index + 1);
     });

@@ -22,7 +22,12 @@
     <p class="help-line"><span class="tag" aria-hidden="true">*{{_.helpFile}}*</span><span>{{hero.helpLine}}</span></p>
     <h1>{{hero.tagline}}</h1>
     <p class="lead">{{hero.lead}}</p>
-    <p class="cta"><a class="button primary" href="#get">{{hero.get}}</a><a class="jump" href="{{site.repo}}" rel="noopener"><span aria-hidden="true">|</span>{{hero.source}}<span aria-hidden="true">|</span></a></p>
+    <div class="brew-install" role="group" aria-labelledby="brew-label">
+      <p class="brew-label" id="brew-label">{{hero.homebrew}}</p>
+      <div class="brew-command"><code data-install-command>{{site.homebrewInstall}}</code><button type="button" class="button primary copy-command" data-copy-command data-copied="{{hero.copied}}" data-copy-failed="{{hero.copyFailed}}" hidden>{{hero.copy}}</button></div>
+      <span class="visually-hidden" role="status" data-copy-status></span>
+    </div>
+    <p class="cta"><a class="button small" href="{{site.download}}">{{hero.get}}</a><a class="jump" href="{{site.repo}}" rel="noopener"><span aria-hidden="true">|</span>{{hero.source}}<span aria-hidden="true">|</span></a></p>
     <div class="demo" id="demo">
       <script type="application/json" id="demo-config">{{{_.demoConfig}}}</script>
       <div class="stage" role="img" aria-label="{{demo.aria}}" data-focus="{{_.demoFocus}}">
@@ -107,6 +112,9 @@
       <li><p>{{get.allow}}</p></li>
       <li><p>{{{get.enter_html}}}</p></li>
     </ol>
+    <p>{{get.homebrew}}</p>
+    <pre><code>{{site.homebrewInstall}}</code></pre>
+    <p><a class="jump" href="{{site.changelog}}" rel="noopener"><span aria-hidden="true">|</span>{{get.changelog}}<span aria-hidden="true">|</span></a></p>
     <h3>{{get.accessibilityTitle}}</h3>
     <p>{{get.accessibilityText}}</p>
   </section>

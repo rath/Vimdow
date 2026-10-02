@@ -13,8 +13,12 @@
     "helpLine": "For macOS 14 and later",
     "tagline": "Your windows, in Vim's vocabulary.",
     "lead": "Vimdow is a keyboard-driven window manager for macOS. Press one shortcut to enter command mode, then move, resize, snap, and switch windows with h, j, k, l, counts, and the other Vim habits already in your fingers. The mouse stays where it is.",
-    "get": "Get Vimdow",
-    "source": "Source on GitHub"
+    "get": "Download ZIP",
+    "source": "Source on GitHub",
+    "homebrew": "Install with Homebrew",
+    "copy": "Copy command",
+    "copied": "Copied!",
+    "copyFailed": "Select the command and copy it manually."
   },
   "demo": {
     "aria": "Animated demo: in command mode, Vim keys move a window, widen it, center it, undo that, and snap it to the left half. A second window is then picked by number and snapped to the right half.",
@@ -80,11 +84,15 @@
     },
     "switch": {
       "title": "Switch without hunting",
-      "text": "Q shows up to nine numbered windows; type a digit to focus one. / searches by application name, and n and N cycle through the matches."
+      "text": "Q shows large white numbers in translucent black badges at window centers. Overlapping badges spread out; selection cancels after three seconds without keyboard input. Type a digit to focus a window, or use / to search and n and N to cycle matches."
     },
     "settings": {
       "title": "Yours to tune",
-      "text": "Set separate move and resize steps, choose whether resizing stops at display edges, turn the glide off, and rebind the five global shortcuts."
+      "text": "Set separate move and resize steps, choose whether resizing stops at display edges, turn the glide off, and rebind the six global shortcuts."
+    },
+    "marks": {
+      "title": "Switch between your chosen windows",
+      "text": "Press M in command mode to mark a window, then Control–Option–Tab to cycle only your marks. Two marks alternate; more cycle in order. The destination pulses twice, for 0.18 seconds each. Marks last until Vimdow quits; hidden windows rejoin when visible."
     }
   },
   "cheat": {
@@ -104,11 +112,13 @@
       "center": "Center on the display",
       "halves": "Fill the left / bottom / top / right half",
       "fill": "Fill the display",
-      "numbered": "Focus a numbered window; Q again shows the next nine",
+      "numbered": "Focus a numbered window; Q pages; three seconds idle cancels",
       "search": "Search by application name; next / previous match",
       "displays": "Move to the next display",
       "settings": "Open Settings",
-      "exit": "Exit command mode"
+      "exit": "Exit command mode",
+      "mark": "Mark / unmark the focused window and exit command mode",
+      "markedCycle": "Cycle marked windows, also available in normal mode"
     }
   },
   "faq": {
@@ -127,7 +137,7 @@
     },
     "shortcuts": {
       "question": "Can I change the shortcuts?",
-      "answer": "You can rebind or clear the five global shortcuts in Settings, including Control–Option–A for command mode. Keys inside command mode are fixed, so they always mean the same thing."
+      "answer": "You can rebind or clear the six global shortcuts in Settings, including Control–Option–A for command mode and Control–Option–Tab for marked windows. Keys inside command mode are fixed, so they always mean the same thing."
     },
     "apps": {
       "question": "Does it work with every app?",
@@ -135,12 +145,12 @@
     },
     "update": {
       "question": "How do I update Vimdow?",
-      "answer": "Download the latest Vimdow.zip and replace the app in Applications; your settings stay. Vimdow makes no network connections, so it never checks for updates itself. New versions appear on GitHub Releases."
+      "answer": "Quit Vimdow, then download the latest Vimdow.zip and replace the app in Applications. If installed with Homebrew, run brew update and brew upgrade --cask vimdow. Settings stay; window marks reset on restart. Vimdow never checks for updates itself."
     }
   },
   "get": {
     "title": "Get Vimdow",
-    "intro": "For macOS 14 or later, on Apple silicon and Intel Macs. The app is signed with Developer ID and notarized by Apple.",
+    "intro": "Vimdow 1.1.0 supports macOS 14 or later, on Apple silicon and Intel Macs. The app is signed with Developer ID and notarized by Apple.",
     "download": "Download Vimdow.zip",
     "releases": "Release notes",
     "source": "Build from source",
@@ -148,7 +158,9 @@
     "allow": "Open it, then allow it in System Settings → Privacy & Security → Accessibility.",
     "enter_html": "Press <kbd>⌃</kbd><kbd>⌥</kbd><kbd>A</kbd> to enter command mode.",
     "accessibilityTitle": "About Accessibility permission",
-    "accessibilityText": "macOS requires it for any app that moves another app's windows. Vimdow uses it for that and nothing else: no network access, no analytics, nothing leaves your Mac."
+    "accessibilityText": "macOS requires it for any app that moves another app's windows. Vimdow uses it for that and nothing else: no network access, no analytics, nothing leaves your Mac.",
+    "homebrew": "Or install with Homebrew, then open Vimdow and grant Accessibility permission:",
+    "changelog": "Full changelog"
   },
   "footer": {
     "license": "BSD 3-Clause License",

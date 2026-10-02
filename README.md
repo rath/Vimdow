@@ -6,6 +6,7 @@
 
 **Download:** [Vimdow.zip](https://github.com/rath/Vimdow/releases/latest/download/Vimdow.zip)
 for macOS 14 or later, signed and notarized · [Release notes](https://github.com/rath/Vimdow/releases/latest)
+· [Changelog](CHANGELOG.md)
 
 Vimdow is a keyboard-driven window manager for macOS. Press a shortcut to enter
 command mode, then move, resize, snap, and switch windows with `h`, `j`, `k`,
@@ -46,7 +47,7 @@ whose hands have the same habits.
 You can also install it with [Homebrew](https://brew.sh):
 
 ```sh
-brew install --cask rath/tap/vimdow
+brew install rath/tap/vimdow
 ```
 
 Open **Vimdow.app** from Applications and grant Accessibility permission as

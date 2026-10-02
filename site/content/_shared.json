@@ -11,7 +11,9 @@
     "license": "https://github.com/rath/Vimdow/blob/master/LICENSE",
     "author": "Jang Ho Hwang",
     "authorUrl": "https://xrath.com",
-    "indexNowKey": "a0d0cefb0f1ef6121dd8bedc0e44a318"
+    "indexNowKey": "a0d0cefb0f1ef6121dd8bedc0e44a318",
+    "homebrewInstall": "brew install rath/tap/vimdow",
+    "changelog": "https://github.com/rath/Vimdow/blob/master/CHANGELOG.md"
   },
   "languages": [
     {
@@ -274,6 +276,7 @@
     "snap",
     "undo",
     "displays",
+    "marks",
     "switch",
     "settings"
   ],
@@ -404,6 +407,24 @@
         [
           "q",
           "1–9"
+        ]
+      ]
+    },
+    {
+      "id": "mark",
+      "keys": [
+        [
+          "m"
+        ]
+      ]
+    },
+    {
+      "id": "markedCycle",
+      "keys": [
+        [
+          "⌃",
+          "⌥",
+          "tab"
         ]
       ]
     },

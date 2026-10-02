@@ -206,6 +206,13 @@ kbd + kbd { margin-inline-start: 2px; }
 .lead { max-width: 60ch; font-size: 1.25rem; }
 :lang(ko) .lead, :lang(ja) .lead, :lang(zh-Hans) .lead { font-size: 1.125rem; }
 
+.brew-install { max-width: 60ch; margin-top: 1.75rem; }
+.brew-label { margin-bottom: 0.5rem; font-family: var(--font-mono); font-weight: 700; }
+.brew-command { display: flex; align-items: center; gap: 1.5ch; padding: 0.5rem 0.5rem 0.5rem 1rem; background: var(--visual); border: 1px solid var(--muted); }
+.brew-command code { flex: 1; min-width: 0; overflow-wrap: anywhere; user-select: all; font: clamp(0.875rem, 0.72rem + 0.6vw, 1rem) / 1.5 var(--font-mono); }
+.copy-command { flex: none; min-width: 9ch; font-size: 0.875rem; }
+.copy-command[hidden] { display: none; }
+
 .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 3ch; margin: 1.75rem 0 0; }
 .button {
   display: inline-flex; align-items: center; justify-content: center;
@@ -223,6 +230,7 @@ kbd + kbd { margin-inline-start: 2px; }
   font-weight: 400; font-size: 0.875rem;
 }
 .button.small:hover { background: var(--visual); }
+.hero .cta .button.small { min-height: 44px; }
 .jump { font-family: var(--font-mono); font-size: 1rem; }
 .jump span { color: var(--muted); text-decoration: none; display: inline-block; }
 
@@ -347,14 +355,15 @@ kbd + kbd { margin-inline-start: 2px; }
 .document .line.heading { width: 45%; height: 1.5cqw; margin-bottom: 1.6cqw; background: #aeb7c3; }
 .document .line.short { width: 60%; }
 
-/* Numbered guides, as the app draws them: a translucent black square in the corner. */
+/* Numbered guides mirror the app's 160-point badges on this 640-point desktop. */
 .guide {
-  position: absolute; top: 0.8cqw; left: 0.8cqw;
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
   display: none; place-items: center;
-  width: 5.6cqw; aspect-ratio: 1;
-  background: rgba(0, 0, 0, 0.4);
+  width: 25cqw; aspect-ratio: 1; border-radius: 2.5cqw;
+  background: rgba(0, 0, 0, 0.65);
   color: #fff;
-  font: max(10px, 4.2cqw) / 1 system-ui, -apple-system, sans-serif;
+  font: 700 15cqw / 1 system-ui, -apple-system, sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 .stage.show-guides .guide { display: grid; }
 

@@ -13,8 +13,12 @@
     "helpLine": "适用于 macOS 14 及更高版本",
     "tagline": "像用 Vim 一样，管理你的窗口。",
     "lead": "Vimdow 是一款用键盘操作的 macOS 窗口管理器。按下快捷键进入命令模式，就能用 h、j、k、l、计数等早已熟悉的 Vim 操作来移动窗口、调整大小、贴边和切换，全程不用碰鼠标。",
-    "get": "获取 Vimdow",
-    "source": "在 GitHub 查看源码"
+    "get": "下载 ZIP",
+    "source": "在 GitHub 查看源码",
+    "homebrew": "通过 Homebrew 轻松安装",
+    "copy": "复制命令",
+    "copied": "已复制",
+    "copyFailed": "请选择命令并手动复制。"
   },
   "demo": {
     "aria": "动画演示：进入命令模式后，用 Vim 按键移动窗口、加宽、居中后撤销，再铺满左半屏；接着按编号选中第二个窗口，让它铺满右半屏。",
@@ -80,11 +84,15 @@
     },
     "switch": {
       "title": "快速切换窗口",
-      "text": "按 Q 会给最多 9 个窗口标上编号，按对应数字就能切换过去。/ 用于按应用名称搜索，n 和 N 在搜索结果之间前后切换。"
+      "text": "按 Q 会在各窗口中央显示半透明黑色背景和大号白色编号。重叠的编号会自动分散，3秒没有键盘输入就取消选择。按数字选择窗口，也可用 / 搜索应用名称，再用 n 和 N 切换结果。"
     },
     "settings": {
       "title": "按喜好调整",
-      "text": "移动和调整大小的步长可以分别设置；还能选择调整大小时是否停在屏幕边缘、是否开启动画，并自定义 5 个全局快捷键。"
+      "text": "移动和调整大小的步长可以分别设置；还能选择调整大小时是否停在屏幕边缘、是否开启动画，并自定义6个全局快捷键。"
+    },
+    "marks": {
+      "title": "只切换常用窗口",
+      "text": "在命令模式下按 M 标记窗口，再用 Control–Option–Tab 只在标记的窗口间切换。两个窗口交替切换，更多窗口按标记顺序循环。目标窗口闪烁两次，每次0.18秒。标记保留到应用退出；隐藏的窗口重新显示后会再次参与切换。"
     }
   },
   "cheat": {
@@ -104,11 +112,13 @@
       "center": "移到屏幕正中",
       "halves": "铺满左 / 下 / 上 / 右半屏",
       "fill": "铺满整个屏幕",
-      "numbered": "按编号切换窗口；再按 Q 显示后 9 个",
+      "numbered": "按编号选择；Q 翻页；3秒没有输入则取消",
       "search": "按应用名称搜索；下一个 / 上一个结果",
       "displays": "移到下一台显示器",
       "settings": "打开设置",
-      "exit": "退出命令模式"
+      "exit": "退出命令模式",
+      "mark": "标记／取消标记当前窗口，并退出命令模式",
+      "markedCycle": "切换标记的窗口（普通模式也可使用）"
     }
   },
   "faq": {
@@ -127,7 +137,7 @@
     },
     "shortcuts": {
       "question": "可以修改快捷键吗？",
-      "answer": "可以。包括进入命令模式的 Control–Option–A 在内，5 个全局快捷键都能在设置中修改或清除。命令模式里的按键是固定的，含义始终不变。"
+      "answer": "可以。包括进入命令模式的 Control–Option–A 和切换标记窗口的 Control–Option–Tab 在内，6个全局快捷键都能在设置中修改或清除。命令模式里的按键是固定的。"
     },
     "apps": {
       "question": "所有应用都能用吗？",
@@ -135,12 +145,12 @@
     },
     "update": {
       "question": "怎么更新？",
-      "answer": "下载最新的 Vimdow.zip，替换“应用程序”文件夹里的旧版本即可，设置会保留。Vimdow 不联网，所以不会自动检查更新，新版本会发布在 GitHub 的发布页面上。"
+      "answer": "先退出 Vimdow，再下载最新的 Vimdow.zip，替换“应用程序”文件夹里的旧版本。通过 Homebrew 安装的用户可运行 brew update 和 brew upgrade --cask vimdow。设置会保留，窗口标记会在重启时清空。应用本身不会检查更新。"
     }
   },
   "get": {
     "title": "获取 Vimdow",
-    "intro": "需要 macOS 14 或更高版本，搭载 Apple 芯片或 Intel 处理器的 Mac 均可使用。应用已用 Developer ID 签名，并通过了 Apple 公证。",
+    "intro": "Vimdow 1.1.0 支持 macOS 14 或更高版本，适用于 Apple 芯片和 Intel Mac。应用已用 Developer ID 签名，并通过 Apple 公证。",
     "download": "下载 Vimdow.zip",
     "releases": "发布说明",
     "source": "从源码构建",
@@ -148,7 +158,9 @@
     "allow": "打开应用，然后在“系统设置 → 隐私与安全性 → 辅助功能”中为它开启权限。",
     "enter_html": "按 <kbd>⌃</kbd><kbd>⌥</kbd><kbd>A</kbd> 进入命令模式。",
     "accessibilityTitle": "关于辅助功能权限",
-    "accessibilityText": "凡是要移动其他应用窗口的应用，macOS 都要求先获得这项权限。Vimdow 只把它用在移动窗口上：不联网，不收集使用数据，任何信息都不会离开你的 Mac。"
+    "accessibilityText": "凡是要移动其他应用窗口的应用，macOS 都要求先获得这项权限。Vimdow 只把它用在移动窗口上：不联网，不收集使用数据，任何信息都不会离开你的 Mac。",
+    "homebrew": "也可通过 Homebrew 安装。安装后打开应用并授予辅助功能权限：",
+    "changelog": "完整更新日志"
   },
   "footer": {
     "license": "BSD 3-Clause 许可证",
