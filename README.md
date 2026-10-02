@@ -43,6 +43,15 @@ whose hands have the same habits.
 3. Press **Control–Option–A** to enter command mode, and `,` there to open
    Settings.
 
+You can also install it with [Homebrew](https://brew.sh):
+
+```sh
+brew install --cask rath/tap/vimdow
+```
+
+Open **Vimdow.app** from Applications and grant Accessibility permission as
+above. For later updates, run `brew update` and `brew upgrade --cask vimdow`.
+
 The app is signed with Developer ID and notarized by Apple. To build it
 yourself, follow [Development](#development); the
 [signing notes](#signing-and-permissions) explain how to keep Accessibility
@@ -389,6 +398,9 @@ it with Developer ID and the hardened runtime, notarizes and staples it, writes
 `build/release/Vimdow.zip`, and tags the commit `v<version>`. It publishes
 nothing; it prints the commands to push the tag and create a draft release. Set
 `NOTARY_PROFILE` to use another keychain profile.
+
+After publishing, update the version and ZIP checksum in `Casks/vimdow.rb` in
+[rath/homebrew-tap](https://github.com/rath/homebrew-tap).
 
 ### Architecture
 
