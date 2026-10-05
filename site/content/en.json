@@ -88,11 +88,11 @@
     },
     "settings": {
       "title": "Yours to tune",
-      "text": "Set separate move and resize steps, choose whether resizing stops at display edges, turn the glide off, and rebind the six global shortcuts."
+      "text": "Set separate move and resize steps, choose whether resizing stops at display edges, turn the glide off, and rebind the seven global shortcuts."
     },
     "marks": {
       "title": "Switch between your chosen windows",
-      "text": "Press M in command mode to mark a window, then Control–Option–Tab to cycle only your marks. Two marks alternate; more cycle in order. The destination pulses twice, for 0.18 seconds each. Marks last until Vimdow quits; hidden windows rejoin when visible."
+      "text": "Press M in command mode to mark a window, then Control–Option–[ for the previous mark or Control–Option–] for the next. Cycle in registration order, wrapping at either end. The destination pulses twice, for 0.18 seconds each. Marks last until Vimdow quits; hidden windows rejoin when visible."
     }
   },
   "cheat": {
@@ -137,7 +137,7 @@
     },
     "shortcuts": {
       "question": "Can I change the shortcuts?",
-      "answer": "You can rebind or clear the six global shortcuts in Settings, including Control–Option–A for command mode and Control–Option–Tab for marked windows. Keys inside command mode are fixed, so they always mean the same thing."
+      "answer": "You can rebind or clear the seven global shortcuts in Settings, including Control–Option–A for command mode and Control–Option–[ and Control–Option–] for previous and next marked windows. Keys inside command mode are fixed, so they always mean the same thing."
     },
     "apps": {
       "question": "Does it work with every app?",

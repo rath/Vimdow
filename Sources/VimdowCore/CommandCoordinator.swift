@@ -56,10 +56,10 @@ public final class CommandCoordinator {
             case .cycle(let step):
                 guard mode != .search && mode != .settings else { return }
                 try cycle(step: step, count: prefix.take())
-            case .cycleMarked:
+            case .cycleMarked(let step):
                 guard mode != .search && mode != .settings else { return }
                 transition(to: .normal)
-                try cycleMarked()
+                try cycleMarked(step: step)
             default:
                 guard mode == .command || mode == .quickSwitch else { return }
                 if let pending { try complete(pending, with: command) } else { try handleModal(command) }
@@ -295,11 +295,13 @@ public final class CommandCoordinator {
         windows.retainWindows(Set(markedWindows))
     }
 
-    private func cycleMarked() throws {
+    private func cycleMarked(step: Int) throws {
+        guard step != 0 else { return }
         let visible = try windows.windows()
         try pruneMarks()
         let visibleIDs = Set(visible.map(\.id))
-        let available = markedWindows.filter { visibleIDs.contains($0) }
+        var available = markedWindows.filter { visibleIDs.contains($0) }
+        if step < 0 { available.reverse() }
         let current = visible.first(where: \.isFocused)?.id
         let start = current.flatMap { available.firstIndex(of: $0) }.map { $0 + 1 } ?? 0
         let candidates = Array(available.dropFirst(start)) + Array(available.prefix(start))

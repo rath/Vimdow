@@ -97,6 +97,7 @@ extension SearchPanelTests {
             for binding in shortcuts.bindings {
                 KeyboardShortcuts.setShortcut(nil, for: binding.name)
                 UserDefaults.standard.removeObject(forKey: "KeyboardShortcuts_\(binding.name.rawValue)")
+                UserDefaults.standard.removeObject(forKey: "\(binding.name.rawValue)_bracketDefaultMigrated")
             }
             defaults.removePersistentDomain(forName: suite)
         }

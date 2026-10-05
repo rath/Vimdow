@@ -99,18 +99,18 @@ private struct MarkSession {
     #expect(s.windows.pointerMoves == 0)
 }
 
-@Test @MainActor func twoMarksAlternateAndExcludeOtherWindowsOfTheSameApp() {
+@Test(arguments: [-1, 1]) @MainActor func twoMarksAlternateAndExcludeOtherWindowsOfTheSameApp(_ step: Int) {
     let s = MarkSession()
     s.mark(0)
     s.mark(1)
-    for _ in 0..<4 { s.controller.handle(.cycleMarked) }
+    for _ in 0..<4 { s.controller.handle(.cycleMarked(step)) }
     #expect(s.windows.focused == [s.ids[0], s.ids[1], s.ids[0], s.ids[1]])
     #expect(s.windows.pointerMoves == 0)
     #expect(s.ui.notices.count == 2) // Switching itself stays quiet.
     #expect(s.ui.flashes == [0, 1, 0, 1].map { s.windows.items[$0].frame })
     s.windows.current = s.ids[3]
-    s.controller.handle(.cycleMarked)
-    #expect(s.windows.current == s.ids[0])
+    s.controller.handle(.cycleMarked(step))
+    #expect(s.windows.current == s.ids[step > 0 ? 0 : 1])
     // Existing full-window cycling still visits the unmarked second Chrome window.
     s.windows.current = s.ids[1]
     s.controller.handle(.cycle(1))
@@ -118,19 +118,19 @@ private struct MarkSession {
     #expect(s.ui.flashes.count == 5) // Whole-window cycling has no flash.
 }
 
-@Test @MainActor func markOrderSurvivesWindowReorderingAndRemarksAppend() {
+@Test(arguments: [-1, 1]) @MainActor func markOrderSurvivesWindowReorderingAndRemarksAppend(_ step: Int) {
     let s = MarkSession()
     s.mark(2)
     s.mark(0)
     s.mark(1)
     s.windows.visible.reverse()
-    for _ in 0..<3 { s.controller.handle(.cycleMarked) }
-    #expect(s.windows.focused == [s.ids[2], s.ids[0], s.ids[1]])
+    for _ in 0..<3 { s.controller.handle(.cycleMarked(step)) }
+    #expect(s.windows.focused == (step > 0 ? [2, 0, 1] : [0, 2, 1]).map { s.ids[$0] })
     s.mark(0)
     s.mark(0)
     #expect(s.controller.markedWindows == [s.ids[2], s.ids[1], s.ids[0]])
-    s.controller.handle(.cycleMarked)
-    #expect(s.windows.current == s.ids[2])
+    s.controller.handle(.cycleMarked(step))
+    #expect(s.windows.current == s.ids[step > 0 ? 2 : 1])
 }
 
 @Test @MainActor func hiddenMarksSurviveScansAndRejoinInTheirOriginalOrder() {
@@ -139,87 +139,88 @@ private struct MarkSession {
     s.mark(1)
     s.mark(2)
     s.windows.visible.removeAll { $0 == s.ids[0] }
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(1))
     #expect(s.windows.current == s.ids[1])
     #expect(s.windows.retained == Set(s.ids.prefix(3)))
     s.windows.visible.append(s.ids[0])
     s.windows.current = s.ids[2]
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(1))
     #expect(s.windows.current == s.ids[0])
     // Closing a hidden window is different from merely hiding it.
     s.windows.visible.removeAll { $0 == s.ids[1] }
     s.windows.live.remove(s.ids[1])
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(1))
     #expect(s.controller.markedWindows == [s.ids[0], s.ids[2]])
     #expect(!s.windows.retained.contains(s.ids[1]))
 }
 
-@Test @MainActor func emptyAndSingleVisibleMarksDoNotSwitchToUnmarkedWindows() {
+@Test(arguments: [-1, 1]) @MainActor func emptyAndSingleVisibleMarksDoNotSwitchToUnmarkedWindows(_ step: Int) {
     let s = MarkSession()
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     #expect(s.ui.notices.last == "No marked windows")
     s.mark(0)
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     #expect(s.windows.focused.isEmpty)
     #expect(s.ui.flashes.isEmpty)
     s.windows.current = s.ids[3]
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     #expect(s.windows.current == s.ids[0])
     s.windows.visible.removeAll { $0 == s.ids[0] }
     s.windows.current = s.ids[3]
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     #expect(s.ui.notices.last == "No marked windows on this desktop")
     #expect(s.windows.current == s.ids[3])
     #expect(s.controller.markedWindows == [s.ids[0]])
     s.windows.live.remove(s.ids[0])
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     #expect(s.ui.notices.last == "No marked windows")
     #expect(s.windows.retained.isEmpty)
 }
 
-@Test @MainActor func closingBetweenScanAndFocusContinuesToNextMark() {
+@Test(arguments: [-1, 1]) @MainActor func closingBetweenScanAndFocusContinuesToNextMark(_ step: Int) {
     let s = MarkSession()
     s.mark(0)
     s.mark(1)
     s.mark(2)
+    s.windows.current = s.ids[step > 0 ? 2 : 1]
     s.windows.closingOnFocus = [s.ids[0]]
-    s.controller.handle(.cycleMarked)
-    #expect(s.windows.current == s.ids[1])
+    s.controller.handle(.cycleMarked(step))
+    #expect(s.windows.current == s.ids[step > 0 ? 1 : 2])
     #expect(s.controller.markedWindows == [s.ids[1], s.ids[2]])
     #expect(s.ui.errors.isEmpty)
-    #expect(s.ui.flashes == [s.windows.items[1].frame])
+    #expect(s.ui.flashes == [s.windows.items[step > 0 ? 1 : 2].frame])
     s.windows.closingOnFocus = [s.ids[1], s.ids[2]]
     s.windows.current = s.ids[3]
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     #expect(s.controller.markedWindows.isEmpty)
     #expect(s.ui.notices.last == "No marked windows")
 }
 
-@Test @MainActor func transientLivenessErrorsPreserveMarksButPermissionErrorsStop() {
+@Test(arguments: [-1, 1]) @MainActor func transientLivenessErrorsPreserveMarksButPermissionErrorsStop(_ step: Int) {
     let s = MarkSession()
     s.mark(0)
     s.mark(1)
     s.windows.livenessFailures[s.ids[0]] = .accessibility(-25204)
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     #expect(s.windows.current == s.ids[0])
     #expect(s.controller.markedWindows == [s.ids[0], s.ids[1]])
     s.windows.livenessFailures[s.ids[0]] = .permissionDenied
     s.controller.handle(.enter)
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     #expect(s.ui.errors.last as? WindowFailure == .permissionDenied)
     #expect(s.controller.mode == .normal)
     #expect(s.controller.markedWindows.count == 2)
 }
 
-@Test(arguments: [WindowFailure.permissionDenied, .unavailableWindow, .unsupportedOperation, .accessibility(-25204)])
-@MainActor func focusErrorsKeepMarksAndReleaseModalInput(_ error: WindowFailure) {
+@Test(arguments: [WindowFailure.permissionDenied, .unavailableWindow, .unsupportedOperation, .accessibility(-25204)], [-1, 1])
+@MainActor func focusErrorsKeepMarksAndReleaseModalInput(_ error: WindowFailure, _ step: Int) {
     let s = MarkSession()
     s.mark(0)
     s.mark(1)
     s.windows.focusFailure = error
     s.controller.handle(.enter)
     s.controller.handle(.quickSwitch)
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     #expect(s.controller.mode == .normal)
     #expect(s.ui.guides.isEmpty)
     #expect(s.controller.markedWindows.count == 2)
@@ -227,7 +228,7 @@ private struct MarkSession {
     #expect(s.ui.flashes.isEmpty)
 }
 
-@Test @MainActor func markedCommandsIgnoreCountsAndRespectInputModesAndSequences() {
+@Test(arguments: [-1, 1]) @MainActor func markedCommandsIgnoreCountsAndRespectInputModesAndSequences(_ step: Int) {
     let s = MarkSession()
     s.windows.current = s.ids[0]
     s.controller.handle(.toggleMark) // Normal typing must never mark a window.
@@ -239,34 +240,77 @@ private struct MarkSession {
     s.mark(2)
     s.controller.handle(.enter)
     s.controller.handle(.digit(2))
-    s.controller.handle(.cycleMarked)
-    #expect(s.windows.current == s.ids[0])
+    s.controller.handle(.cycleMarked(step))
+    #expect(s.windows.current == s.ids[step > 0 ? 0 : 1])
+    #expect(s.controller.mode == .normal)
     s.controller.handle(.enter)
     s.controller.handle(.sequence(.g))
     s.controller.handle(.toggleMark) // Invalid second key cancels the sequence.
     #expect(s.controller.markedWindows.count == 3)
     s.controller.handle(.search)
     let before = s.windows.focused
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     s.controller.handle(.toggleMark)
     #expect(s.controller.mode == .search)
     #expect(s.windows.focused == before)
     s.controller.setSettingsActive(true)
     let afterSearch = s.windows.focused
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     s.controller.handle(.toggleMark)
     #expect(s.controller.mode == .settings)
     #expect(s.windows.focused == afterSearch)
     #expect(s.controller.markedWindows.count == 3)
 }
 
-@Test @MainActor func scanErrorsPreserveMarksAndNewSessionsStartEmpty() {
+@Test(arguments: [-1, 1]) @MainActor func scanErrorsPreserveMarksAndNewSessionsStartEmpty(_ step: Int) {
     let s = MarkSession()
     s.mark(0)
     s.windows.scanFailure = .accessibility(-25204)
-    s.controller.handle(.cycleMarked)
+    s.controller.handle(.cycleMarked(step))
     #expect(s.controller.markedWindows == [s.ids[0]])
     #expect(s.ui.errors.count == 1)
     let fresh = MarkSession()
     #expect(fresh.controller.markedWindows.isEmpty)
+}
+
+@Test @MainActor func backwardCyclingSkipsHiddenMarksAndRestoresRegistrationOrder() {
+    let s = MarkSession()
+    s.mark(0)
+    s.mark(1)
+    s.mark(2)
+    s.windows.current = s.ids[0]
+    s.windows.visible.removeAll { $0 == s.ids[2] }
+    s.controller.handle(.cycleMarked(-1))
+    #expect(s.windows.current == s.ids[1])
+    #expect(s.windows.retained == Set(s.ids.prefix(3)))
+    s.windows.visible.insert(s.ids[2], at: 0)
+    s.controller.handle(.cycleMarked(-1))
+    s.controller.handle(.cycleMarked(-1))
+    #expect(s.windows.focused == [s.ids[1], s.ids[0], s.ids[2]])
+    s.windows.visible.removeAll { $0 == s.ids[1] }
+    s.windows.live.remove(s.ids[1])
+    s.controller.handle(.cycleMarked(-1))
+    #expect(s.windows.current == s.ids[0])
+    #expect(s.controller.markedWindows == [s.ids[0], s.ids[2]])
+}
+
+@Test @MainActor func changingDirectionAndEnteringFromOutsideUseRegistrationOrder() {
+    let s = MarkSession()
+    s.mark(2)
+    s.mark(0)
+    s.mark(1)
+    s.windows.current = s.ids[3]
+    s.controller.handle(.cycleMarked(-1))
+    #expect(s.windows.current == s.ids[1])
+    s.controller.handle(.cycleMarked(1))
+    #expect(s.windows.current == s.ids[2])
+    s.controller.handle(.cycleMarked(-1))
+    #expect(s.windows.current == s.ids[1])
+    s.windows.current = nil
+    s.controller.handle(.cycleMarked(1))
+    #expect(s.windows.current == s.ids[2])
+    s.windows.current = nil
+    s.controller.handle(.cycleMarked(-1))
+    #expect(s.windows.current == s.ids[1])
+    #expect(s.windows.pointerMoves == 0)
 }

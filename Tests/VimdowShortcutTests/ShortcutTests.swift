@@ -34,15 +34,28 @@ struct ShortcutTests {
         #expect(activity == 1)
     }
 
-    @Test func markedWindowShortcutsAreSinglePressAndTheGlobalBindingPersists() throws {
+    @Test(arguments: [-1, 1])
+    func markedWindowShortcutsAreSinglePressAndTheGlobalBindingPersists(_ step: Int) throws {
         let namespace = "test_\(UUID().uuidString)"
         let controller = ShortcutController(namespace: namespace) { _ in }
         defer { cleanUp(controller) }
-        let cycle = try #require(controller.bindings.first { if case .cycleMarked = $0.command { true } else { false } })
+        let cycle = try #require(controller.bindings.first {
+            if case .cycleMarked(let direction) = $0.command { direction == step } else { false }
+        })
+        let initial = KeyboardShortcuts.Shortcut(step < 0 ? .leftBracket : .rightBracket, modifiers: [.control, .option])
+        let other = try #require(controller.bindings.first {
+            if case .cycleMarked(let direction) = $0.command { direction == -step } else { false }
+        })
+        let otherShortcut = try #require(other.name.shortcut)
+        if case .disallow = controller.validate(otherShortcut, for: cycle.name) {} else {
+            Issue.record("Duplicate marked-window shortcut accepted")
+        }
         let toggle = try #require(controller.bindings.first { if case .toggleMark = $0.command { true } else { false } })
         #expect(cycle.isGlobal && !cycle.repeats)
         #expect(!toggle.isGlobal && !toggle.repeats)
-        #expect(cycle.name.shortcut == KeyboardShortcuts.Shortcut(.tab, modifiers: [.control, .option]))
+        #expect(controller.editableBindings.count == 7)
+        #expect(controller.editableBindings.contains { $0.name == cycle.name })
+        #expect(cycle.name.shortcut == initial)
         #expect(toggle.name.shortcut == KeyboardShortcuts.Shortcut(.m))
         let replacement = KeyboardShortcuts.Shortcut(.tab, modifiers: [.control, .shift])
         cycle.name.shortcut = replacement
@@ -51,10 +64,15 @@ struct ShortcutTests {
         defer { recreated.stop() }
         #expect(recreated.bindings.first { $0.name == cycle.name }?.name.shortcut == replacement)
         cycle.name.shortcut = nil
-        #expect(recreated.setMode(.normal).isEmpty)
+        recreated.stop()
+        let cleared = ShortcutController(namespace: namespace) { _ in }
+        defer { cleared.stop() }
+        #expect(cycle.name.shortcut == nil)
+        #expect(other.name.shortcut == otherShortcut)
+        #expect(cleared.setMode(.normal).isEmpty)
         #expect(!KeyboardShortcuts.isEnabled(for: cycle.name))
-        recreated.restoreDefaults()
-        #expect(cycle.name.shortcut == KeyboardShortcuts.Shortcut(.tab, modifiers: [.control, .option]))
+        cleared.restoreDefaults()
+        #expect(cycle.name.shortcut == initial)
     }
 
     @Test func modalKeysRegisterAndAreReleasedOnExitAndSearch() async {
@@ -128,11 +146,50 @@ struct ShortcutTests {
         #expect(defaults.object(forKey: "KeyboardShortcuts_new_key") as? Bool == false)
     }
 
+    @Test(arguments: [false, true])
+    func formerMarkedDefaultMigratesOnceIncludingLegacyNames(_ legacy: Bool) throws {
+        let namespace = "test_\(UUID().uuidString)"
+        let old = KeyboardShortcuts.Shortcut(.tab, modifiers: [.control, .option])
+        let oldKey = "KeyboardShortcuts_\(namespace)\(legacy ? ".marks.next" : "_marks_next")"
+        UserDefaults.standard.set(String(decoding: try JSONEncoder().encode(old), as: UTF8.self), forKey: oldKey)
+        defer { UserDefaults.standard.removeObject(forKey: oldKey) }
+        let controller = ShortcutController(namespace: namespace) { _ in }
+        defer { cleanUp(controller) }
+        let next = try #require(controller.bindings.first { $0.name.rawValue == "\(namespace)_marks_next" })
+        #expect(next.name.shortcut == KeyboardShortcuts.Shortcut(.rightBracket, modifiers: [.control, .option]))
+        if legacy { #expect(UserDefaults.standard.object(forKey: oldKey) == nil) }
+        next.name.shortcut = old
+        controller.stop()
+        let recreated = ShortcutController(namespace: namespace) { _ in }
+        defer { recreated.stop() }
+        #expect(next.name.shortcut == old)
+    }
+
+    @Test(arguments: [false, true], [false, true])
+    func markedMigrationPreservesCustomAndClearedBindings(_ legacy: Bool, _ cleared: Bool) throws {
+        let namespace = "test_\(UUID().uuidString)"
+        let replacement = KeyboardShortcuts.Shortcut(.tab, modifiers: [.control, .shift])
+        let oldKey = "KeyboardShortcuts_\(namespace)\(legacy ? ".marks.next" : "_marks_next")"
+        if cleared {
+            UserDefaults.standard.set(false, forKey: oldKey)
+        } else {
+            UserDefaults.standard.set(String(decoding: try JSONEncoder().encode(replacement), as: UTF8.self), forKey: oldKey)
+        }
+        defer { UserDefaults.standard.removeObject(forKey: oldKey) }
+        let controller = ShortcutController(namespace: namespace) { _ in }
+        defer { cleanUp(controller) }
+        let next = try #require(controller.bindings.first { $0.name.rawValue == "\(namespace)_marks_next" })
+        #expect(next.name.shortcut == (cleared ? nil : replacement))
+        let previous = try #require(controller.bindings.first { $0.name.rawValue == "\(namespace)_marks_previous" })
+        #expect(previous.name.shortcut == KeyboardShortcuts.Shortcut(.leftBracket, modifiers: [.control, .option]))
+    }
+
     private func cleanUp(_ controller: ShortcutController) {
         controller.stop()
         for binding in controller.bindings {
             KeyboardShortcuts.setShortcut(nil, for: binding.name)
             UserDefaults.standard.removeObject(forKey: "KeyboardShortcuts_\(binding.name.rawValue)")
+            UserDefaults.standard.removeObject(forKey: "\(binding.name.rawValue)_bracketDefaultMigrated")
         }
     }
 }

@@ -22,8 +22,10 @@ final class ShortcutController {
     init(namespace: String = "vimdow", onCommand: @escaping (Command) -> Void) {
         self.onCommand = onCommand
         self.namespace = namespace
+        Self.migrateMarkedShortcut(namespace: namespace)
         add("enter", .a, [.control, .option], .enter, global: true, title: "Enter command mode")
-        add("marks.next", .tab, [.control, .option], .cycleMarked, global: true, title: "Next marked window")
+        add("marks.previous", .leftBracket, [.control, .option], .cycleMarked(-1), global: true, title: "Previous marked window")
+        add("marks.next", .rightBracket, [.control, .option], .cycleMarked(1), global: true, title: "Next marked window")
         add("marks.toggle", .m, [], .toggleMark)
         for (key, direction) in [(KeyboardShortcuts.Key.h, Direction.left), (.j, .down), (.k, .up), (.l, .right)] {
             let step = direction == .left || direction == .down ? -1 : 1
@@ -93,6 +95,24 @@ final class ShortcutController {
             defaults.set(saved, forKey: newKey)
         }
         defaults.removeObject(forKey: oldKey)
+    }
+
+    /// Run before Name initialization, which persists initial shortcuts.
+    static func migrateMarkedShortcut(namespace: String, defaults: UserDefaults = .standard) {
+        let name = "\(namespace)_marks_next"
+        migrateShortcut(from: "\(namespace).marks.next", to: name, defaults: defaults)
+        let migratedKey = "\(name)_bracketDefaultMigrated"
+        guard !defaults.bool(forKey: migratedKey) else { return }
+        let shortcutKey = "KeyboardShortcuts_\(name)"
+        if let saved = defaults.string(forKey: shortcutKey),
+           let data = saved.data(using: .utf8),
+           let shortcut = try? JSONDecoder().decode(KeyboardShortcuts.Shortcut.self, from: data),
+           shortcut == KeyboardShortcuts.Shortcut(.tab, modifiers: [.control, .option]) {
+            // Let the new initial shortcut replace only the former default.
+            defaults.removeObject(forKey: shortcutKey)
+        }
+        // A later explicit reassignment to Tab must survive subsequent launches.
+        defaults.set(true, forKey: migratedKey)
     }
 
     func stop() {

@@ -57,10 +57,12 @@ in the relevant PR or issue. Check supported OS versions before a release.
   search. Check focus restoration, no matches, and N/Shift–N navigation.
 - [ ] **Marked windows:** with Ghostty, two Chrome windows, and another app open,
   enter command mode then M in Ghostty and one Chrome window. Each shows Marked
-  briefly without taking focus and returns to normal typing. Control–Option–Tab
-  alternates only those two, leaves the pointer in place, and fires once when
-  held. From an unmarked window it selects the first mark. Add a third mark and
-  verify registration order, wraparound, and unmark/re-mark appending to the end.
+  briefly without taking focus and returns to normal typing. Control–Option–[
+  and Control–Option–] alternate only those two, leave the pointer in place,
+  and fire once when held. From an unmarked window, ] selects the first mark
+  and [ selects the last. Add a third mark and verify forward and backward
+  registration order, wraparound at both ends, changing direction, and
+  unmark/re-mark appending to the end. Confirm [ and ] also work with Korean input.
   Ordinary Control–Shift focus shortcuts still include all windows.
 - [ ] **Marked focus flash:** each successful marked switch briefly outlines
   and tints only the destination window, pulsing twice over 0.36 seconds without
@@ -77,8 +79,12 @@ in the relevant PR or issue. Check supported OS versions before a release.
   visible window preserves its undo and display history.
 - [ ] **Mark input and feedback:** M uses the physical key with Korean input
   active. Marked switching exits command mode and Q selection, ignores counts,
-  and is suspended in search and Settings. Changing or clearing its shortcut
-  persists across restart. Rapid mark changes replace the notice and reset its
+  and is suspended in search and Settings. Settings shows separate Previous
+  marked window and Next marked window recorders. Changing or clearing either
+  persists across restart; Restore Defaults returns them to [ and ]. Upgrade
+  an old Tab default and confirm it becomes ]; custom and cleared bindings stay
+  intact. Explicitly reassign Tab afterward and confirm it survives restart.
+  Rapid mark changes replace the notice and reset its
   0.8-second timer; notices remain readable in light/dark mode and at display
   edges, never intercept typing or clicks, and are announced by VoiceOver.
 - [ ] **Displays:** move small-to-large and back, including displays above/left

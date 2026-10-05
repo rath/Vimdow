@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Cycle marked windows backward with Control–Option–[ and forward with
+  Control–Option–], wrapping at both ends of registration order. Each shortcut
+  can be changed or cleared independently in Settings.
+- Migrate the former Control–Option–Tab default to Control–Option–] once,
+  preserving custom shortcuts and cleared bindings.
+
 ## [1.1.0](https://github.com/rath/Vimdow/releases/tag/v1.1.0) — 2026-10-03
 
 ### Added

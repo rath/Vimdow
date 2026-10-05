@@ -67,7 +67,8 @@ permission across rebuilds.
 | Control–Option–A | Enter command mode (customizable in Settings) |
 | Control–Shift–H / J | Focus the previous window, ordered by horizontal position |
 | Control–Shift–K / L | Focus the next window |
-| Control–Option–Tab | Focus the next marked window (customizable in Settings) |
+| Control–Option–[ | Focus the previous marked window (customizable in Settings) |
+| Control–Option–] | Focus the next marked window (customizable in Settings) |
 
 ### Command mode
 
@@ -147,16 +148,22 @@ if numbered selection remains active.
 
 To switch between just a Ghostty window and a Chrome window, enter command mode
 in each and press **M**. A brief **Marked** confirmation appears and normal typing
-resumes. Press **Control–Option–Tab** to alternate between them, without entering
-command mode. Press M in command mode again to unmark a window.
+resumes. Press **Control–Option–[** for the previous marked window or
+**Control–Option–]** for the next, without entering command mode. Press M in
+command mode again to unmark a window.
 The newly focused window briefly flashes with an accent-colored outline and a
 faint tint, pulsing twice over 0.36 seconds. Reduce Motion uses a single
 gentle outline fade over the same duration.
 
 Marks identify specific windows, so other windows of the same app are excluded.
-Three or more marks cycle in registration order, wrapping at the end; unmarking
-and marking again moves a window to the end. From an unmarked window, switching
-starts at the first available mark. Existing full-window shortcuts are unchanged.
+Three or more marks cycle in registration order, wrapping in either direction;
+unmarking and marking again moves a window to the end. From an unmarked window,
+next selects the first available mark and previous selects the last.
+Existing full-window shortcuts are unchanged.
+
+Both shortcuts can be changed or cleared in Settings. On upgrade, the former
+Control–Option–Tab default becomes Control–Option–]; custom shortcuts and cleared
+bindings are preserved. You can explicitly reassign Tab afterward.
 
 Only windows currently shown on the desktop, across all displays, participate.
 Minimized windows, hidden apps, and windows on another Space are skipped but keep
@@ -166,7 +173,7 @@ Marks last only while Vimdow is running.
 
 A single available mark focuses that window, or does nothing if already focused.
 If none are available, a brief notice explains why. Switching leaves the pointer
-in place and exits command mode or numbered selection. Both mark commands ignore
+in place and exits command mode or numbered selection. All mark commands ignore
 counts and run once per press, without held-key repeat. They are suspended during
 search and Settings input.
 
@@ -192,7 +199,7 @@ Vimdow is active, or reopen the running app from `/Applications`.
   window's first visit to a display, and check Accessibility permission. Keep
   Size preserves the offset from the source display, fitting the window within
   smaller displays when necessary.
-- **Shortcuts:** customize or clear the six global shortcuts. Command-mode keys
+- **Shortcuts:** customize or clear the seven global shortcuts. Command-mode keys
   remain fixed and are listed for reference. Duplicate assignments and detected
   system/menu conflicts are rejected. If you clear the entry shortcut, reopen
   Vimdow from Applications to reach Settings again.

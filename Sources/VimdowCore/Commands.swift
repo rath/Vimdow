@@ -35,7 +35,7 @@ public enum Command: Sendable {
     case enter, escape, digit(Int), move(Direction), resize(Direction, ResizeAnchor), undo, redo
     case place(Placement), sequence(SequenceKey)
     case cycle(Int), quickSwitch, search, repeatSearch(Int), nextScreen, settings, quit
-    case toggleMark, cycleMarked
+    case toggleMark, cycleMarked(Int)
 }
 
 public struct RepeatPrefix: Sendable {
