@@ -150,7 +150,7 @@
   },
   "get": {
     "title": "获取 Vimdow",
-    "intro": "Vimdow 1.1.0 支持 macOS 14 或更高版本，适用于 Apple 芯片和 Intel Mac。应用已用 Developer ID 签名，并通过 Apple 公证。",
+    "intro": "Vimdow 1.2.0 支持 macOS 14 或更高版本，适用于 Apple 芯片和 Intel Mac。应用已用 Developer ID 签名，并通过 Apple 公证。",
     "download": "下载 Vimdow.zip",
     "releases": "发布说明",
     "source": "从源码构建",

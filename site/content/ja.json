@@ -150,7 +150,7 @@
   },
   "get": {
     "title": "Vimdow を入手",
-    "intro": "Vimdow 1.1.0 は macOS 14 以降の Apple Silicon と Intel Mac に対応しています。Developer ID で署名し、Apple の公証を受けています。",
+    "intro": "Vimdow 1.2.0 は macOS 14 以降の Apple Silicon と Intel Mac に対応しています。Developer ID で署名し、Apple の公証を受けています。",
     "download": "Vimdow.zip をダウンロード",
     "releases": "リリースノート",
     "source": "ソースからビルド",

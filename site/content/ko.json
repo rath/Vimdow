@@ -150,7 +150,7 @@
   },
   "get": {
     "title": "Vimdow 받기",
-    "intro": "Vimdow 1.1.0은 macOS 14 이상에서 Apple Silicon과 Intel Mac을 모두 지원합니다. Developer ID로 서명하고 Apple 공증을 받았습니다.",
+    "intro": "Vimdow 1.2.0은 macOS 14 이상에서 Apple Silicon과 Intel Mac을 모두 지원합니다. Developer ID로 서명하고 Apple 공증을 받았습니다.",
     "download": "Vimdow.zip 다운로드",
     "releases": "릴리스 노트",
     "source": "소스에서 빌드",

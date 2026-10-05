@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [1.2.0](https://github.com/rath/Vimdow/releases/tag/v1.2.0) — 2026-10-05
 
 ### Added
 
