@@ -177,6 +177,24 @@ in place and exits command mode or numbered selection. All mark commands ignore
 counts and run once per press, without held-key repeat. They are suspended during
 search and Settings input.
 
+tmux pane numbers are **off by default**. To enable them, open **Settings →
+General → Terminal integration** and turn on **Show tmux pane numbers after
+marked switches**. After a marked switch into Ghostty, Terminal, or Alacritty,
+Vimdow then tries to show pane numbers for selection, like the default prefix-q
+binding. This uses tmux's `display-panes` command, so it does not depend on your
+prefix key or type anything into a shell. Ordinary app/window switching does
+not trigger it. Turning the option off cancels pending work; General's Restore
+Defaults turns it off too.
+
+This first version supports local tmux on its default socket. The terminal must
+report focus, and tmux must have `set -s focus-events on` configured (detach and
+reattach existing clients after enabling it). Vimdow requires exactly one focused
+tmux client belonging to the destination terminal process; missing, ambiguous,
+or unsupported connections are skipped. Terminal apps/versions without focus
+reporting, SSH-only tmux, and custom socket names are not supported. Homebrew
+tmux paths and the app's inherited PATH are checked. Switching away during
+lookup cancels the action; marks with no actual focus change do not trigger it.
+
 ### Display movement
 
 Display movement remembers each window's last position and size on each display

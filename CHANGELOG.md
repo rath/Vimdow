@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Added
+
+- Optional tmux pane numbers after a marked switch into a supported terminal.
+  Enable it under Settings → General → Terminal integration; it is off by default.
+  Requires tmux focus reporting and the default socket; ambiguous or unavailable
+  connections are skipped without sending keys. Disabling it cancels pending work.
+
 ### Changed
 
 - Cycle marked windows backward with Control–Option–[ and forward with

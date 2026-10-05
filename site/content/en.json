@@ -92,7 +92,7 @@
     },
     "marks": {
       "title": "Switch between your chosen windows",
-      "text": "Press M in command mode to mark a window, then Control–Option–[ for the previous mark or Control–Option–] for the next. Cycle in registration order, wrapping at either end. The destination pulses twice, for 0.18 seconds each. Marks last until Vimdow quits; hidden windows rejoin when visible."
+      "text": "Press M in command mode to mark a window, then Control–Option–[ for the previous mark or Control–Option–] for the next. Cycle in registration order, wrapping at either end. The destination pulses twice, for 0.18 seconds each. Marks last until Vimdow quits; hidden windows rejoin when visible. An optional tmux integration shows pane numbers after marked switches. Enable it in Settings; it is off by default."
     }
   },
   "cheat": {

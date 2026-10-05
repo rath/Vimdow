@@ -21,6 +21,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         installMenu()
+        service.showsTmuxPaneNumbers = settingsStore.showsTmuxPaneNumbers
+        settingsStore.onTmuxPaneNumbersChange = { [weak self] in self?.service.showsTmuxPaneNumbers = $0 }
+        coordinator.onMarkedWindowFocus = { [weak self] id in self?.service.showTmuxPanes(in: id) }
         settingsStore.onDisplayBehaviorChange = { [weak self] in self?.coordinator.resetDisplayHistory() }
         service.onGlideFailure = { [weak self] error in self?.showFailure(error) }
         search.onFinish = { [weak self] query in self?.coordinator.finishSearch(query) }

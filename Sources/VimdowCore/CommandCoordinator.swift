@@ -12,6 +12,8 @@ public final class CommandCoordinator {
     public private(set) var mode: Mode = .normal
     public private(set) var lastQuery: String?
     public private(set) var markedWindows: [UUID] = []
+    /// Optional integration work, only after a successful marked-window switch.
+    public var onMarkedWindowFocus: ((UUID) -> Void)?
     private var prefix = RepeatPrefix()
     private var pageOffset: Int?
     private var page: [WindowInfo] = []
@@ -312,6 +314,7 @@ public final class CommandCoordinator {
                 if let target = visible.first(where: { $0.id == id }) {
                     presentation.flashWindow(target.frame)
                 }
+                onMarkedWindowFocus?(id)
                 return
             } catch WindowFailure.unavailableWindow {
                 // An unavailable attribute is not proof of closure. Confirm before

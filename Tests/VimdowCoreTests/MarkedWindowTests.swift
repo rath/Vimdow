@@ -314,3 +314,27 @@ private struct MarkSession {
     #expect(s.windows.current == s.ids[1])
     #expect(s.windows.pointerMoves == 0)
 }
+
+@Test(arguments: [-1, 1]) @MainActor func markedFocusIntegrationOnlyRunsAfterSuccessfulSwitches(_ step: Int) {
+    let s = MarkSession()
+    var destinations: [UUID] = []
+    s.controller.onMarkedWindowFocus = { destinations.append($0) }
+    s.controller.handle(.cycleMarked(step)) // No marks.
+    s.mark(0)
+    s.controller.handle(.cycleMarked(step)) // Already focused single mark.
+    #expect(destinations.isEmpty)
+    s.mark(1)
+    s.controller.handle(.cycleMarked(step))
+    #expect(destinations == [s.ids[0]])
+    s.controller.handle(.cycle(1)) // Ordinary switching must not trigger the integration.
+    #expect(destinations.count == 1)
+    s.windows.focusFailure = .unavailableWindow
+    s.controller.handle(.cycleMarked(step))
+    #expect(destinations.count == 1)
+    s.controller.handle(.enter)
+    s.controller.handle(.search)
+    s.controller.handle(.cycleMarked(step))
+    s.controller.setSettingsActive(true)
+    s.controller.handle(.cycleMarked(step))
+    #expect(destinations.count == 1)
+}

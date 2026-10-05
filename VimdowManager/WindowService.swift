@@ -13,6 +13,11 @@ final class WindowService: WindowControlling {
 
     private var handles: [UUID: Handle] = [:]
     private var retainedWindows: Set<UUID> = []
+    private let tmuxPanes = TmuxPaneDisplay()
+    var showsTmuxPaneNumbers: Bool {
+        get { tmuxPanes.isEnabled }
+        set { tmuxPanes.isEnabled = newValue }
+    }
     private lazy var animator = WindowAnimator { [unowned self] id, frame, previous, isFinal in
         try self.applyGlide(frame, previous: previous, isFinal: isFinal, of: id)
     }
@@ -108,6 +113,7 @@ final class WindowService: WindowControlling {
     }
 
     func focus(_ id: UUID, movePointer: Bool) throws {
+        tmuxPanes.cancel()
         try requirePermission()
         let handle = try handle(for: id)
         let bounds = try animator.destination(of: id) ?? frame(of: handle.window)
@@ -117,6 +123,15 @@ final class WindowService: WindowControlling {
         if raiseResult != .actionUnsupported { try check(raiseResult) }
         try check(AXUIElementSetAttributeValue(handle.app, kAXFrontmostAttribute as CFString, kCFBooleanTrue))
         if movePointer { CGWarpMouseCursorPosition(CGPoint(x: bounds.midX, y: bounds.midY)) }
+    }
+
+    func showTmuxPanes(in id: UUID) {
+        guard let handle = handles[id],
+              let bundle = NSRunningApplication(processIdentifier: handle.pid)?.bundleIdentifier,
+              ["com.mitchellh.ghostty", "com.apple.Terminal", "org.alacritty"].contains(bundle) else { return }
+        tmuxPanes.show(terminalPID: handle.pid) { [weak self] in
+            (try? self?.focusedWindow().id) == id
+        }
     }
 
     func setFrame(_ desired: CGRect, of id: UUID, animated: Bool) throws {

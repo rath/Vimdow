@@ -11,6 +11,12 @@ extension SearchPanelTests {
         defer { defaults.removePersistentDomain(forName: suite) }
         let store = SettingsStore(defaults: defaults)
         #expect(store.preferences == WindowPreferences())
+        #expect(!store.showsTmuxPaneNumbers)
+        var tmuxChanges: [Bool] = []
+        store.onTmuxPaneNumbersChange = { tmuxChanges.append($0) }
+        store.setShowsTmuxPaneNumbers(true)
+        store.setShowsTmuxPaneNumbers(true)
+        #expect(tmuxChanges == [true])
         #expect(store.setStep("7", resizing: false))
         #expect(store.setStep("31", resizing: true))
         for invalid in ["", "0", "201", "2.5", "한", "999999999999999999999999"] {
@@ -24,12 +30,15 @@ extension SearchPanelTests {
         store.setResizeStopsAtDisplayEdges(false)
         store.setAnimatesSteps(false)
         let recreated = SettingsStore(defaults: defaults)
+        #expect(recreated.showsTmuxPaneNumbers)
         #expect(recreated.preferences == WindowPreferences(moveStep: 7, resizeStep: 31, displayBehavior: .keepSize,
                                                            resizeStopsAtDisplayEdges: false, animatesSteps: false))
         defaults.set("unrelated", forKey: "anotherPreference")
         store.restoreDefaults()
         #expect(resets == 2)
         #expect(recreated.preferences == WindowPreferences())
+        #expect(!recreated.showsTmuxPaneNumbers)
+        #expect(tmuxChanges == [true, false])
         #expect(defaults.string(forKey: "anotherPreference") == "unrelated")
     }
 
@@ -80,6 +89,15 @@ extension SearchPanelTests {
                 checkbox.performClick(nil)
                 #expect(store.preferences[keyPath: preference])
             }
+            #expect(controller.tmuxPaneNumbers.state == .off)
+            controller.tmuxPaneNumbers.performClick(nil)
+            #expect(store.showsTmuxPaneNumbers)
+            controller.tmuxPaneNumbers.performClick(nil)
+            #expect(!store.showsTmuxPaneNumbers)
+            store.setShowsTmuxPaneNumbers(true)
+            controller.close()
+            controller.show()
+            #expect(controller.tmuxPaneNumbers.state == .on)
         }
     }
 

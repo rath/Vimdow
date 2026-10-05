@@ -22,6 +22,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
     private(set) var tabs = NSTabView()
     private(set) var stopAtEdges = NSButton(checkboxWithTitle: "Stop resizing at display edges", target: nil, action: nil)
     private(set) var animateSteps = NSButton(checkboxWithTitle: "Animate moving and resizing", target: nil, action: nil)
+    private(set) var tmuxPaneNumbers = NSButton(checkboxWithTitle: "Show tmux pane numbers after marked switches", target: nil, action: nil)
     private let moveStepper = NSStepper()
     private let resizeStepper = NSStepper()
     private let behavior = NSPopUpButton()
@@ -52,6 +53,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
     required init?(coder: NSCoder) { fatalError("Use init(store:shortcuts:)") }
 
     func show() {
+        tmuxPaneNumbers.state = store.showsTmuxPaneNumbers ? .on : .off
         refreshPermission()
         onActivationChange?(true)
         showWindow(nil)
@@ -173,6 +175,12 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         behavior.setAccessibilityLabel("First move to a display")
         stack.addArrangedSubview(behavior)
         stack.addArrangedSubview(note("Used on the first visit to a display. Return visits restore the window’s last position and size. Changing this setting clears remembered positions."))
+        stack.addArrangedSubview(heading("Terminal integration"))
+        tmuxPaneNumbers.target = self
+        tmuxPaneNumbers.action = #selector(tmuxPaneNumbersChanged)
+        stack.addArrangedSubview(tmuxPaneNumbers)
+        stack.setCustomSpacing(4, after: tmuxPaneNumbers)
+        stack.addArrangedSubview(note("Choose a pane by number when you switch to a marked terminal window. Requires local tmux with focus reporting."))
         stack.addArrangedSubview(heading("Accessibility"))
         stack.addArrangedSubview(permission)
         stack.addArrangedSubview(button("Open System Settings", action: #selector(openAccessibility)))
@@ -282,6 +290,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         behavior.selectItem(at: settings.displayBehavior == .fillDisplay ? 0 : 1)
         stopAtEdges.state = settings.resizeStopsAtDisplayEdges ? .on : .off
         animateSteps.state = settings.animatesSteps ? .on : .off
+        tmuxPaneNumbers.state = store.showsTmuxPaneNumbers ? .on : .off
         updateValidation()
         refreshPermission()
     }
@@ -305,6 +314,10 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
 
     @objc private func animateStepsChanged() {
         store.setAnimatesSteps(animateSteps.state == .on)
+    }
+
+    @objc private func tmuxPaneNumbersChanged() {
+        store.setShowsTmuxPaneNumbers(tmuxPaneNumbers.state == .on)
     }
 
     @objc private func resetGeneral() {

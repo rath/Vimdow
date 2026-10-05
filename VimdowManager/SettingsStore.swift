@@ -5,8 +5,17 @@ import VimdowCore
 final class SettingsStore {
     private let defaults: UserDefaults
     var onDisplayBehaviorChange: (() -> Void)?
+    var onTmuxPaneNumbersChange: ((Bool) -> Void)?
 
     init(defaults: UserDefaults = .standard) { self.defaults = defaults }
+
+    var showsTmuxPaneNumbers: Bool { defaults.bool(forKey: "showsTmuxPaneNumbers") }
+
+    func setShowsTmuxPaneNumbers(_ enabled: Bool) {
+        let previous = showsTmuxPaneNumbers
+        defaults.set(enabled, forKey: "showsTmuxPaneNumbers")
+        if previous != enabled { onTmuxPaneNumbersChange?(enabled) }
+    }
 
     var preferences: WindowPreferences {
         WindowPreferences(moveStep: defaults.object(forKey: "windowMoveStep") as? Int ?? 20,
@@ -41,10 +50,12 @@ final class SettingsStore {
 
     func restoreDefaults() {
         let previous = preferences.displayBehavior
+        let tmuxWasEnabled = showsTmuxPaneNumbers
         for key in ["windowMoveStep", "windowResizeStep", "displayMoveBehavior", "resizeStopsAtDisplayEdges",
-                    "animatesSteps"] {
+                    "animatesSteps", "showsTmuxPaneNumbers"] {
             defaults.removeObject(forKey: key)
         }
         if previous != preferences.displayBehavior { onDisplayBehaviorChange?() }
+        if tmuxWasEnabled { onTmuxPaneNumbersChange?(false) }
     }
 }

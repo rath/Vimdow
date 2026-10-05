@@ -70,6 +70,23 @@ in the relevant PR or issue. Check supported OS versions before a release.
   Check light/dark mode, full-screen windows, and displays above/left of primary.
   Reduce Motion uses one gentle outline fade without tint. A failed switch or already-focused single mark
   has no flash; ordinary full-window switching has no flash.
+- [ ] **tmux opt-in:** with clean preferences, pane numbers stay off and the
+  General → Terminal integration checkbox is unchecked. Enable it, restart,
+  and confirm the choice persists. Disable during a pending switch; no delayed
+  pane display should appear. General's Restore Defaults turns it off, while
+  Shortcuts' Restore Defaults leaves it unchanged.
+- [ ] **tmux after marked switching:** enable the Terminal integration checkbox
+  and `set -s focus-events on` in a local default-socket tmux, then reattach.
+  Mark Ghostty or Alacritty and another
+  app; switching back with either marked shortcut should show pane numbers and
+  allow numeric selection. Try multiple terminal windows/tabs and rapid switches;
+  only the focused client's panes should be shown. Leaving the target during
+  lookup cancels the action. Ordinary app switching, whole-window cycling,
+  failed switches, and an already-focused single mark must not trigger it.
+  Plain shells, no server, focus reporting off, SSH-only tmux, custom sockets,
+  and ambiguous clients must stay untouched. Check Terminal only if that version
+  supports focus reporting; otherwise it should be skipped. Test both stable
+  tmux (client targets) and newer pane-targeting versions.
 - [ ] **Mark lifetime:** minimize a marked window, hide its app, or move it to
   another Space; it is skipped and rejoins on return, even after using Q or search.
   Marks on another visible display participate. Closing a window or quitting its
