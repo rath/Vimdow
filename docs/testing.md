@@ -55,6 +55,21 @@ in the relevant PR or issue. Check supported OS versions before a release.
 - [ ] **Search:** `/` stays open and accepts English and Korean composition.
   Enter submits after composition; Escape cancels composition before cancelling
   search. Check focus restoration, no matches, and N/Shift–N navigation.
+- [ ] **Launcher:** with clean preferences the Open launcher recorder is empty
+  and nothing opens a launcher. Recording Option–Command–Space is refused while
+  Spotlight's Show Finder search window shortcut is on and accepted after
+  turning it off; quit Alfred or clear its hotkey first. The panel opens from
+  normal and command mode on the display under the pointer, including over a
+  full-screen app, and the same shortcut closes it. `gc`, `sysset`, `wifi`, and
+  `battery` show Google Chrome, System Settings, Wi‑Fi, and Battery first.
+  Return launches a stopped app, brings a running or hidden app forward, and
+  opens a pane in System Settings (try Wi‑Fi, Battery, and General). Korean
+  composition filters live while Return and Escape stay in the input method,
+  and Return after composition opens the row. Up/Down, Control–N/P, and clicks
+  select rows; Escape and clicking another window cancel. Choosing Slack for
+  `s` ranks it first on the next open; General's Restore Defaults forgets that
+  while Shortcuts' Restore Defaults clears the shortcut. Without Accessibility
+  permission the launcher still works and shows no permission alert.
 - [ ] **Marked windows:** with Ghostty, two Chrome windows, and another app open,
   enter command mode then M in Ghostty and one Chrome window. Each shows Marked
   briefly without taking focus and returns to normal typing. Control–Option–[

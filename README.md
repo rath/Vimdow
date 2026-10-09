@@ -69,6 +69,7 @@ permission across rebuilds.
 | Control–Shift–K / L | Focus the next window |
 | Control–Option–[ | Focus the previous marked window (customizable in Settings) |
 | Control–Option–] | Focus the next marked window (customizable in Settings) |
+| Unbound by default | Open the launcher; record a shortcut such as Option–Command–Space in Settings |
 
 ### Command mode
 
@@ -195,6 +196,38 @@ reporting, SSH-only tmux, and custom socket names are not supported. Homebrew
 tmux paths and the app's inherited PATH are checked. Switching away during
 lookup cancels the action; marks with no actual focus change do not trigger it.
 
+### Launcher
+
+The launcher opens applications and System Settings panes by name, so the two
+things most people use a launcher for need no separate app. It ships without a
+shortcut: record one under **Settings → Shortcuts → Open launcher**. To use
+**Option–Command–Space**, first turn off **Show Finder search window** in
+System Settings → Keyboard → Keyboard Shortcuts → Spotlight; the recorder
+refuses shortcuts that macOS still owns.
+
+Press the shortcut, type, and press **Return** to open the highlighted row.
+**Up / Down** or **Control–N / Control–P** move the highlight, a click opens a
+row, and **Escape**, the shortcut itself, or clicking elsewhere closes the
+panel. The launcher works from normal and command mode, returns to normal mode
+when it closes, and needs no Accessibility permission.
+
+It indexes `.app` bundles in `/Applications` (including one level of
+subfolders), `/System/Applications`, `/System/Applications/Utilities`, and
+`~/Applications`, plus every System Settings pane that macOS exposes through
+its settings URL scheme. Pane names follow the System Settings sidebar in your
+language; English names and bundle names also match on localized systems.
+
+Matching is case-, diacritic-, and width-insensitive and accepts Korean input
+while it is being composed. Exact names rank first, then names starting with the
+query, later words starting with it, consecutive word prefixes such as `gc` for
+Google Chrome, `sysset` for System Settings, or `wifi` for Wi‑Fi, and finally
+substrings. There is no fuzzy matching, so `xoe` does not find Xcode.
+
+The launcher learns: the item you open for a query ranks first the next time you
+type exactly that query, and items you open more often win ties. The 500 most
+recent queries are kept in local `UserDefaults`; **Restore Defaults** on the
+General tab forgets them.
+
 ### Display movement
 
 Display movement remembers each window's last position and size on each display
@@ -217,8 +250,9 @@ Vimdow is active, or reopen the running app from `/Applications`.
   window's first visit to a display, and check Accessibility permission. Keep
   Size preserves the offset from the source display, fitting the window within
   smaller displays when necessary.
-- **Shortcuts:** customize or clear the seven global shortcuts. Command-mode keys
-  remain fixed and are listed for reference. Duplicate assignments and detected
+- **Shortcuts:** customize or clear the eight global shortcuts, including the
+  launcher, which has no shortcut until you record one. Command-mode keys remain
+  fixed and are listed for reference. Duplicate assignments and detected
   system/menu conflicts are rejected. If you clear the entry shortcut, reopen
   Vimdow from Applications to reach Settings again.
 - Changes apply immediately and persist across launches. **Restore Defaults**
@@ -355,8 +389,8 @@ Simply toggling the old entry may not refresh its stored signing requirement.
 
 ### Tests
 
-Pure command and geometry tests run without launching Vimdow or granting
-Accessibility permission:
+Pure command, geometry, and launcher-ranking tests run without launching Vimdow
+or granting Accessibility permission:
 
 ```sh
 xcodebuild -project VimdowManager.xcodeproj -scheme VimdowCore \
@@ -378,9 +412,10 @@ when entering search, returning to normal mode, and stopping. Actual key-repeat
 behavior, IME input, and controlling other apps require the manual checks in
 [docs/testing.md](docs/testing.md).
 
-The AppKit presentation tests briefly show the search panel on an interactive
-Mac. They check focus, prevent accidental submission during activation, and
-exercise Return/Escape with committed and marked text:
+The AppKit presentation tests briefly show the search and launcher panels on an
+interactive Mac. They check focus, prevent accidental submission during
+activation, exercise Return/Escape with committed and marked text, and scan the
+installed System Settings panes:
 
 ```sh
 xcodebuild -project VimdowManager.xcodeproj -scheme VimdowPresentation \
@@ -438,6 +473,10 @@ After publishing, update the version and ZIP checksum in `Casks/vimdow.rb` in
   positions and sizes do not confuse focus selection. Its WindowAnimator applies
   glides in step with the display refresh.
 - **ShortcutController:** KeyboardShortcuts registration and held-key repetition.
+- **Launcher:** `LauncherCatalog` scans application folders and System Settings
+  extensions off the main thread, `LauncherPanel` is a nonactivating results
+  panel, and `LauncherController` opens the chosen item. Ranking and learned
+  history live in VimdowCore.
 - **AppKit presentation:** native search text field and nonactivating numbered
   panels. UI and command coordination use `@MainActor`.
 - **SettingsStore / SettingsWindowController:** persisted preferences and the

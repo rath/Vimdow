@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- A launcher for applications and System Settings panes: type a name, pick a
+  row with Up/Down or Control–N/P, and press Return. It indexes /Applications,
+  the system application folders, ~/Applications, and every pane System Settings
+  exposes. It ships without a shortcut; record one such as Option–Command–Space
+  under Settings → Shortcuts after turning off Spotlight's Show Finder search
+  window shortcut.
+- The launcher remembers which item you chose for a query and ranks it first the
+  next time. General's Restore Defaults clears this history.
+
 ## [1.2.0](https://github.com/rath/Vimdow/releases/tag/v1.2.0) — 2026-10-05
 
 ### Added

@@ -86,9 +86,13 @@
       "title": "Switch without hunting",
       "text": "Q shows large white numbers in translucent black badges at window centers. Overlapping badges spread out; selection cancels after three seconds without keyboard input. Type a digit to focus a window, or use / to search and n and N to cycle matches."
     },
+    "launcher": {
+      "title": "Launch without Spotlight",
+      "text": "Type an application or System Settings pane name and press Return. Vimdow scans /Applications, the system application folders, and System Settings panes, and understands initials such as gc for Google Chrome. It remembers what you picked and shows it first for the same query. The shortcut is unbound until you record one, such as Option–Command–Space, in Settings."
+    },
     "settings": {
       "title": "Yours to tune",
-      "text": "Set separate move and resize steps, choose whether resizing stops at display edges, turn the glide off, and rebind the seven global shortcuts."
+      "text": "Set separate move and resize steps, choose whether resizing stops at display edges, turn the glide off, and rebind the eight global shortcuts."
     },
     "marks": {
       "title": "Switch between your chosen windows",
@@ -137,7 +141,7 @@
     },
     "shortcuts": {
       "question": "Can I change the shortcuts?",
-      "answer": "You can rebind or clear the seven global shortcuts in Settings, including Control–Option–A for command mode and Control–Option–[ and Control–Option–] for previous and next marked windows. Keys inside command mode are fixed, so they always mean the same thing."
+      "answer": "You can rebind or clear the eight global shortcuts in Settings, including Control–Option–A for command mode and Control–Option–[ and Control–Option–] for previous and next marked windows. Keys inside command mode are fixed, so they always mean the same thing."
     },
     "apps": {
       "question": "Does it work with every app?",
