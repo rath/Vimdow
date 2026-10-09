@@ -11,6 +11,18 @@ final class SettingsStore {
 
     var showsTmuxPaneNumbers: Bool { defaults.bool(forKey: "showsTmuxPaneNumbers") }
 
+    /// Queries and the launcher items chosen for them. Unreadable data counts as empty.
+    var launcherHistory: LauncherHistory {
+        guard let data = defaults.data(forKey: "launcherHistory"),
+              let history = try? JSONDecoder().decode(LauncherHistory.self, from: data) else { return LauncherHistory() }
+        return history
+    }
+
+    func setLauncherHistory(_ history: LauncherHistory) {
+        guard let data = try? JSONEncoder().encode(history) else { return }
+        defaults.set(data, forKey: "launcherHistory")
+    }
+
     func setShowsTmuxPaneNumbers(_ enabled: Bool) {
         let previous = showsTmuxPaneNumbers
         defaults.set(enabled, forKey: "showsTmuxPaneNumbers")
@@ -52,7 +64,7 @@ final class SettingsStore {
         let previous = preferences.displayBehavior
         let tmuxWasEnabled = showsTmuxPaneNumbers
         for key in ["windowMoveStep", "windowResizeStep", "displayMoveBehavior", "resizeStopsAtDisplayEdges",
-                    "animatesSteps", "showsTmuxPaneNumbers"] {
+                    "animatesSteps", "showsTmuxPaneNumbers", "launcherHistory"] {
             defaults.removeObject(forKey: key)
         }
         if previous != preferences.displayBehavior { onDisplayBehaviorChange?() }

@@ -23,7 +23,7 @@ struct ShortcutTests {
         controller.setMode(.quickSwitch) // Paging must not duplicate observers.
         NSApp.sendEvent(event)
         #expect(activity == 1)
-        for mode in [Mode.normal, .search, .settings] {
+        for mode in [Mode.normal, .search, .settings, .launcher] {
             controller.setMode(mode)
             NSApp.sendEvent(event)
         }
@@ -53,7 +53,7 @@ struct ShortcutTests {
         let toggle = try #require(controller.bindings.first { if case .toggleMark = $0.command { true } else { false } })
         #expect(cycle.isGlobal && !cycle.repeats)
         #expect(!toggle.isGlobal && !toggle.repeats)
-        #expect(controller.editableBindings.count == 7)
+        #expect(controller.editableBindings.count == 8)
         #expect(controller.editableBindings.contains { $0.name == cycle.name })
         #expect(cycle.name.shortcut == initial)
         #expect(toggle.name.shortcut == KeyboardShortcuts.Shortcut(.m))
@@ -81,11 +81,13 @@ struct ShortcutTests {
         defer { cleanUp(controller) }
         #expect(controller.setMode(.normal).isEmpty)
         for binding in controller.bindings {
-            #expect(KeyboardShortcuts.isEnabled(for: binding.name) == binding.isGlobal)
+            #expect(KeyboardShortcuts.isEnabled(for: binding.name) == (binding.isGlobal && binding.name.shortcut != nil))
         }
         #expect(controller.setMode(.command).isEmpty)
         #expect(controller.setMode(.command).isEmpty)
-        for binding in controller.bindings { #expect(KeyboardShortcuts.isEnabled(for: binding.name)) }
+        for binding in controller.bindings {
+            #expect(KeyboardShortcuts.isEnabled(for: binding.name) == (binding.name.shortcut != nil))
+        }
         #expect(controller.setMode(.quickSwitch).isEmpty)
         #expect(controller.setMode(.search).isEmpty)
         for binding in controller.bindings { #expect(!KeyboardShortcuts.isEnabled(for: binding.name)) }
@@ -93,7 +95,7 @@ struct ShortcutTests {
         for binding in controller.bindings { #expect(!KeyboardShortcuts.isEnabled(for: binding.name)) }
         #expect(controller.setMode(.normal).isEmpty)
         for binding in controller.bindings {
-            #expect(KeyboardShortcuts.isEnabled(for: binding.name) == binding.isGlobal)
+            #expect(KeyboardShortcuts.isEnabled(for: binding.name) == (binding.isGlobal && binding.name.shortcut != nil))
         }
         controller.stop()
         await Task.yield()
@@ -127,7 +129,7 @@ struct ShortcutTests {
         defer { cleanUp(controller) }
         #expect(controller.bindings.allSatisfy { !$0.name.rawValue.contains(".") })
         let first = try #require(controller.editableBindings.first)
-        let other = try #require(controller.editableBindings.last?.name.shortcut)
+        let other = try #require(controller.editableBindings.last(where: { $0.name.shortcut != nil })?.name.shortcut)
         if case .disallow = controller.validate(other, for: first.name) {} else { Issue.record("Duplicate accepted") }
         let fixed = try #require(controller.bindings.first(where: { !$0.isGlobal })?.name.shortcut)
         if case .disallow = controller.validate(fixed, for: first.name) {} else { Issue.record("Modal duplicate accepted") }
@@ -182,6 +184,41 @@ struct ShortcutTests {
         #expect(next.name.shortcut == (cleared ? nil : replacement))
         let previous = try #require(controller.bindings.first { $0.name.rawValue == "\(namespace)_marks_previous" })
         #expect(previous.name.shortcut == KeyboardShortcuts.Shortcut(.leftBracket, modifiers: [.control, .option]))
+    }
+
+    @Test func launcherIsUnboundByDefaultAndEnablesAloneInLauncherMode() throws {
+        _ = NSApplication.shared
+        let namespace = "test_\(UUID().uuidString)"
+        let controller = ShortcutController(namespace: namespace) { _ in }
+        defer { cleanUp(controller) }
+        let launcher = try #require(controller.bindings.first { if case .launcher = $0.command { true } else { false } })
+        #expect(launcher.isGlobal && !launcher.repeats)
+        #expect(launcher.title == "Open launcher")
+        #expect(launcher.name.shortcut == nil)
+        #expect(controller.editableBindings.last?.name == launcher.name)
+        #expect(controller.setMode(.normal).isEmpty)
+        #expect(!KeyboardShortcuts.isEnabled(for: launcher.name))
+        #expect(controller.setMode(.launcher).isEmpty)
+        for binding in controller.bindings { #expect(!KeyboardShortcuts.isEnabled(for: binding.name)) }
+        // Not Option–Command–Space: Spotlight may still own it on the test Mac.
+        let recorded = KeyboardShortcuts.Shortcut(.space, modifiers: [.control, .option, .shift])
+        launcher.name.shortcut = recorded
+        #expect(controller.setMode(.launcher).isEmpty)
+        for binding in controller.bindings {
+            #expect(KeyboardShortcuts.isEnabled(for: binding.name) == (binding.name == launcher.name))
+        }
+        #expect(controller.setMode(.normal).isEmpty)
+        for binding in controller.bindings {
+            #expect(KeyboardShortcuts.isEnabled(for: binding.name) == binding.isGlobal)
+        }
+        #expect(controller.setMode(.search).isEmpty)
+        for binding in controller.bindings { #expect(!KeyboardShortcuts.isEnabled(for: binding.name)) }
+        controller.stop()
+        let recreated = ShortcutController(namespace: namespace) { _ in }
+        defer { recreated.stop() }
+        #expect(launcher.name.shortcut == recorded)
+        recreated.restoreDefaults()
+        #expect(launcher.name.shortcut == nil)
     }
 
     private func cleanUp(_ controller: ShortcutController) {

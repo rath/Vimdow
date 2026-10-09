@@ -31,7 +31,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
             guard let self else { return }
             let requiresPermission: Bool
             switch command {
-            case .enter, .escape, .settings, .quit: requiresPermission = false
+            case .enter, .escape, .settings, .quit, .launcher: requiresPermission = false
             default: requiresPermission = true
             }
             if requiresPermission && !AXIsProcessTrusted() {
@@ -80,6 +80,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
     func hideGuides() { guides.hide() }
     func showSearch() { search.show() }
     func hideSearch() { search.hide() }
+    func showLauncher() {}
+    func hideLauncher() {}
     func showNotice(_ text: String, near frame: CGRect?) { notice.show(text, near: frame) }
     func flashWindow(_ frame: CGRect) { focusFlash.show(frame) }
     func showSettings() {

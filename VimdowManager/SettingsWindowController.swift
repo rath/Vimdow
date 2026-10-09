@@ -207,6 +207,8 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         grid.columnSpacing = 20
         grid.yPlacement = .center
         stack.addArrangedSubview(grid)
+        stack.setCustomSpacing(4, after: grid)
+        stack.addArrangedSubview(note("Open launcher has no shortcut until you record one. To use Option–Command–Space, first turn off Spotlight’s Show Finder search window shortcut in System Settings → Keyboard → Keyboard Shortcuts."))
         stack.addArrangedSubview(button("Restore Defaults", action: #selector(resetShortcuts)))
         stack.addArrangedSubview(heading("Command mode reference"))
         stack.addArrangedSubview(note("These keys are fixed. Release the entry shortcut before using them."))

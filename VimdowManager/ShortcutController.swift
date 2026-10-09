@@ -35,6 +35,8 @@ final class ShortcutController {
             add("resize.topLeft.\(key.rawValue)", key, [.option], .resize(direction, .topLeft), repeats: true)
             add("resize.bottomRight.\(key.rawValue)", key, [.shift], .resize(direction, .bottomRight), repeats: true)
         }
+        // Unbound until recorded: Option–Command–Space belongs to Spotlight by default.
+        add("launcher", initial: nil, .launcher, global: true, title: "Open launcher")
         add("undo", .u, [], .undo)
         add("redo", .r, [.control], .redo)
         add("place.right", .four, [.shift], .place(.edge(.right))) // $
@@ -67,6 +69,7 @@ final class ShortcutController {
             case .normal: binding.isGlobal
             case .command, .quickSwitch: true
             case .search, .settings: false // Native controls own text input and shortcut recording.
+            case .launcher: if case .launcher = binding.command { true } else { false } // The same key closes it.
             }
         }
         let names = Set(enabled.map(\.name))
@@ -149,9 +152,16 @@ final class ShortcutController {
         _ identifier: String, _ key: KeyboardShortcuts.Key, _ modifiers: NSEvent.ModifierFlags,
         _ command: Command, global: Bool = false, repeats: Bool = false, title: String = ""
     ) {
+        add(identifier, initial: .init(key, modifiers: modifiers), command, global: global, repeats: repeats, title: title)
+    }
+
+    private func add(
+        _ identifier: String, initial: KeyboardShortcuts.Shortcut?, _ command: Command,
+        global: Bool = false, repeats: Bool = false, title: String = ""
+    ) {
         let rawName = "\(namespace)_\(identifier.replacingOccurrences(of: ".", with: "_"))"
         Self.migrateShortcut(from: "\(namespace).\(identifier)", to: rawName)
-        bindings.append(Binding(name: .init(rawName, initial: .init(key, modifiers: modifiers)), title: title,
+        bindings.append(Binding(name: .init(rawName, initial: initial), title: title,
                                 command: command, isGlobal: global, repeats: repeats))
     }
 

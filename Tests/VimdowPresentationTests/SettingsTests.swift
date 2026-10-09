@@ -29,7 +29,15 @@ extension SearchPanelTests {
         #expect(resets == 1)
         store.setResizeStopsAtDisplayEdges(false)
         store.setAnimatesSteps(false)
+        #expect(store.launcherHistory == LauncherHistory())
+        var history = LauncherHistory()
+        history.record(query: "s", itemID: "/Applications/Slack.app")
+        store.setLauncherHistory(history)
         let recreated = SettingsStore(defaults: defaults)
+        #expect(recreated.launcherHistory == history)
+        defaults.set(Data([1, 2, 3]), forKey: "launcherHistory")
+        #expect(recreated.launcherHistory == LauncherHistory())
+        store.setLauncherHistory(history)
         #expect(recreated.showsTmuxPaneNumbers)
         #expect(recreated.preferences == WindowPreferences(moveStep: 7, resizeStep: 31, displayBehavior: .keepSize,
                                                            resizeStopsAtDisplayEdges: false, animatesSteps: false))
@@ -38,6 +46,7 @@ extension SearchPanelTests {
         #expect(resets == 2)
         #expect(recreated.preferences == WindowPreferences())
         #expect(!recreated.showsTmuxPaneNumbers)
+        #expect(recreated.launcherHistory == LauncherHistory())
         #expect(tmuxChanges == [true, false])
         #expect(defaults.string(forKey: "anotherPreference") == "unrelated")
     }
@@ -71,7 +80,7 @@ extension SearchPanelTests {
             window.close()
             await Task.yield()
             #expect(!active)
-            #expect(shortcuts.editableBindings.allSatisfy { KeyboardShortcuts.isEnabled(for: $0.name) })
+            #expect(shortcuts.editableBindings.filter { $0.name.shortcut != nil }.allSatisfy { KeyboardShortcuts.isEnabled(for: $0.name) })
         }
     }
 
