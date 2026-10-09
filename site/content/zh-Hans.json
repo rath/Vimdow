@@ -12,7 +12,7 @@
   "hero": {
     "helpLine": "适用于 macOS 14 及更高版本",
     "tagline": "像用 Vim 一样，管理你的窗口。",
-    "lead": "Vimdow 是一款用键盘操作的 macOS 窗口管理器。按下快捷键进入命令模式，就能用 h、j、k、l、计数等早已熟悉的 Vim 操作来移动窗口、调整大小、贴边和切换，全程不用碰鼠标。",
+    "lead": "Vimdow 是一款用键盘操作的 macOS 窗口管理器。按下快捷键进入命令模式，就能用 h、j、k、l、计数等早已熟悉的 Vim 操作来移动窗口、调整大小、贴边和切换，全程不用碰鼠标。 还能按名称打开应用，或只保留正在使用的窗口、调暗其余窗口。",
     "get": "下载 ZIP",
     "source": "在 GitHub 查看源码",
     "homebrew": "通过 Homebrew 轻松安装",
@@ -152,6 +152,10 @@
       "question": "所有应用都能用吗？",
       "answer": "只要 macOS 允许其他应用移动它的窗口就能用，绝大多数应用都是如此。如果应用拒绝移动或调整大小，比如尺寸固定的窗口，Vimdow 不会强行改变，只会发出提示音。"
     },
+    "dim": {
+      "question": "能只保留正在使用的窗口，把其他窗口调暗吗？",
+      "answer": "可以。按下 Control–Option–D，就像 HazeOver 一样，所有显示器上的其他窗口都会蒙上一层半透明的黑色，点击窗口或切换应用时，明亮的窗口也会跟着变化。暗的程度在设置的 General → Dimming 中调整，再按一次快捷键即可关闭。"
+    },
     "update": {
       "question": "怎么更新？",
       "answer": "先退出 Vimdow，再下载最新的 Vimdow.zip，替换“应用程序”文件夹里的旧版本。通过 Homebrew 安装的用户可运行 brew update 和 brew upgrade --cask vimdow。设置会保留，窗口标记会在重启时清空。应用本身不会检查更新。"
@@ -159,7 +163,7 @@
   },
   "get": {
     "title": "获取 Vimdow",
-    "intro": "Vimdow 1.2.0 支持 macOS 14 或更高版本，适用于 Apple 芯片和 Intel Mac。应用已用 Developer ID 签名，并通过 Apple 公证。",
+    "intro": "Vimdow 1.3.0 支持 macOS 14 或更高版本，适用于 Apple 芯片和 Intel Mac。应用已用 Developer ID 签名，并通过 Apple 公证。",
     "download": "下载 Vimdow.zip",
     "releases": "发布说明",
     "source": "从源码构建",

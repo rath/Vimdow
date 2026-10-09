@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [1.3.0](https://github.com/rath/Vimdow/releases/tag/v1.3.0) — 2026-10-09
 
 ### Added
 
@@ -15,7 +15,15 @@
 - Dim other windows: Control–Option–D covers every window except the focused
   one with a translucent black layer on every display, like HazeOver. Set the
   intensity (10–90 %) under Settings → General → Dimming; the state and the
-  intensity persist, and General's Restore Defaults turns it off.
+  intensity persist, and General's Restore Defaults turns it off. Vimdow's own
+  panels, the menu bar, and the Dock stay bright, and full-screen Spaces are
+  never dimmed.
+
+### Changed
+
+- Updated the four-language website, README, and manual testing checklist for
+  the launcher and dimming. The website's cheat sheet now shows
+  Control–Option–[ and Control–Option–] for marked-window cycling.
 
 ## [1.2.0](https://github.com/rath/Vimdow/releases/tag/v1.2.0) — 2026-10-05
 

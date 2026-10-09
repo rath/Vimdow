@@ -12,7 +12,7 @@
   "hero": {
     "helpLine": "For macOS 14 and later",
     "tagline": "Your windows, in Vim's vocabulary.",
-    "lead": "Vimdow is a keyboard-driven window manager for macOS. Press one shortcut to enter command mode, then move, resize, snap, and switch windows with h, j, k, l, counts, and the other Vim habits already in your fingers. The mouse stays where it is.",
+    "lead": "Vimdow is a keyboard-driven window manager for macOS. Press one shortcut to enter command mode, then move, resize, snap, and switch windows with h, j, k, l, counts, and the other Vim habits already in your fingers. The mouse stays where it is. It also opens apps by name and can dim everything but the window you are using.",
     "get": "Download ZIP",
     "source": "Source on GitHub",
     "homebrew": "Install with Homebrew",
@@ -152,6 +152,10 @@
       "question": "Does it work with every app?",
       "answer": "It works with any app whose windows macOS lets other apps move, which is nearly all of them. When an app refuses a move or resize, for example a window with a fixed size, Vimdow beeps instead of forcing it."
     },
+    "dim": {
+      "question": "Can it dim everything except the window I am using?",
+      "answer": "Yes. Control–Option–D lays a translucent black layer over every other window on every display, like HazeOver, and the bright spot follows the focus as you click or switch apps. Set how dark it gets under Settings → General → Dimming; press the shortcut again to stop."
+    },
     "update": {
       "question": "How do I update Vimdow?",
       "answer": "Quit Vimdow, then download the latest Vimdow.zip and replace the app in Applications. If installed with Homebrew, run brew update and brew upgrade --cask vimdow. Settings stay; window marks reset on restart. Vimdow never checks for updates itself."
@@ -159,7 +163,7 @@
   },
   "get": {
     "title": "Get Vimdow",
-    "intro": "Vimdow 1.2.0 supports macOS 14 or later, on Apple silicon and Intel Macs. The app is signed with Developer ID and notarized by Apple.",
+    "intro": "Vimdow 1.3.0 supports macOS 14 or later, on Apple silicon and Intel Macs. The app is signed with Developer ID and notarized by Apple.",
     "download": "Download Vimdow.zip",
     "releases": "Release notes",
     "source": "Build from source",

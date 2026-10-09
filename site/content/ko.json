@@ -12,7 +12,7 @@
   "hero": {
     "helpLine": "macOS 14 이상",
     "tagline": "창 관리를 Vim 스타일로",
-    "lead": "Vimdow는 키보드로 조작하는 macOS 윈도 매니저입니다. 단축키 하나로 명령 모드에 들어간 뒤 h, j, k, l, 숫자 반복, 실행 취소로 창을 옮기고, 크기를 바꾸고, 정렬하고, 전환합니다. 마우스는 제자리에 둡니다.",
+    "lead": "Vimdow는 키보드로 조작하는 macOS 윈도 매니저입니다. 단축키 하나로 명령 모드에 들어간 뒤 h, j, k, l, 숫자 반복, 실행 취소로 창을 옮기고, 크기를 바꾸고, 정렬하고, 전환합니다. 마우스는 제자리에 둡니다. 앱을 이름으로 열거나, 지금 쓰는 창만 남기고 나머지를 어둡게 할 수도 있습니다.",
     "get": "ZIP 다운로드",
     "source": "GitHub에서 소스 보기",
     "homebrew": "Homebrew로 간편하게 설치",
@@ -152,6 +152,10 @@
       "question": "모든 앱에서 동작하나요?",
       "answer": "macOS가 다른 앱의 창 이동을 허용하는 앱이라면 동작하고, 거의 모든 앱이 여기에 해당합니다. 크기가 고정된 창처럼 앱이 이동이나 크기 조절을 거부하면, Vimdow는 억지로 바꾸지 않고 경고음만 냅니다."
     },
+    "dim": {
+      "question": "지금 쓰는 창만 남기고 나머지를 어둡게 할 수 있나요?",
+      "answer": "네. Control–Option–D를 누르면 HazeOver처럼 모든 디스플레이의 나머지 창 위에 반투명한 검은 막이 덮이고, 창을 클릭하거나 앱을 전환하면 밝은 창도 따라 바뀝니다. 어둡기는 설정의 General → Dimming에서 정하고, 단축키를 다시 누르면 꺼집니다."
+    },
     "update": {
       "question": "업데이트는 어떻게 하나요?",
       "answer": "Vimdow를 종료한 뒤 최신 Vimdow.zip을 받아 응용 프로그램 폴더의 앱을 교체하세요. Homebrew로 설치했다면 brew update와 brew upgrade --cask vimdow를 실행하면 됩니다. 설정은 유지되고, 창 표시는 재시작 시 초기화됩니다. 앱 자체는 업데이트를 확인하지 않습니다."
@@ -159,7 +163,7 @@
   },
   "get": {
     "title": "Vimdow 받기",
-    "intro": "Vimdow 1.2.0은 macOS 14 이상에서 Apple Silicon과 Intel Mac을 모두 지원합니다. Developer ID로 서명하고 Apple 공증을 받았습니다.",
+    "intro": "Vimdow 1.3.0은 macOS 14 이상에서 Apple Silicon과 Intel Mac을 모두 지원합니다. Developer ID로 서명하고 Apple 공증을 받았습니다.",
     "download": "Vimdow.zip 다운로드",
     "releases": "릴리스 노트",
     "source": "소스에서 빌드",

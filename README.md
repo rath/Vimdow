@@ -11,7 +11,8 @@ for macOS 14 or later, signed and notarized · [Release notes](https://github.co
 Vimdow is a keyboard-driven window manager for macOS. Press a shortcut to enter
 command mode, then move, resize, snap, and switch windows with `h`, `j`, `k`,
 `l`, counts, and the other Vim habits already in your fingers. The mouse stays
-where it is.
+where it is. It also opens apps and System Settings panes by name, and can dim
+every window except the one you are using.
 
 <img src="docs/demo.gif" width="768" alt="Animated demo: in command mode, Vim keys move a terminal window, widen it, center it, undo that, and snap it to the left half. Q then 2 switches to a second window, which Control-W then L snaps to the right half.">
 
