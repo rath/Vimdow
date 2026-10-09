@@ -8,9 +8,10 @@ import VimdowCore
 final class LauncherPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
     static let maxResults = 8
     private static let width: CGFloat = 600
-    private static let fieldHeight: CGFloat = 70
-    private static let rowHeight: CGFloat = 48
+    private static let headerHeight: CGFloat = 62
+    private static let rowHeight: CGFloat = 44
     private static let listInset: CGFloat = 8
+    private static let listSpacing: CGFloat = 6
 
     var resultsProvider: ((String) -> [LauncherItem])?
     var iconProvider: ((LauncherItem) -> NSImage?)?
@@ -21,6 +22,7 @@ final class LauncherPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
     var query: String { (field.currentEditor() as? NSTextView)?.string ?? field.stringValue }
 
     private let field = NSTextField(string: "")
+    private let separator = NSBox()
     private let list = NSStackView()
     private var rows: [LauncherRowView] = []
     private var listHeight: NSLayoutConstraint?
@@ -30,7 +32,7 @@ final class LauncherPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
     override var canBecomeKey: Bool { true }
 
     init() {
-        super.init(contentRect: CGRect(x: 0, y: 0, width: Self.width, height: Self.fieldHeight),
+        super.init(contentRect: CGRect(x: 0, y: 0, width: Self.width, height: Self.headerHeight),
                    styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         isReleasedWhenClosed = false
         hidesOnDeactivate = false
@@ -55,6 +57,10 @@ final class LauncherPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
         field.cell?.sendsActionOnEndEditing = false
         field.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(field)
+        separator.boxType = .separator
+        separator.isHidden = true
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(separator)
         list.orientation = .vertical
         list.alignment = .leading
         list.spacing = 0
@@ -72,11 +78,13 @@ final class LauncherPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
         let listHeight = list.heightAnchor.constraint(equalToConstant: 0)
         self.listHeight = listHeight
         NSLayoutConstraint.activate([
-            field.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            field.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            field.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),
-            field.heightAnchor.constraint(equalToConstant: Self.fieldHeight),
-            list.topAnchor.constraint(equalTo: field.bottomAnchor),
+            field.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            field.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            field.centerYAnchor.constraint(equalTo: contentView.topAnchor, constant: Self.headerHeight / 2),
+            separator.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            separator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            separator.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Self.headerHeight),
+            list.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: Self.listSpacing),
             list.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Self.listInset),
             listHeight,
         ])
@@ -119,9 +127,10 @@ final class LauncherPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
                 row.isHidden = true
             }
         }
-        let listHeight = results.isEmpty ? 0 : CGFloat(results.count) * Self.rowHeight + Self.listInset
+        separator.isHidden = results.isEmpty
+        let listHeight = CGFloat(results.count) * Self.rowHeight
         self.listHeight?.constant = listHeight
-        let height = Self.fieldHeight + listHeight
+        let height = Self.headerHeight + (results.isEmpty ? 0 : 1 + Self.listSpacing + listHeight + Self.listInset)
         setFrame(CGRect(x: frame.minX, y: topEdge - height, width: Self.width, height: height), display: true)
     }
 
@@ -196,7 +205,7 @@ final class LauncherRowView: NSView {
         super.init(frame: .zero)
         translatesAutoresizingMaskIntoConstraints = false
         icon.imageScaling = .scaleProportionallyUpOrDown
-        title.font = .systemFont(ofSize: 15)
+        title.font = .systemFont(ofSize: 14, weight: .medium)
         title.lineBreakMode = .byTruncatingTail
         caption.font = .systemFont(ofSize: 11)
         for view in [icon, title, caption] {
@@ -206,13 +215,13 @@ final class LauncherRowView: NSView {
         NSLayoutConstraint.activate([
             icon.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
             icon.centerYAnchor.constraint(equalTo: centerYAnchor),
-            icon.widthAnchor.constraint(equalToConstant: 32),
-            icon.heightAnchor.constraint(equalToConstant: 32),
-            title.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 12),
+            icon.widthAnchor.constraint(equalToConstant: 30),
+            icon.heightAnchor.constraint(equalToConstant: 30),
+            title.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 10),
             title.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -12),
-            title.topAnchor.constraint(equalTo: topAnchor, constant: 7),
+            title.topAnchor.constraint(equalTo: topAnchor, constant: 5),
             caption.leadingAnchor.constraint(equalTo: title.leadingAnchor),
-            caption.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 1),
+            caption.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 0),
         ])
     }
 
