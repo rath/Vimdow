@@ -146,6 +146,8 @@ extension SearchPanelTests {
         #expect(!battery.aliases.isEmpty)
         let applications = LauncherScan.applications()
         #expect(applications.contains { $0.id == "/System/Applications/System Settings.app" })
+        #expect(applications.contains { $0.id == "/System/Library/CoreServices/Finder.app" })
+        #expect(applications.contains { $0.id == "/System/Library/CoreServices/Applications/Keychain Access.app" })
         #expect(Set(applications.map(\.id)).count == applications.count)
     }
 }

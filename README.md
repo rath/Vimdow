@@ -212,9 +212,10 @@ panel. The launcher works from normal and command mode, returns to normal mode
 when it closes, and needs no Accessibility permission.
 
 It indexes `.app` bundles in `/Applications` (including one level of
-subfolders), `/System/Applications`, `/System/Applications/Utilities`, and
-`~/Applications`, plus every System Settings pane that macOS exposes through
-its settings URL scheme. Pane names follow the System Settings sidebar in your
+subfolders), `/System/Applications`, `/System/Applications/Utilities`,
+`/System/Library/CoreServices/Applications` (Keychain Access, Archive Utility,
+and similar), and `~/Applications`, plus Finder and every System Settings pane
+that macOS exposes through its settings URL scheme. Pane names follow the System Settings sidebar in your
 language; English names and bundle names also match on localized systems.
 
 Matching is case-, diacritic-, and width-insensitive and accepts Korean input

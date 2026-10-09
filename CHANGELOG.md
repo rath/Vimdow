@@ -6,8 +6,8 @@
 
 - A launcher for applications and System Settings panes: type a name, pick a
   row with Up/Down or Control–N/P, and press Return. It indexes /Applications,
-  the system application folders, ~/Applications, and every pane System Settings
-  exposes. It ships without a shortcut; record one such as Option–Command–Space
+  the system application folders, ~/Applications, Finder, and every pane System
+  Settings exposes. It ships without a shortcut; record one such as Option–Command–Space
   under Settings → Shortcuts after turning off Spotlight's Show Finder search
   window shortcut.
 - The launcher remembers which item you chose for a query and ranks it first the

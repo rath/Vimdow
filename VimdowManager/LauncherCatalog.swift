@@ -33,8 +33,11 @@ enum LauncherScan {
         ("/Applications", 2),
         ("/System/Applications", 1),
         ("/System/Applications/Utilities", 1),
+        ("/System/Library/CoreServices/Applications", 1),
         (NSHomeDirectory() + "/Applications", 1),
     ]
+    /// Launchable apps that live among background agents, so their folder is not scanned.
+    static let standaloneApplications = ["/System/Library/CoreServices/Finder.app"]
     static let paneRoots = [
         "/System/Library/ExtensionKit/Extensions",
         "/System/Applications/System Settings.app/Contents/PlugIns",
@@ -66,6 +69,13 @@ enum LauncherScan {
             }
         }
         for root in applicationRoots { visit(URL(fileURLWithPath: root.path), depth: root.depth) }
+        for path in standaloneApplications {
+            guard fileManager.fileExists(atPath: path),
+                  let item = application(at: URL(fileURLWithPath: path), fileManager: fileManager),
+                  !seen.contains(item.id) else { continue }
+            seen.insert(item.id)
+            items.append(item)
+        }
         return items.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
