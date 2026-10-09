@@ -11,6 +11,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
     private let notice = StatusNotice()
     private let focusFlash = FocusFlash()
     private let settingsStore = SettingsStore()
+    private lazy var launcher = LauncherController(store: settingsStore)
     private var settingsWindow: SettingsWindowController?
     private let logger = Logger(subsystem: "rath.toys.VimdowManager", category: "WindowControl")
     private lazy var coordinator = CommandCoordinator(windows: service, presentation: self,
@@ -27,6 +28,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         settingsStore.onDisplayBehaviorChange = { [weak self] in self?.coordinator.resetDisplayHistory() }
         service.onGlideFailure = { [weak self] error in self?.showFailure(error) }
         search.onFinish = { [weak self] query in self?.coordinator.finishSearch(query) }
+        launcher.onFinish = { [weak self] in self?.coordinator.finishLauncher() }
+        launcher.prewarm()
         shortcuts = ShortcutController { [weak self] command in
             guard let self else { return }
             let requiresPermission: Bool
@@ -55,6 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         shortcuts?.stop()
         guides.hide()
         search.hide()
+        launcher.hide()
         notice.hide()
         focusFlash.hide()
     }
@@ -80,8 +84,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
     func hideGuides() { guides.hide() }
     func showSearch() { search.show() }
     func hideSearch() { search.hide() }
-    func showLauncher() {}
-    func hideLauncher() {}
+    func showLauncher() { launcher.show() }
+    func hideLauncher() { launcher.hide() }
     func showNotice(_ text: String, near frame: CGRect?) { notice.show(text, near: frame) }
     func flashWindow(_ frame: CGRect) { focusFlash.show(frame) }
     func showSettings() {

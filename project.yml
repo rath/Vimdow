@@ -82,6 +82,8 @@ targets:
     sources:
       - Tests/VimdowPresentationTests
       - VimdowManager/WindowPresentation.swift
+      - VimdowManager/LauncherPanel.swift
+      - VimdowManager/LauncherCatalog.swift
       - VimdowManager/SettingsWindowController.swift
       - VimdowManager/SettingsStore.swift
       - VimdowManager/ShortcutController.swift
