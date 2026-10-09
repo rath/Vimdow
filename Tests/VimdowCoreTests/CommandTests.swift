@@ -808,6 +808,9 @@ private final class FakePresentation: CommandPresenting {
     var modes: [Mode] = []
     var guides: [WindowInfo] = []
     var searchVisible = false
+    var launcherVisible = false
+    var launcherShows = 0
+    var launcherHides = 0
     var errors: [any Error] = []
     var didQuit = false
     func setMode(_ mode: Mode) { modes.append(mode) }
@@ -815,6 +818,8 @@ private final class FakePresentation: CommandPresenting {
     func hideGuides() { guides = [] }
     func showSearch() { searchVisible = true }
     func hideSearch() { searchVisible = false }
+    func showLauncher() { launcherVisible = true; launcherShows += 1 }
+    func hideLauncher() { launcherVisible = false; launcherHides += 1 }
     func showSettings() {}
     func showNotice(_ text: String, near frame: CGRect?) {}
     func flashWindow(_ frame: CGRect) {}
@@ -907,7 +912,7 @@ private final class FakePresentation: CommandPresenting {
     #expect(ui.guides.isEmpty)
 }
 
-@Test(arguments: ["search", "settings", "command", "select"])
+@Test(arguments: ["search", "settings", "command", "select", "launcher"])
 @MainActor func numberSelectionTimeoutDoesNotCancelSubsequentModes(_ next: String) async throws {
     let windows = FakeWindows()
     let ui = FakePresentation()
@@ -925,6 +930,9 @@ private final class FakePresentation: CommandPresenting {
     case "command":
         controller.handle(.move(.right))
         expected = .command
+    case "launcher":
+        controller.handle(.launcher)
+        expected = .launcher
     default:
         controller.handle(.digit(1))
         controller.handle(.enter)
@@ -935,6 +943,82 @@ private final class FakePresentation: CommandPresenting {
     #expect(controller.mode == expected)
     #expect(ui.guides.isEmpty)
     #expect(ui.searchVisible == (next == "search"))
+    #expect(ui.launcherVisible == (next == "launcher"))
+}
+
+@Test @MainActor func launcherOpensFromNormalAndCommandAndTogglesClosed() {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    controller.handle(.launcher)
+    #expect(controller.mode == .launcher)
+    #expect(ui.modes.last == .launcher)
+    #expect(ui.launcherVisible)
+    #expect(ui.launcherShows == 1)
+    controller.handle(.launcher)
+    #expect(controller.mode == .normal)
+    #expect(!ui.launcherVisible)
+    #expect(ui.launcherHides == 1)
+    controller.handle(.enter)
+    controller.handle(.launcher)
+    #expect(controller.mode == .launcher)
+    controller.finishLauncher()
+    #expect(controller.mode == .normal) // Launching something ends command mode too.
+    #expect(ui.launcherShows == 2)
+    #expect(ui.launcherHides == 2)
+    controller.finishLauncher()
+    #expect(ui.launcherHides == 2)
+    #expect(ui.modes.filter { $0 == .normal }.count == 2)
+}
+
+@Test @MainActor func launcherCancelsNumberedSelectionAndIgnoresModalCommands() {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    controller.handle(.enter)
+    controller.handle(.quickSwitch)
+    #expect(ui.guides.count == 9)
+    controller.handle(.launcher)
+    #expect(controller.mode == .launcher)
+    #expect(ui.guides.isEmpty)
+    for command in [Command.move(.left), .cycle(1), .cycleMarked(1), .enter, .digit(1), .quickSwitch] {
+        controller.handle(command)
+    }
+    #expect(windows.frames.isEmpty)
+    #expect(windows.focused.isEmpty)
+    #expect(ui.guides.isEmpty)
+    #expect(controller.mode == .launcher)
+    #expect(ui.launcherShows == 1)
+    controller.handle(.escape)
+    #expect(controller.mode == .normal)
+    #expect(ui.launcherHides == 1)
+    #expect(!ui.launcherVisible)
+}
+
+@Test @MainActor func launcherIsIgnoredDuringSearchAndSettingsAndSettingsCancelsIt() {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    controller.handle(.enter)
+    controller.handle(.search)
+    controller.handle(.launcher)
+    #expect(controller.mode == .search)
+    #expect(ui.launcherShows == 0)
+    controller.finishSearch(nil)
+    controller.setSettingsActive(true)
+    controller.handle(.launcher)
+    #expect(controller.mode == .settings)
+    #expect(ui.launcherShows == 0)
+    controller.setSettingsActive(false)
+    controller.handle(.launcher)
+    #expect(controller.mode == .launcher)
+    controller.setSettingsActive(true)
+    #expect(controller.mode == .settings)
+    #expect(ui.launcherHides == 1)
+    #expect(!ui.launcherVisible)
+    controller.finishLauncher()
+    #expect(controller.mode == .settings)
+    #expect(ui.launcherHides == 1)
 }
 
 @Test @MainActor func numberSelectionTimerDoesNotRetainItsCoordinator() {

@@ -62,6 +62,8 @@ private final class MarkPresentation: CommandPresenting {
     func hideGuides() { guides = [] }
     func showSearch() {}
     func hideSearch() {}
+    func showLauncher() {}
+    func hideLauncher() {}
     func showSettings() {}
     func showNotice(_ text: String, near frame: CGRect?) { notices.append(text); noticeFrame = frame }
     func flashWindow(_ frame: CGRect) { flashes.append(frame) }

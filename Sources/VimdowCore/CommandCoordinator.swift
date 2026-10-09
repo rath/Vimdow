@@ -50,16 +50,23 @@ public final class CommandCoordinator {
             case .settings:
                 setSettingsActive(true)
                 presentation.showSettings()
+            case .launcher:
+                if mode == .launcher {
+                    finishLauncher() // The same key closes the panel again.
+                } else if mode != .search && mode != .settings { // Text input and recording own the keyboard.
+                    transition(to: .launcher)
+                    presentation.showLauncher()
+                }
             case .enter:
                 // Re-entering is idempotent; it must not duplicate handlers or reset a prefix.
                 if mode == .normal { transition(to: .command) }
             case .escape:
                 if mode == .search { finishSearch(nil) } else { transition(to: .normal) }
             case .cycle(let step):
-                guard mode != .search && mode != .settings else { return }
+                guard mode != .search && mode != .settings && mode != .launcher else { return }
                 try cycle(step: step, count: prefix.take())
             case .cycleMarked(let step):
-                guard mode != .search && mode != .settings else { return }
+                guard mode != .search && mode != .settings && mode != .launcher else { return }
                 transition(to: .normal)
                 try cycleMarked(step: step)
             default:
@@ -176,6 +183,7 @@ public final class CommandCoordinator {
     public func setSettingsActive(_ active: Bool) {
         if active {
             if mode == .search { finishSearch(nil) }
+            if mode == .launcher { finishLauncher() }
             if mode != .settings { transition(to: .settings) }
         } else if mode == .settings {
             transition(to: .normal)
@@ -184,6 +192,12 @@ public final class CommandCoordinator {
 
     public func resetDisplayHistory() {
         screenHistory.removeAll()
+    }
+
+    /// Closes the launcher. Whatever was chosen is opened by the presentation afterwards.
+    public func finishLauncher() {
+        guard mode == .launcher else { return }
+        transition(to: .normal)
     }
 
     public func finishSearch(_ query: String?) {
@@ -345,5 +359,6 @@ public final class CommandCoordinator {
         presentation.hideGuides()
         presentation.setMode(next)
         if previous == .search { presentation.hideSearch() }
+        if previous == .launcher { presentation.hideLauncher() }
     }
 }
