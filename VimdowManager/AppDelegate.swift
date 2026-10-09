@@ -10,6 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
     private let search = SearchPanel()
     private let notice = StatusNotice()
     private let focusFlash = FocusFlash()
+    private let dimming = DimController()
     private let settingsStore = SettingsStore()
     private lazy var launcher = LauncherController(store: settingsStore)
     private var settingsWindow: SettingsWindowController?
@@ -24,6 +25,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         installMenu()
         service.showsTmuxPaneNumbers = settingsStore.showsTmuxPaneNumbers
         settingsStore.onTmuxPaneNumbersChange = { [weak self] in self?.service.showsTmuxPaneNumbers = $0 }
+        dimming.intensity = settingsStore.dimIntensity
+        dimming.ownWindowNumber = { [weak self] in
+            guard let window = self?.settingsWindow?.window, window.isVisible else { return nil }
+            return window.windowNumber
+        }
+        settingsStore.onDimmingChange = { [weak self] in self?.dimming.setEnabled($0) }
+        settingsStore.onDimIntensityChange = { [weak self] in self?.dimming.intensity = $0 }
         coordinator.onMarkedWindowFocus = { [weak self] id in self?.service.showTmuxPanes(in: id) }
         settingsStore.onDisplayBehaviorChange = { [weak self] in self?.coordinator.resetDisplayHistory() }
         service.onGlideFailure = { [weak self] error in self?.showFailure(error) }
@@ -46,6 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         }
         shortcuts?.onInput = { [weak self] in self?.coordinator.recordInput() }
         setMode(.normal)
+        if settingsStore.dimsOtherWindows { dimming.setEnabled(true, animated: false) }
         if !AXIsProcessTrusted() { showPermissionAlert() }
     }
 
@@ -61,6 +70,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         launcher.hide()
         notice.hide()
         focusFlash.hide()
+        dimming.stop()
     }
 
     func setMode(_ mode: Mode) {
@@ -97,6 +107,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         }
         settingsWindow?.show()
     }
+    func toggleDimming() { settingsStore.setDimsOtherWindows(!settingsStore.dimsOtherWindows) }
     @objc private func openSettings(_ sender: Any?) { coordinator.handle(.settings) }
     func quit() { NSApp.terminate(nil) }
 

@@ -53,7 +53,7 @@ struct ShortcutTests {
         let toggle = try #require(controller.bindings.first { if case .toggleMark = $0.command { true } else { false } })
         #expect(cycle.isGlobal && !cycle.repeats)
         #expect(!toggle.isGlobal && !toggle.repeats)
-        #expect(controller.editableBindings.count == 8)
+        #expect(controller.editableBindings.count == 9)
         #expect(controller.editableBindings.contains { $0.name == cycle.name })
         #expect(cycle.name.shortcut == initial)
         #expect(toggle.name.shortcut == KeyboardShortcuts.Shortcut(.m))
@@ -219,6 +219,37 @@ struct ShortcutTests {
         #expect(launcher.name.shortcut == recorded)
         recreated.restoreDefaults()
         #expect(launcher.name.shortcut == nil)
+    }
+
+    @Test func dimmingShortcutIsGlobalSinglePressAndDefaultsToControlOptionD() throws {
+        _ = NSApplication.shared
+        let namespace = "test_\(UUID().uuidString)"
+        let controller = ShortcutController(namespace: namespace) { _ in }
+        defer { cleanUp(controller) }
+        let dim = try #require(controller.bindings.first { if case .toggleDimming = $0.command { true } else { false } })
+        let initial = KeyboardShortcuts.Shortcut(.d, modifiers: [.control, .option])
+        #expect(dim.isGlobal && !dim.repeats)
+        #expect(dim.title == "Dim other windows")
+        #expect(dim.name.rawValue == "\(namespace)_dim")
+        #expect(dim.name.shortcut == initial)
+        #expect(controller.editableBindings.contains { $0.name == dim.name })
+        let enter = try #require(controller.bindings.first { if case .enter = $0.command { true } else { false } })
+        if case .disallow = controller.validate(initial, for: enter.name) {} else {
+            Issue.record("Duplicate dimming shortcut accepted")
+        }
+        let expectations: [(Mode, Bool)] = [(.normal, true), (.command, true), (.quickSwitch, true),
+                                            (.launcher, false), (.search, false), (.settings, false)]
+        for (mode, enabled) in expectations {
+            #expect(controller.setMode(mode).isEmpty)
+            #expect(KeyboardShortcuts.isEnabled(for: dim.name) == enabled, "\(mode)")
+        }
+        dim.name.shortcut = nil
+        controller.stop()
+        let recreated = ShortcutController(namespace: namespace) { _ in }
+        defer { recreated.stop() }
+        #expect(dim.name.shortcut == nil)
+        recreated.restoreDefaults()
+        #expect(dim.name.shortcut == initial)
     }
 
     private func cleanUp(_ controller: ShortcutController) {

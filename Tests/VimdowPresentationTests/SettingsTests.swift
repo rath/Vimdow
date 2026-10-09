@@ -17,6 +17,17 @@ extension SearchPanelTests {
         store.setShowsTmuxPaneNumbers(true)
         store.setShowsTmuxPaneNumbers(true)
         #expect(tmuxChanges == [true])
+        #expect(!store.dimsOtherWindows)
+        #expect(store.dimIntensity == 50)
+        var dimChanges: [Bool] = []
+        var intensityChanges: [Int] = []
+        store.onDimmingChange = { dimChanges.append($0) }
+        store.onDimIntensityChange = { intensityChanges.append($0) }
+        store.setDimsOtherWindows(true)
+        store.setDimsOtherWindows(true)
+        #expect(dimChanges == [true])
+        for percent in [95, 3, 70, 70] { store.setDimIntensity(percent) }
+        #expect(intensityChanges == [90, 10, 70])
         #expect(store.setStep("7", resizing: false))
         #expect(store.setStep("31", resizing: true))
         for invalid in ["", "0", "201", "2.5", "한", "999999999999999999999999"] {
@@ -39,6 +50,14 @@ extension SearchPanelTests {
         #expect(recreated.launcherHistory == LauncherHistory())
         store.setLauncherHistory(history)
         #expect(recreated.showsTmuxPaneNumbers)
+        #expect(recreated.dimsOtherWindows)
+        #expect(recreated.dimIntensity == 70)
+        defaults.set("x", forKey: "dimIntensity")
+        #expect(recreated.dimIntensity == 50)
+        defaults.set(400, forKey: "dimIntensity")
+        #expect(recreated.dimIntensity == 90)
+        store.setDimIntensity(70)
+        #expect(intensityChanges == [90, 10, 70, 70])
         #expect(recreated.preferences == WindowPreferences(moveStep: 7, resizeStep: 31, displayBehavior: .keepSize,
                                                            resizeStopsAtDisplayEdges: false, animatesSteps: false))
         defaults.set("unrelated", forKey: "anotherPreference")
@@ -48,6 +67,10 @@ extension SearchPanelTests {
         #expect(!recreated.showsTmuxPaneNumbers)
         #expect(recreated.launcherHistory == LauncherHistory())
         #expect(tmuxChanges == [true, false])
+        #expect(dimChanges == [true, false])
+        #expect(intensityChanges == [90, 10, 70, 70, 50])
+        #expect(!recreated.dimsOtherWindows)
+        #expect(recreated.dimIntensity == 50)
         #expect(defaults.string(forKey: "anotherPreference") == "unrelated")
     }
 
@@ -107,6 +130,36 @@ extension SearchPanelTests {
             controller.close()
             controller.show()
             #expect(controller.tmuxPaneNumbers.state == .on)
+        }
+    }
+
+    @Test func dimmingControlsShowAndSaveTheirValues() async throws {
+        try await withSettings { store, _, controller in
+            controller.show()
+            #expect(controller.dimOtherWindows.state == .off)
+            controller.dimOtherWindows.performClick(nil)
+            #expect(store.dimsOtherWindows)
+            controller.dimOtherWindows.performClick(nil)
+            #expect(!store.dimsOtherWindows)
+            #expect(controller.dimIntensity.integerValue == 50)
+            #expect(controller.dimIntensityLabel.stringValue == "50 %")
+            controller.dimIntensity.integerValue = 80
+            #expect(controller.dimIntensity.sendAction(controller.dimIntensity.action, to: controller.dimIntensity.target))
+            #expect(store.dimIntensity == 80)
+            #expect(controller.dimIntensityLabel.stringValue == "80 %")
+            store.setDimIntensity(30)
+            store.setDimsOtherWindows(true)
+            controller.close()
+            controller.show()
+            #expect(controller.dimOtherWindows.state == .on)
+            #expect(controller.dimIntensity.integerValue == 30)
+            #expect(controller.dimIntensityLabel.stringValue == "30 %")
+            store.restoreDefaults()
+            controller.close()
+            controller.show()
+            #expect(controller.dimOtherWindows.state == .off)
+            #expect(controller.dimIntensity.integerValue == 50)
+            #expect(controller.dimIntensityLabel.stringValue == "50 %")
         }
     }
 

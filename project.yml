@@ -88,6 +88,8 @@ targets:
       - VimdowManager/SettingsStore.swift
       - VimdowManager/ShortcutController.swift
       - VimdowManager/TmuxPaneDisplay.swift
+      - VimdowManager/FocusTracker.swift
+      - VimdowManager/DimOverlay.swift
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES

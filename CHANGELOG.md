@@ -12,6 +12,10 @@
   window shortcut.
 - The launcher remembers which item you chose for a query and ranks it first the
   next time. General's Restore Defaults clears this history.
+- Dim other windows: Control–Option–D covers every window except the focused
+  one with a translucent black layer on every display, like HazeOver. Set the
+  intensity (10–90 %) under Settings → General → Dimming; the state and the
+  intensity persist, and General's Restore Defaults turns it off.
 
 ## [1.2.0](https://github.com/rath/Vimdow/releases/tag/v1.2.0) — 2026-10-05
 

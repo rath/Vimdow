@@ -69,6 +69,7 @@ permission across rebuilds.
 | Control–Shift–K / L | Focus the next window |
 | Control–Option–[ | Focus the previous marked window (customizable in Settings) |
 | Control–Option–] | Focus the next marked window (customizable in Settings) |
+| Control–Option–D | Dim every window except the focused one; press again to stop (customizable in Settings) |
 | Unbound by default | Open the launcher; record a shortcut such as Option–Command–Space in Settings |
 
 ### Command mode
@@ -229,6 +230,23 @@ type exactly that query, and items you open more often win ties. The 500 most
 recent queries are kept in local `UserDefaults`; **Restore Defaults** on the
 General tab forgets them.
 
+### Dim other windows
+
+**Control–Option–D** covers every window except the focused one with a
+translucent black layer on every display, like HazeOver, so the window you are
+working in stands out. Press it again to stop. Clicking a dimmed window or
+switching apps moves the bright spot at once; Vimdow's own panels, the menu bar,
+the Dock, and floating palettes stay bright. When the frontmost app has no
+focused window, for example after clicking the desktop, everything is dimmed.
+Full-screen Spaces are never dimmed. Apps with weak Accessibility support, such
+as some Java and Electron apps, may report no focused window and get dimmed too.
+
+Dimming is off by default and needs Accessibility permission. **Settings →
+General → Dimming** has the same switch and an intensity slider from 10 to
+90 % (default 50 %); both persist across launches, and **Restore Defaults** on
+the General tab turns dimming off. The layer is a window ordered just below the
+focused one, so it costs nothing while focus rests.
+
 ### Display movement
 
 Display movement remembers each window's last position and size on each display
@@ -248,11 +266,13 @@ Vimdow is active, or reopen the running app from `/Applications`.
 - **General:** set separate movement and resize steps (1–200 points, default 20),
   choose whether resizing stops at display edges and whether moving and resizing
   animate (both on by default), choose **Fill Display** or **Keep Size** for a
-  window's first visit to a display, and check Accessibility permission. Keep
+  window's first visit to a display, turn **Dim other windows** on and set its
+  intensity (10–90 %, default 50), and check Accessibility permission. Keep
   Size preserves the offset from the source display, fitting the window within
   smaller displays when necessary.
-- **Shortcuts:** customize or clear the eight global shortcuts, including the
-  launcher, which has no shortcut until you record one. Command-mode keys remain
+- **Shortcuts:** customize or clear the nine global shortcuts, including
+  Control–Option–D for dimming and the launcher, which has no shortcut until you
+  record one. Command-mode keys remain
   fixed and are listed for reference. Duplicate assignments and detected
   system/menu conflicts are rejected. If you clear the entry shortcut, reopen
   Vimdow from Applications to reach Settings again.
@@ -415,8 +435,8 @@ behavior, IME input, and controlling other apps require the manual checks in
 
 The AppKit presentation tests briefly show the search and launcher panels on an
 interactive Mac. They check focus, prevent accidental submission during
-activation, exercise Return/Escape with committed and marked text, and scan the
-installed System Settings panes:
+activation, exercise Return/Escape with committed and marked text, scan the
+installed System Settings panes, and check the dimming sheets' window setup:
 
 ```sh
 xcodebuild -project VimdowManager.xcodeproj -scheme VimdowPresentation \
@@ -478,6 +498,10 @@ After publishing, update the version and ZIP checksum in `Casks/vimdow.rb` in
   extensions off the main thread, `LauncherPanel` is a nonactivating results
   panel, and `LauncherController` opens the chosen item. Ranking and learned
   history live in VimdowCore.
+- **Dimming:** `FocusTracker` turns workspace and Accessibility notifications
+  into a value-type focus target, `DimOverlay` keeps one click-through black
+  window per display ordered just below the focused window, and `DimController`
+  ties them to Settings.
 - **AppKit presentation:** native search text field and nonactivating numbered
   panels. UI and command coordination use `@MainActor`.
 - **SettingsStore / SettingsWindowController:** persisted preferences and the

@@ -90,9 +90,13 @@
       "title": "Launch without Spotlight",
       "text": "Type an application or System Settings pane name and press Return. Vimdow scans /Applications, the system application folders, and System Settings panes, and understands initials such as gc for Google Chrome. It remembers what you picked and shows it first for the same query. The shortcut is unbound until you record one, such as Option–Command–Space, in Settings."
     },
+    "dim": {
+      "title": "Dim everything else",
+      "text": "Control–Option–D lays a translucent black layer over every window except the one you are working in, on every display, like HazeOver. Set how dark it gets in Settings. The layer sits just below the focused window, so it costs nothing while focus rests."
+    },
     "settings": {
       "title": "Yours to tune",
-      "text": "Set separate move and resize steps, choose whether resizing stops at display edges, turn the glide off, and rebind the eight global shortcuts."
+      "text": "Set separate move and resize steps, choose whether resizing stops at display edges, turn the glide off, and rebind the nine global shortcuts."
     },
     "marks": {
       "title": "Switch between your chosen windows",
@@ -122,7 +126,8 @@
       "settings": "Open Settings",
       "exit": "Exit command mode",
       "mark": "Mark / unmark the focused window and exit command mode",
-      "markedCycle": "Cycle marked windows, also available in normal mode"
+      "markedCycle": "Cycle marked windows, also available in normal mode",
+      "dim": "Dim every window except the focused one, also available in normal mode"
     }
   },
   "faq": {
@@ -141,7 +146,7 @@
     },
     "shortcuts": {
       "question": "Can I change the shortcuts?",
-      "answer": "You can rebind or clear the eight global shortcuts in Settings, including Control–Option–A for command mode and Control–Option–[ and Control–Option–] for previous and next marked windows. Keys inside command mode are fixed, so they always mean the same thing."
+      "answer": "You can rebind or clear the nine global shortcuts in Settings, including Control–Option–A for command mode and Control–Option–[ and Control–Option–] for previous and next marked windows. Keys inside command mode are fixed, so they always mean the same thing."
     },
     "apps": {
       "question": "Does it work with every app?",

@@ -57,6 +57,8 @@ public final class CommandCoordinator {
                     transition(to: .launcher)
                     presentation.showLauncher()
                 }
+            case .toggleDimming:
+                presentation.toggleDimming() // A side effect in every mode; the mode never changes.
             case .enter:
                 // Re-entering is idempotent; it must not duplicate handlers or reset a prefix.
                 if mode == .normal { transition(to: .command) }

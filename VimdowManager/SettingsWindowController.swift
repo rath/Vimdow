@@ -23,6 +23,9 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
     private(set) var stopAtEdges = NSButton(checkboxWithTitle: "Stop resizing at display edges", target: nil, action: nil)
     private(set) var animateSteps = NSButton(checkboxWithTitle: "Animate moving and resizing", target: nil, action: nil)
     private(set) var tmuxPaneNumbers = NSButton(checkboxWithTitle: "Show tmux pane numbers after marked switches", target: nil, action: nil)
+    private(set) var dimOtherWindows = NSButton(checkboxWithTitle: "Dim other windows", target: nil, action: nil)
+    private(set) var dimIntensity = NSSlider()
+    private(set) var dimIntensityLabel = NSTextField(labelWithString: "50 %")
     private let moveStepper = NSStepper()
     private let resizeStepper = NSStepper()
     private let behavior = NSPopUpButton()
@@ -54,6 +57,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
 
     func show() {
         tmuxPaneNumbers.state = store.showsTmuxPaneNumbers ? .on : .off
+        refreshDimming()
         refreshPermission()
         onActivationChange?(true)
         showWindow(nil)
@@ -62,6 +66,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
+        refreshDimming() // A shortcut may have toggled dimming while Settings was open but not key.
         refreshPermission()
         onActivationChange?(true)
     }
@@ -181,6 +186,13 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         stack.addArrangedSubview(tmuxPaneNumbers)
         stack.setCustomSpacing(4, after: tmuxPaneNumbers)
         stack.addArrangedSubview(note("Choose a pane by number when you switch to a marked terminal window. Requires local tmux with focus reporting."))
+        stack.addArrangedSubview(heading("Dimming"))
+        dimOtherWindows.target = self
+        dimOtherWindows.action = #selector(dimOtherWindowsChanged)
+        stack.addArrangedSubview(dimOtherWindows)
+        stack.setCustomSpacing(4, after: dimOtherWindows)
+        stack.addArrangedSubview(note("Covers every window except the focused one with a translucent black layer. Toggle it with the Dim other windows shortcut (Control–Option–D by default). Requires Accessibility permission."))
+        stack.addArrangedSubview(dimIntensityControl())
         stack.addArrangedSubview(heading("Accessibility"))
         stack.addArrangedSubview(permission)
         stack.addArrangedSubview(button("Open System Settings", action: #selector(openAccessibility)))
@@ -283,6 +295,23 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         return row
     }
 
+    private func dimIntensityControl() -> NSStackView {
+        dimIntensity.minValue = Double(SettingsStore.dimIntensityRange.lowerBound)
+        dimIntensity.maxValue = Double(SettingsStore.dimIntensityRange.upperBound)
+        dimIntensity.numberOfTickMarks = 9
+        dimIntensity.allowsTickMarkValuesOnly = false
+        dimIntensity.isContinuous = true // Visible sheets follow the knob.
+        dimIntensity.target = self
+        dimIntensity.action = #selector(dimIntensityChanged(_:))
+        dimIntensity.setAccessibilityLabel("Dim intensity in percent")
+        dimIntensity.widthAnchor.constraint(equalToConstant: 220).isActive = true
+        dimIntensityLabel.font = .monospacedDigitSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        dimIntensityLabel.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        let row = NSStackView(views: [NSTextField(labelWithString: "Intensity"), dimIntensity, dimIntensityLabel])
+        row.spacing = 8
+        return row
+    }
+
     private func refreshGeneral() {
         let settings = store.preferences
         moveField.integerValue = settings.moveStep
@@ -293,6 +322,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         stopAtEdges.state = settings.resizeStopsAtDisplayEdges ? .on : .off
         animateSteps.state = settings.animatesSteps ? .on : .off
         tmuxPaneNumbers.state = store.showsTmuxPaneNumbers ? .on : .off
+        refreshDimming()
         updateValidation()
         refreshPermission()
     }
@@ -320,6 +350,21 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
 
     @objc private func tmuxPaneNumbersChanged() {
         store.setShowsTmuxPaneNumbers(tmuxPaneNumbers.state == .on)
+    }
+
+    func refreshDimming() {
+        dimOtherWindows.state = store.dimsOtherWindows ? .on : .off
+        dimIntensity.integerValue = store.dimIntensity
+        dimIntensityLabel.stringValue = "\(store.dimIntensity) %"
+    }
+
+    @objc private func dimOtherWindowsChanged() {
+        store.setDimsOtherWindows(dimOtherWindows.state == .on)
+    }
+
+    @objc private func dimIntensityChanged(_ sender: NSSlider) {
+        store.setDimIntensity(sender.integerValue)
+        dimIntensityLabel.stringValue = "\(store.dimIntensity) %"
     }
 
     @objc private func resetGeneral() {

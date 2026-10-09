@@ -65,6 +65,7 @@ private final class MarkPresentation: CommandPresenting {
     func showLauncher() {}
     func hideLauncher() {}
     func showSettings() {}
+    func toggleDimming() {}
     func showNotice(_ text: String, near frame: CGRect?) { notices.append(text); noticeFrame = frame }
     func flashWindow(_ frame: CGRect) { flashes.append(frame) }
     func showFailure(_ error: any Error) { errors.append(error) }

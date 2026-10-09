@@ -813,6 +813,7 @@ private final class FakePresentation: CommandPresenting {
     var launcherHides = 0
     var errors: [any Error] = []
     var didQuit = false
+    var dimToggles = 0
     func setMode(_ mode: Mode) { modes.append(mode) }
     func showGuides(_ windows: [WindowInfo]) { guides = windows }
     func hideGuides() { guides = [] }
@@ -821,6 +822,7 @@ private final class FakePresentation: CommandPresenting {
     func showLauncher() { launcherVisible = true; launcherShows += 1 }
     func hideLauncher() { launcherVisible = false; launcherHides += 1 }
     func showSettings() {}
+    func toggleDimming() { dimToggles += 1 }
     func showNotice(_ text: String, near frame: CGRect?) {}
     func flashWindow(_ frame: CGRect) {}
     func showFailure(_ error: any Error) { errors.append(error) }
@@ -1019,6 +1021,48 @@ private final class FakePresentation: CommandPresenting {
     controller.finishLauncher()
     #expect(controller.mode == .settings)
     #expect(ui.launcherHides == 1)
+}
+
+@Test @MainActor func dimmingTogglesInEveryModeWithoutChangingMode() {
+    let windows = FakeWindows()
+    let ui = FakePresentation()
+    let controller = CommandCoordinator(windows: windows, presentation: ui)
+    let entries: [(mode: Mode, enter: @MainActor () -> Void, leave: @MainActor () -> Void)] = [
+        (.normal, {}, {}),
+        (.command, { controller.handle(.enter) }, { controller.handle(.escape) }),
+        (.quickSwitch, { controller.handle(.enter); controller.handle(.quickSwitch) }, { controller.handle(.escape) }),
+        // Cancelling search returns to command mode and restores focus; the toggle itself must not.
+        (.search, { controller.handle(.enter); controller.handle(.search) }, { controller.finishSearch(nil); controller.handle(.escape) }),
+        (.settings, { controller.setSettingsActive(true) }, { controller.setSettingsActive(false) }),
+        (.launcher, { controller.handle(.launcher) }, { controller.handle(.escape) }),
+    ]
+    var toggles = 0
+    for entry in entries {
+        entry.enter()
+        #expect(controller.mode == entry.mode)
+        let modeChanges = ui.modes.count
+        let guides = ui.guides.count
+        let focuses = windows.focused.count
+        controller.handle(.toggleDimming)
+        toggles += 1
+        #expect(ui.dimToggles == toggles, "\(entry.mode)")
+        #expect(controller.mode == entry.mode, "\(entry.mode)")
+        #expect(ui.modes.count == modeChanges, "\(entry.mode)")
+        #expect(ui.guides.count == guides, "\(entry.mode)")
+        #expect(windows.focused.count == focuses, "\(entry.mode)")
+        #expect(windows.frames.isEmpty, "\(entry.mode)")
+        entry.leave()
+        #expect(controller.mode == .normal, "\(entry.mode)")
+    }
+    #expect(ui.errors.isEmpty)
+    // Like any command, the toggle settles a pending two-key sequence without completing it.
+    controller.handle(.enter)
+    controller.handle(.sequence(.g))
+    controller.handle(.toggleDimming)
+    controller.handle(.sequence(.g))
+    #expect(windows.frames.isEmpty)
+    #expect(ui.dimToggles == toggles + 1)
+    controller.handle(.escape)
 }
 
 @Test @MainActor func numberSelectionTimerDoesNotRetainItsCoordinator() {

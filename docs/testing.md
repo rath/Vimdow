@@ -70,6 +70,25 @@ in the relevant PR or issue. Check supported OS versions before a release.
   `s` ranks it first on the next open; General's Restore Defaults forgets that
   while Shortcuts' Restore Defaults clears the shortcut. Without Accessibility
   permission the launcher still works and shows no permission alert.
+- [ ] **Dim other windows:** with clean preferences the General → Dimming
+  checkbox is off and nothing is dimmed. Control–Option–D fades a black layer
+  over every window except the focused one on every display within 0.15 s, and
+  again fades it out; Reduce Motion makes both instant. Click a dimmed window,
+  Cmd-Tab between apps (including to an app whose window sits behind others),
+  Cmd-` within one app, minimize and close the focused window, hide and quit the
+  frontmost app, and click the desktop: the bright spot follows the focus at
+  once, and the desktop click dims everything. Vimdow's own flows stay bright
+  and clickable: Control–Shift–H/J/K/L, marked switches and their flash, Q
+  badges, search, the launcher, and the Settings window. Dragging a window still
+  snaps to a neighbouring window's edge. In Settings, the intensity slider
+  previews live and persists; Restore Defaults turns dimming off and resets
+  50 %; a shortcut toggle while Settings is open but not key shows when it
+  becomes key. Relaunching with dimming on restores it at launch. With two
+  displays both dim; a full-screen app leaves its Space untouched while the
+  other display still dims, and leaving full screen re-dims. Mission Control
+  shows no stray sheets. Revoking Accessibility hides the layer and the shortcut
+  shows the permission alert; granting it again and switching apps brings the
+  layer back. Vimdow idles near 0 % CPU with dimming on.
 - [ ] **Marked windows:** with Ghostty, two Chrome windows, and another app open,
   enter command mode then M in Ghostty and one Chrome window. Each shows Marked
   briefly without taking focus and returns to normal typing. Control–Option–[

@@ -35,7 +35,7 @@ public enum Command: Sendable {
     case enter, escape, digit(Int), move(Direction), resize(Direction, ResizeAnchor), undo, redo
     case place(Placement), sequence(SequenceKey)
     case cycle(Int), quickSwitch, search, repeatSearch(Int), nextScreen, settings, quit
-    case toggleMark, cycleMarked(Int), launcher
+    case toggleMark, cycleMarked(Int), launcher, toggleDimming
 }
 
 public struct RepeatPrefix: Sendable {
@@ -115,6 +115,7 @@ public protocol CommandPresenting: AnyObject {
     func showLauncher()
     func hideLauncher()
     func showSettings()
+    func toggleDimming()
     func showNotice(_ text: String, near frame: CGRect?)
     func flashWindow(_ frame: CGRect)
     func showFailure(_ error: any Error)

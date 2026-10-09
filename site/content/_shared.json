@@ -279,6 +279,7 @@
     "marks",
     "switch",
     "launcher",
+    "dim",
     "settings"
   ],
   "faq": [
@@ -426,6 +427,16 @@
           "⌃",
           "⌥",
           "tab"
+        ]
+      ]
+    },
+    {
+      "id": "dim",
+      "keys": [
+        [
+          "⌃",
+          "⌥",
+          "d"
         ]
       ]
     },

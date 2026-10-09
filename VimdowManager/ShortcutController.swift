@@ -35,6 +35,7 @@ final class ShortcutController {
             add("resize.topLeft.\(key.rawValue)", key, [.option], .resize(direction, .topLeft), repeats: true)
             add("resize.bottomRight.\(key.rawValue)", key, [.shift], .resize(direction, .bottomRight), repeats: true)
         }
+        add("dim", .d, [.control, .option], .toggleDimming, global: true, title: "Dim other windows")
         // Unbound until recorded: Option–Command–Space belongs to Spotlight by default.
         add("launcher", initial: nil, .launcher, global: true, title: "Open launcher")
         add("undo", .u, [], .undo)
