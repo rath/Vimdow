@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.3.1](https://github.com/rath/Vimdow/releases/tag/v1.3.1) — 2026-10-11
+
+### Added
+
+- Open Vimdow at login from Settings → General → Startup. The setting follows
+  macOS Login Items and is not affected by Restore Defaults.
+
+### Changed
+
+- Reduce dimming work during focus changes by sharing one window-list snapshot
+  and batching Accessibility attribute reads. Skip redundant sheet placement
+  without postponing the pending window-order correction, and discard stale
+  work after rapid switches, display changes, or toggling dimming.
+
+### Fixed
+
+- Command–W now closes the Settings window.
+
 ## [1.3.0](https://github.com/rath/Vimdow/releases/tag/v1.3.0) — 2026-10-09
 
 ### Added
