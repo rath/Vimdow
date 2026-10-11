@@ -92,7 +92,7 @@
     },
     "dim": {
       "title": "Dim everything else",
-      "text": "Control–Option–D lays a translucent black layer over every window except the one you are working in, on every display, like HazeOver. Set how dark it gets in Settings. Version 1.3.1 reduces the work needed when switching windows; full-screen Spaces stay untouched."
+      "text": "Control–Option–D lays a translucent black layer over every window except the one you are working in, on every display, like HazeOver. The bright window follows your clicks and app switches. Set the intensity in Settings → General → Dimming. Full-screen Spaces stay untouched."
     },
     "settings": {
       "title": "Yours to tune",
