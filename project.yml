@@ -86,6 +86,7 @@ targets:
       - VimdowManager/LauncherCatalog.swift
       - VimdowManager/SettingsWindowController.swift
       - VimdowManager/SettingsStore.swift
+      - VimdowManager/LoginItem.swift
       - VimdowManager/ShortcutController.swift
       - VimdowManager/TmuxPaneDisplay.swift
       - VimdowManager/FocusTracker.swift

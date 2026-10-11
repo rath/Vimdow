@@ -1,5 +1,6 @@
 import AppKit
 import KeyboardShortcuts
+import ServiceManagement
 import Testing
 import VimdowCore
 
@@ -163,14 +164,50 @@ extension SearchPanelTests {
         }
     }
 
-    private func withSettings(_ body: (SettingsStore, ShortcutController, SettingsWindowController) async throws -> Void) async throws {
+    @Test func openAtLoginFollowsTheSystemAndAsksForApprovalWhenRefused() async throws {
+        let loginItem = FakeLoginItem()
+        try await withSettings(loginItem: loginItem) { store, _, controller in
+            controller.show()
+            #expect(controller.openAtLogin.state == .off)
+            controller.openAtLogin.performClick(nil)
+            #expect(loginItem.status == .enabled)
+            #expect(controller.openAtLogin.state == .on)
+            store.restoreDefaults()
+            controller.close()
+            controller.show()
+            #expect(controller.openAtLogin.state == .on)
+            controller.openAtLogin.performClick(nil)
+            #expect(loginItem.status == .notRegistered)
+            #expect(controller.openAtLogin.state == .off)
+            // Turned off in System Settings while Vimdow was running: macOS refuses to re-register.
+            loginItem.status = .requiresApproval
+            loginItem.failure = CocoaError(.featureUnsupported)
+            controller.close()
+            controller.show()
+            #expect(controller.openAtLogin.state == .off)
+            #expect(controller.loginItemStatus.stringValue.hasPrefix("Turned off in System Settings"))
+            controller.openAtLogin.performClick(nil)
+            #expect(loginItem.openedSystemSettings == 1)
+            #expect(controller.openAtLogin.state == .off)
+            #expect(controller.loginItemStatus.stringValue.hasPrefix("Turned off in System Settings"))
+            loginItem.status = .notFound
+            controller.openAtLogin.performClick(nil)
+            #expect(loginItem.openedSystemSettings == 1)
+            #expect(controller.openAtLogin.state == .off)
+            #expect(controller.loginItemStatus.stringValue.hasPrefix("Could not change the login item"))
+        }
+    }
+
+    private func withSettings(loginItem: any LoginItem = FakeLoginItem(),
+                              _ body: (SettingsStore, ShortcutController, SettingsWindowController) async throws -> Void) async throws {
         _ = NSApplication.shared
         NSApp.setActivationPolicy(.accessory)
         let suite = "settings_\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         let store = SettingsStore(defaults: defaults)
         let shortcuts = ShortcutController(namespace: suite) { _ in }
-        let controller = SettingsWindowController(store: store, shortcuts: shortcuts, permissionGranted: { false })
+        let controller = SettingsWindowController(store: store, shortcuts: shortcuts, permissionGranted: { false },
+                                                loginItem: loginItem)
         defer {
             controller.close()
             shortcuts.stop()
@@ -183,4 +220,23 @@ extension SearchPanelTests {
         }
         try await body(store, shortcuts, controller)
     }
+}
+
+/// Keeps tests from registering the test runner as a real login item.
+private final class FakeLoginItem: LoginItem {
+    var status: SMAppService.Status = .notRegistered
+    var failure: (any Error)?
+    var openedSystemSettings = 0
+
+    func register() throws {
+        if let failure { throw failure }
+        status = .enabled
+    }
+
+    func unregister() throws {
+        if let failure { throw failure }
+        status = .notRegistered
+    }
+
+    func openSystemSettings() { openedSystemSettings += 1 }
 }

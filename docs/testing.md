@@ -146,6 +146,11 @@ in the relevant PR or issue. Check supported OS versions before a release.
   Command–W closes it, including while a step field is being edited.
   Shortcuts pause while editing and resume in normal mode after leaving it.
   Movement/resize values apply separately; invalid input is not saved.
+- [ ] **Open at login:** with the installed app, turning on Open Vimdow at login
+  adds Vimdow to System Settings → General → Login Items and logging out and in
+  starts it; turning it off removes it. Turn it off in System Settings while
+  Settings is open: the checkbox follows on return, and turning it on again
+  opens Login Items with guidance instead of failing silently.
 - [ ] **Shortcut preferences:** edit or clear a global shortcut, restart, and
   confirm persistence. Reopen the app to recover a cleared entry shortcut.
   Detected conflicts are rejected; Restore Defaults resets only its own tab.

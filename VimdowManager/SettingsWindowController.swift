@@ -1,6 +1,7 @@
 import AppKit
 import ApplicationServices
 import KeyboardShortcuts
+import ServiceManagement
 import VimdowCore
 
 private final class SettingsWindow: NSWindow {
@@ -16,10 +17,13 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
     private let store: SettingsStore
     private let shortcuts: ShortcutController
     private let permissionGranted: () -> Bool
+    private let loginItem: any LoginItem
     var onActivationChange: ((Bool) -> Void)?
     private(set) var moveField = NSTextField(string: "20")
     private(set) var resizeField = NSTextField(string: "20")
     private(set) var tabs = NSTabView()
+    private(set) var openAtLogin = NSButton(checkboxWithTitle: "Open Vimdow at login", target: nil, action: nil)
+    private(set) var loginItemStatus = NSTextField(wrappingLabelWithString: "")
     private(set) var stopAtEdges = NSButton(checkboxWithTitle: "Stop resizing at display edges", target: nil, action: nil)
     private(set) var animateSteps = NSButton(checkboxWithTitle: "Animate moving and resizing", target: nil, action: nil)
     private(set) var tmuxPaneNumbers = NSButton(checkboxWithTitle: "Show tmux pane numbers after marked switches", target: nil, action: nil)
@@ -33,10 +37,12 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
     private let permission = NSTextField(labelWithString: "")
 
     init(store: SettingsStore, shortcuts: ShortcutController,
-         permissionGranted: @escaping () -> Bool = { AXIsProcessTrusted() }) {
+         permissionGranted: @escaping () -> Bool = { AXIsProcessTrusted() },
+         loginItem: any LoginItem = SMAppService.mainApp) {
         self.store = store
         self.shortcuts = shortcuts
         self.permissionGranted = permissionGranted
+        self.loginItem = loginItem
         let window = SettingsWindow(contentRect: NSRect(x: 0, y: 0, width: 640, height: 640),
                                     styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
         window.title = "Vimdow Settings"
@@ -59,6 +65,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         tmuxPaneNumbers.state = store.showsTmuxPaneNumbers ? .on : .off
         refreshDimming()
         refreshPermission()
+        refreshLoginItem()
         onActivationChange?(true)
         showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)
@@ -68,6 +75,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
     func windowDidBecomeKey(_ notification: Notification) {
         refreshDimming() // A shortcut may have toggled dimming while Settings was open but not key.
         refreshPermission()
+        refreshLoginItem() // System Settings may have changed the login item meanwhile.
         onActivationChange?(true)
     }
 
@@ -151,6 +159,14 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
 
     private func generalContent() -> NSStackView {
         let stack = column()
+        stack.addArrangedSubview(heading("Startup"))
+        openAtLogin.target = self
+        openAtLogin.action = #selector(openAtLoginChanged)
+        stack.addArrangedSubview(openAtLogin)
+        stack.setCustomSpacing(4, after: openAtLogin)
+        loginItemStatus.textColor = .secondaryLabelColor
+        loginItemStatus.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
+        stack.addArrangedSubview(loginItemStatus)
         stack.addArrangedSubview(heading("Window behavior"))
         stack.addArrangedSubview(note("Changes apply immediately and are saved automatically."))
         let grid = NSGridView(views: [
@@ -325,10 +341,39 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         refreshDimming()
         updateValidation()
         refreshPermission()
+        refreshLoginItem()
     }
 
     private func refreshPermission() {
         permission.stringValue = permissionGranted() ? "Permission granted" : "Permission required"
+    }
+
+    private func refreshLoginItem(error: (any Error)? = nil) {
+        let status = loginItem.status
+        openAtLogin.state = status == .enabled ? .on : .off
+        if let error {
+            loginItemStatus.stringValue = "Could not change the login item: \(error.localizedDescription)"
+        } else if status == .requiresApproval {
+            loginItemStatus.stringValue = "Turned off in System Settings → General → Login Items. Allow Vimdow there to open it at login."
+        } else {
+            loginItemStatus.stringValue = "Not affected by Restore Defaults. You can also change this in System Settings → General → Login Items."
+        }
+    }
+
+    @objc private func openAtLoginChanged() {
+        let enabling = openAtLogin.state == .on
+        var failure: (any Error)?
+        do {
+            if enabling { try loginItem.register() } else { try loginItem.unregister() }
+        } catch {
+            failure = error
+        }
+        // macOS does not let an app re-enable an item the user turned off; only they can allow it again.
+        if enabling && loginItem.status == .requiresApproval {
+            loginItem.openSystemSettings()
+            failure = nil
+        }
+        refreshLoginItem(error: failure)
     }
 
     @objc private func stepChanged(_ sender: NSStepper) {

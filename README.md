@@ -264,9 +264,10 @@ Enter command mode (default **Control–Option–A**), release the keys, then pr
 **comma (`,`)**. You can also use **Vimdow → Settings…** (**Command–,**) while
 Vimdow is active, or reopen the running app from `/Applications`.
 
-- **General:** set separate movement and resize steps (1–200 points, default 20),
-  choose whether resizing stops at display edges and whether moving and resizing
-  animate (both on by default), choose **Fill Display** or **Keep Size** for a
+- **General:** turn on **Open Vimdow at login** (off by default), set separate
+  movement and resize steps (1–200 points, default 20), choose whether resizing
+  stops at display edges and whether moving and resizing animate (both on by
+  default), choose **Fill Display** or **Keep Size** for a
   window's first visit to a display, turn **Dim other windows** on and set its
   intensity (10–90 %, default 50), and check Accessibility permission. Keep
   Size preserves the offset from the source display, fitting the window within
@@ -278,7 +279,9 @@ Vimdow is active, or reopen the running app from `/Applications`.
   system/menu conflicts are rejected. If you clear the entry shortcut, reopen
   Vimdow from Applications to reach Settings again.
 - Changes apply immediately and persist across launches. **Restore Defaults**
-  resets only the current tab. Invalid numeric input is not saved.
+  resets only the current tab and leaves **Open Vimdow at login** unchanged;
+  macOS keeps that setting, and it also appears in System Settings → General →
+  Login Items. Invalid numeric input is not saved.
 - **Command–W** closes Settings.
 - All Vimdow shortcuts are suspended while Settings has keyboard focus. Switching
   to another app or closing Settings returns to normal mode. Settings can be used
