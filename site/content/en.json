@@ -92,11 +92,11 @@
     },
     "dim": {
       "title": "Dim everything else",
-      "text": "Control–Option–D lays a translucent black layer over every window except the one you are working in, on every display, like HazeOver. Set how dark it gets in Settings. The layer sits just below the focused window, so it costs nothing while focus rests."
+      "text": "Control–Option–D lays a translucent black layer over every window except the one you are working in, on every display, like HazeOver. Set how dark it gets in Settings. Version 1.3.1 reduces the work needed when switching windows; full-screen Spaces stay untouched."
     },
     "settings": {
       "title": "Yours to tune",
-      "text": "Set separate move and resize steps, choose whether resizing stops at display edges, turn the glide off, and rebind the nine global shortcuts."
+      "text": "Set separate move and resize steps, choose whether resizing stops at display edges, turn the glide off, and rebind the nine global shortcuts. You can also start Vimdow automatically at login. Command–W closes Settings."
     },
     "marks": {
       "title": "Switch between your chosen windows",
@@ -155,6 +155,10 @@
     "dim": {
       "question": "Can it dim everything except the window I am using?",
       "answer": "Yes. Control–Option–D lays a translucent black layer over every other window on every display, like HazeOver, and the bright spot follows the focus as you click or switch apps. Set how dark it gets under Settings → General → Dimming; press the shortcut again to stop."
+    },
+    "login": {
+      "question": "Can Vimdow start automatically when I log in?",
+      "answer": "Yes. Enable Open Vimdow at login under Settings → General → Startup. It is off by default. macOS manages this setting in System Settings → General → Login Items, and Restore Defaults leaves it unchanged."
     },
     "update": {
       "question": "How do I update Vimdow?",
