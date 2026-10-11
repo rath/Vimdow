@@ -14,6 +14,23 @@ enum FocusTarget: Equatable, Sendable {
     case unavailable
 }
 
+struct FocusUpdate: Sendable {
+    struct Reasons: OptionSet, Sendable {
+        let rawValue: Int
+        static let accessibility = Self(rawValue: 1 << 0)
+        static let initial = Self(rawValue: 1 << 1)
+        static let application = Self(rawValue: 1 << 2)
+        static let space = Self(rawValue: 1 << 3)
+        static let screens = Self(rawValue: 1 << 4)
+
+        var forcesPlacement: Bool { !intersection([.initial, .application, .space, .screens]).isEmpty }
+    }
+
+    let target: FocusTarget
+    var windows: [ScreenWindow] = []
+    var reasons: Reasons = []
+}
+
 /// A window as the window server lists it, front to back.
 struct ScreenWindow: Equatable, Sendable {
     let id: CGWindowID
@@ -46,23 +63,113 @@ enum FocusResolution {
     /// The topmost visible normal-level window of `pid` whose bounds match `frame`, else that
     /// app's topmost one. Equal bounds resolve to the frontmost entry, which is the focused one.
     static func windowID(for pid: pid_t, frame: CGRect, in windows: [ScreenWindow]) -> CGWindowID? {
-        let candidates = windows.filter { $0.pid == pid && $0.layer == 0 && $0.alpha > 0 }
-        return (candidates.first { matches($0.bounds, frame) } ?? candidates.first)?.id
+        var fallback: CGWindowID?
+        for window in windows where window.pid == pid && window.layer == 0 && window.alpha > 0 {
+            if matches(window.bounds, frame) { return window.id }
+            if fallback == nil { fallback = window.id }
+        }
+        return fallback
     }
 
     /// The topmost visible normal-level window of another app among the windows above the
     /// focused one. Vimdow's own windows, the dim sheets included, never count.
-    static func blockingWindow(in above: [ScreenWindow], focusedPID: pid_t, ownPID: pid_t) -> CGWindowID? {
-        above.first { $0.layer == 0 && $0.alpha > 0 && $0.pid != focusedPID && $0.pid != ownPID }?.id
+    static func blockingWindow(above id: CGWindowID, in windows: [ScreenWindow],
+                               focusedPID: pid_t, ownPID: pid_t) -> CGWindowID? {
+        guard let index = windows.firstIndex(where: { $0.id == id }) else { return nil }
+        return windows[..<index].first {
+            $0.layer == 0 && $0.alpha > 0 && $0.pid != focusedPID && $0.pid != ownPID
+        }?.id
+    }
+
+    /// Only skip ordering when all sheets form a contiguous block beside the anchor.
+    /// Missing sheets (including those on another Space) are not evidence of correct placement.
+    static func sheetsAreOrdered(_ sheets: Set<CGWindowID>, beside anchor: CGWindowID,
+                                 above: Bool, in windows: [ScreenWindow]) -> Bool {
+        guard !sheets.isEmpty else { return true }
+        let ids = windows.filter { $0.layer == 0 && ($0.alpha > 0 || sheets.contains($0.id)) }.map(\.id)
+        guard let index = ids.firstIndex(of: anchor) else { return false }
+        let start = above ? index - sheets.count : index + 1
+        guard start >= 0, start + sheets.count <= ids.count else { return false }
+        return Set(ids[start..<(start + sheets.count)]) == sheets
+    }
+}
+
+/// System reads are injectable so failure handling and the IPC budget can be tested without AX permission.
+@MainActor
+struct FocusReader {
+    var isTrusted: () -> Bool = { AXIsProcessTrusted() }
+    var frontmostPID: () -> pid_t? = { NSWorkspace.shared.frontmostApplication?.processIdentifier }
+    var attribute: (AXUIElement, String) -> CFTypeRef? = { element, name in
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(element, name as CFString, &value) == .success else { return nil }
+        return value
+    }
+    var attributes: (AXUIElement, [String]) -> (AXError, [Any]?) = { element, names in
+        var values: CFArray?
+        let result = AXUIElementCopyMultipleAttributeValues(element, names as CFArray, [], &values)
+        return (result, values as? [Any])
+    }
+    var windows: () -> [ScreenWindow] = {
+        let raw = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
+            as? [[String: Any]] ?? []
+        return FocusResolution.screenWindows(raw)
+    }
+
+    func resolve(ownPID: pid_t, reasons: FocusUpdate.Reasons) -> (FocusUpdate, AXUIElement?) {
+        func update(_ target: FocusTarget, windows: [ScreenWindow] = []) -> FocusUpdate {
+            FocusUpdate(target: target, windows: windows, reasons: reasons)
+        }
+        guard isTrusted() else { return (update(.unavailable), nil) }
+        guard let pid = frontmostPID() else { return (update(.none), nil) }
+        guard pid != ownPID else { return (update(.ownApp), nil) }
+        let app = AXUIElementCreateApplication(pid)
+        AXUIElementSetMessagingTimeout(app, 0.25)
+        guard let focused = attribute(app, kAXFocusedWindowAttribute),
+              CFGetTypeID(focused) == AXUIElementGetTypeID() else { return (update(.none), nil) }
+        let window = focused as! AXUIElement
+        AXUIElementSetMessagingTimeout(window, 0.25)
+        let names = [kAXMinimizedAttribute, kAXPositionAttribute, kAXSizeAttribute, "AXFullScreen"]
+        let (status, batch) = attributes(window, names)
+        let values: [Any]
+        switch status {
+        case .success:
+            guard let batch, batch.count == names.count else { return (update(.none), window) }
+            values = batch
+        case .notImplemented:
+            values = names.map { attribute(window, $0) ?? kCFNull! }
+        default:
+            // Do not multiply timeouts or retry a window that disappeared during the read.
+            return (update(.none), window)
+        }
+        guard (values[0] as? Bool) != true,
+              let frame = Self.frame(position: values[1], size: values[2]) else { return (update(.none), window) }
+        let isFullScreen = (values[3] as? Bool) == true
+        let snapshot = windows()
+        guard let id = FocusResolution.windowID(for: pid, frame: frame, in: snapshot) else {
+            return (update(.none, windows: snapshot), window)
+        }
+        return (update(.window(id: id, pid: pid, frame: frame, isFullScreen: isFullScreen), windows: snapshot), window)
+    }
+
+    private static func frame(position: Any, size: Any) -> CGRect? {
+        guard CFGetTypeID(position as CFTypeRef) == AXValueGetTypeID(),
+              CFGetTypeID(size as CFTypeRef) == AXValueGetTypeID() else { return nil }
+        let positionValue = position as! AXValue
+        let sizeValue = size as! AXValue
+        var point = CGPoint.zero
+        var dimensions = CGSize.zero
+        guard AXValueGetValue(positionValue, .cgPoint, &point),
+              AXValueGetValue(sizeValue, .cgSize, &dimensions) else { return nil }
+        return CGRect(origin: point, size: dimensions)
     }
 }
 
 /// Follows the focused window through workspace and Accessibility notifications.
-/// Owns the AX observer and elements; only `FocusTarget` values leave.
+/// Owns the AX observer and elements; only snapshots of values leave.
 @MainActor
 final class FocusTracker: NSObject {
     /// Called after every resolve, whether or not the target changed; placement is idempotent.
-    var onUpdate: ((FocusTarget) -> Void)?
+    var onUpdate: ((FocusUpdate) -> Void)?
     private(set) var target: FocusTarget = .unavailable
     private(set) var isRunning = false
     private let ownPID = ProcessInfo.processInfo.processIdentifier
@@ -70,7 +177,15 @@ final class FocusTracker: NSObject {
     private var observedPID: pid_t?
     private var observedApp: AXUIElement?
     private var observedWindow: AXUIElement?
-    private var pending = false
+    private let reader: FocusReader
+    private var pendingReasons: FocusUpdate.Reasons = []
+    private var refreshTask: Task<Void, Never>?
+    private var generation = 0
+
+    init(reader: FocusReader = FocusReader()) {
+        self.reader = reader
+        super.init()
+    }
 
     private static let applicationNotifications = [
         kAXFocusedWindowChangedNotification, kAXMainWindowChangedNotification,
@@ -79,49 +194,57 @@ final class FocusTracker: NSObject {
 
     func start() {
         guard !isRunning else { return }
+        generation += 1
         isRunning = true
         let center = NSWorkspace.shared.notificationCenter
         center.addObserver(self, selector: #selector(applicationActivated(_:)),
                            name: NSWorkspace.didActivateApplicationNotification, object: nil)
         center.addObserver(self, selector: #selector(spaceChanged),
                            name: NSWorkspace.activeSpaceDidChangeNotification, object: nil)
-        attach(to: NSWorkspace.shared.frontmostApplication?.processIdentifier)
-        update()
+        attach(to: reader.frontmostPID())
+        update(reasons: .initial)
     }
 
     func stop() {
         guard isRunning else { return }
         isRunning = false
+        generation += 1
+        refreshTask?.cancel()
+        refreshTask = nil
         NSWorkspace.shared.notificationCenter.removeObserver(self)
         detach()
-        pending = false
+        pendingReasons = []
         target = .unavailable
     }
 
-    /// Re-resolves at most once per run-loop turn, however many notifications arrive.
-    func refresh() {
-        guard isRunning, !pending else { return }
-        pending = true
-        Task { @MainActor [weak self] in
-            guard let self, pending else { return }
-            pending = false
-            update()
+    /// Coalesces notifications until the queued main-actor task runs, retaining every cause.
+    func refresh(reason: FocusUpdate.Reasons = .accessibility) {
+        guard isRunning else { return }
+        pendingReasons.formUnion(reason)
+        guard refreshTask == nil else { return }
+        let current = generation
+        refreshTask = Task { @MainActor [weak self] in
+            guard !Task.isCancelled, let self, isRunning, generation == current else { return }
+            refreshTask = nil
+            let reasons = pendingReasons
+            pendingReasons = []
+            update(reasons: reasons)
         }
     }
 
     @objc private func applicationActivated(_ notification: Notification) {
         let activated = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
         attach(to: (activated ?? NSWorkspace.shared.frontmostApplication)?.processIdentifier)
-        refresh()
+        refresh(reason: .application)
     }
 
-    @objc private func spaceChanged() { refresh() }
+    @objc private func spaceChanged() { refresh(reason: .space) }
 
-    private func update() {
+    private func update(reasons: FocusUpdate.Reasons) {
         guard isRunning else { return }
-        let (resolved, window) = Self.resolve(ownPID: ownPID)
+        let (resolved, window) = reader.resolve(ownPID: ownPID, reasons: reasons)
         observeDestruction(of: window)
-        target = resolved
+        target = resolved.target
         onUpdate?(resolved)
     }
 
@@ -183,47 +306,5 @@ final class FocusTracker: NSObject {
         if AXObserverAddNotification(observer, window, kAXUIElementDestroyedNotification as CFString, refcon) == .success {
             observedWindow = window
         }
-    }
-
-    /// Frontmost app → focused AX window → its frame → the window server's number for it.
-    private static func resolve(ownPID: pid_t) -> (FocusTarget, AXUIElement?) {
-        guard AXIsProcessTrusted() else { return (.unavailable, nil) }
-        guard let running = NSWorkspace.shared.frontmostApplication else { return (.none, nil) }
-        let pid = running.processIdentifier
-        guard pid != ownPID else { return (.ownApp, nil) }
-        let app = AXUIElementCreateApplication(pid)
-        AXUIElementSetMessagingTimeout(app, 0.25)
-        guard let focused = attribute(app, kAXFocusedWindowAttribute),
-              CFGetTypeID(focused) == AXUIElementGetTypeID() else { return (.none, nil) }
-        let window = focused as! AXUIElement
-        AXUIElementSetMessagingTimeout(window, 0.25)
-        guard (attribute(window, kAXMinimizedAttribute) as? Bool) != true,
-              let frame = frame(of: window) else { return (.none, window) }
-        let isFullScreen = (attribute(window, "AXFullScreen") as? Bool) == true
-        let raw = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
-            as? [[String: Any]] ?? []
-        guard let id = FocusResolution.windowID(for: pid, frame: frame, in: FocusResolution.screenWindows(raw)) else {
-            return (.none, window)
-        }
-        return (.window(id: id, pid: pid, frame: frame, isFullScreen: isFullScreen), window)
-    }
-
-    private static func attribute(_ element: AXUIElement, _ name: String) -> CFTypeRef? {
-        var value: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(element, name as CFString, &value) == .success else { return nil }
-        return value
-    }
-
-    private static func frame(of element: AXUIElement) -> CGRect? {
-        guard let positionValue = attribute(element, kAXPositionAttribute),
-              let sizeValue = attribute(element, kAXSizeAttribute),
-              CFGetTypeID(positionValue) == AXValueGetTypeID(), CFGetTypeID(sizeValue) == AXValueGetTypeID() else {
-            return nil
-        }
-        var position = CGPoint.zero
-        var size = CGSize.zero
-        guard AXValueGetValue(positionValue as! AXValue, .cgPoint, &position),
-              AXValueGetValue(sizeValue as! AXValue, .cgSize, &size) else { return nil }
-        return CGRect(origin: position, size: size)
     }
 }

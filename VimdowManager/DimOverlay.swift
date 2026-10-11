@@ -48,15 +48,27 @@ final class DimOverlay {
     }
     private var screenFrames: [CGRect] = [] // Quartz, parallel to `windows`.
     private var generation = 0
+    private var placementGeneration = 0
     private var settle: Task<Void, Never>?
     private var lastTarget: FocusTarget = .unavailable
     private var lastOwnWindowNumber: Int?
     private let ownPID = ProcessInfo.processInfo.processIdentifier
+    private let sleep: @MainActor (Duration) async throws -> Void
+    private let order: @MainActor (DimWindow, NSWindow.OrderingMode, Int) -> Void
+
+    init(sleep: @escaping @MainActor (Duration) async throws -> Void = { try await Task.sleep(for: $0) },
+         order: @escaping @MainActor (DimWindow, NSWindow.OrderingMode, Int) -> Void = {
+             $0.order($1, relativeTo: $2)
+         }) {
+        self.sleep = sleep
+        self.order = order
+    }
 
     private var alpha: CGFloat { CGFloat(intensity) / 100 }
 
     func show(animated: Bool) {
         generation += 1
+        invalidatePlacement()
         if windows.isEmpty { build() }
         isShowing = true
         fade(to: alpha, animated: animated)
@@ -66,8 +78,7 @@ final class DimOverlay {
         generation += 1
         let current = generation
         isShowing = false
-        settle?.cancel()
-        settle = nil
+        invalidatePlacement()
         let duration = fade(to: 0, animated: animated)
         guard duration > 0 else { orderOutAll(); return }
         Task { @MainActor [weak self] in
@@ -77,12 +88,14 @@ final class DimOverlay {
         }
     }
 
-    /// Orders the sheets for `target`. Pure z-order: nothing is redrawn.
-    func place(_ target: FocusTarget, ownWindowNumber: Int?) {
+    /// Uses the tracker's snapshot for both blocker selection and redundant-order detection.
+    func place(_ update: FocusUpdate, ownWindowNumber: Int?) {
+        let target = update.target
+        let changed = lastTarget != target || lastOwnWindowNumber != ownWindowNumber
+        let force = changed || update.reasons.forcesPlacement
+        if force { invalidatePlacement() }
         lastTarget = target
         lastOwnWindowNumber = ownWindowNumber
-        settle?.cancel()
-        settle = nil
         guard isShowing else { return }
         switch target {
         case .unavailable:
@@ -92,7 +105,7 @@ final class DimOverlay {
             for window in windows { window.orderFrontRegardless() }
         case .ownApp:
             if let ownWindowNumber {
-                for window in windows { window.order(.below, relativeTo: ownWindowNumber) }
+                for window in windows { order(window, .below, ownWindowNumber) }
             } else {
                 for window in windows { window.orderFrontRegardless() }
             }
@@ -101,35 +114,50 @@ final class DimOverlay {
             let skipped = isFullScreen ? WindowGeometry.screenIndex(for: frame, screens: screenFrames) : nil
             // Just after activation another app's window can still sit above the focused
             // one; a sheet above it is lifted over by the pending raise, not left on top.
-            let blocker = blockingWindow(above: id, focusedPID: pid)
-            for (index, window) in windows.enumerated() {
-                if index == skipped {
-                    window.orderOut(nil)
-                } else if let blocker {
-                    window.order(.above, relativeTo: Int(blocker))
-                } else {
-                    window.order(.below, relativeTo: Int(id))
+            let blocker = FocusResolution.blockingWindow(above: id, in: update.windows,
+                                                        focusedPID: pid, ownPID: ownPID)
+            let active = windows.enumerated().filter { $0.offset != skipped }.map(\.element)
+            let sheetIDs = Set(active.compactMap { $0.windowNumber > 0 ? CGWindowID($0.windowNumber) : nil })
+            let correctlyOrdered = sheetIDs.count == active.count && active.allSatisfy(\.isVisible)
+                && FocusResolution.sheetsAreOrdered(sheetIDs, beside: blocker ?? id,
+                                                    above: blocker != nil, in: update.windows)
+                && (skipped.map { !windows[$0].isVisible } ?? true)
+            if force || !correctlyOrdered {
+                for (index, window) in windows.enumerated() {
+                    if index == skipped {
+                        window.orderOut(nil)
+                    } else {
+                        order(window, blocker == nil ? .below : .above, Int(blocker ?? id))
+                    }
                 }
+            } else {
+                // Keep an existing settle's deadline. A duplicate must neither postpone it
+                // nor start another timer once the sheets have settled.
+                return
             }
+            guard !active.isEmpty, settle == nil else { return }
+            let current = placementGeneration
+            let sleep = self.sleep
             settle = Task { @MainActor [weak self] in
-                do { try await Task.sleep(for: Self.settleDelay) } catch { return }
-                guard let self, isShowing, lastTarget == target else { return }
+                do { try await sleep(Self.settleDelay) } catch { return }
+                guard !Task.isCancelled, let self, isShowing, placementGeneration == current else { return }
+                settle = nil
                 for (index, window) in windows.enumerated() where index != skipped {
-                    window.order(.below, relativeTo: Int(id))
+                    order(window, .below, Int(id))
                 }
             }
         }
     }
 
-    /// Displays changed: rebuild the sheets to the new frames and restore the last placement.
+    /// Displays changed: wait for a fresh tracker snapshot before placing the rebuilt sheets.
     func rebuildScreens() {
+        invalidatePlacement()
         orderOutAll()
         windows = []
         screenFrames = []
         guard isShowing else { return }
         build()
         for window in windows { window.alphaValue = alpha }
-        place(lastTarget, ownWindowNumber: lastOwnWindowNumber)
     }
 
     private func build() {
@@ -143,10 +171,10 @@ final class DimOverlay {
         for window in windows { window.orderOut(nil) }
     }
 
-    private func blockingWindow(above id: CGWindowID, focusedPID: pid_t) -> CGWindowID? {
-        let raw = CGWindowListCopyWindowInfo([.optionOnScreenAboveWindow, .excludeDesktopElements], id)
-            as? [[String: Any]] ?? []
-        return FocusResolution.blockingWindow(in: FocusResolution.screenWindows(raw), focusedPID: focusedPID, ownPID: ownPID)
+    private func invalidatePlacement() {
+        placementGeneration += 1
+        settle?.cancel()
+        settle = nil
     }
 
     /// Returns how long the fade takes; 0 when the value was applied at once.

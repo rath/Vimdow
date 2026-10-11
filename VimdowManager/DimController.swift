@@ -17,7 +17,7 @@ final class DimController: NSObject {
 
     override init() {
         super.init()
-        tracker.onUpdate = { [weak self] target in self?.apply(target) }
+        tracker.onUpdate = { [weak self] update in self?.apply(update) }
         NotificationCenter.default.addObserver(self, selector: #selector(screensChanged),
                                                name: NSApplication.didChangeScreenParametersNotification, object: nil)
     }
@@ -38,10 +38,10 @@ final class DimController: NSObject {
 
     @objc private func screensChanged() {
         overlay.rebuildScreens()
-        if isEnabled { tracker.refresh() }
+        if isEnabled { tracker.refresh(reason: .screens) }
     }
 
-    private func apply(_ target: FocusTarget) {
-        overlay.place(target, ownWindowNumber: ownWindowNumber())
+    private func apply(_ update: FocusUpdate) {
+        overlay.place(update, ownWindowNumber: ownWindowNumber())
     }
 }
