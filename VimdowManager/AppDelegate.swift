@@ -163,6 +163,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
         ] { editMenu.addItem(withTitle: title, action: action, keyEquivalent: key) }
         editItem.submenu = editMenu
         menu.addItem(editItem)
+        // Vimdow shows no menu bar, but its key equivalents still reach the Settings window.
+        let windowItem = NSMenuItem()
+        let windowMenu = NSMenu(title: "Window")
+        windowMenu.addItem(withTitle: "Close", action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w")
+        windowItem.submenu = windowMenu
+        menu.addItem(windowItem)
         NSApp.mainMenu = menu
     }
 }

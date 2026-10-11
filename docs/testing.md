@@ -143,6 +143,7 @@ in the relevant PR or issue. Check supported OS versions before a release.
   each window's last frame. A single display is unchanged; layout changes clear
   history. Check labels on mixed display scales.
 - [ ] **Settings:** comma, the app menu, and reopening Vimdow reuse one window.
+  Command–W closes it, including while a step field is being edited.
   Shortcuts pause while editing and resume in normal mode after leaving it.
   Movement/resize values apply separately; invalid input is not saved.
 - [ ] **Shortcut preferences:** edit or clear a global shortcut, restart, and

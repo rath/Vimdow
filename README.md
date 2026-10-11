@@ -279,6 +279,7 @@ Vimdow is active, or reopen the running app from `/Applications`.
   Vimdow from Applications to reach Settings again.
 - Changes apply immediately and persist across launches. **Restore Defaults**
   resets only the current tab. Invalid numeric input is not saved.
+- **Command–W** closes Settings.
 - All Vimdow shortcuts are suspended while Settings has keyboard focus. Switching
   to another app or closing Settings returns to normal mode. Settings can be used
   without Accessibility permission.
