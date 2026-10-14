@@ -482,9 +482,12 @@ to retry after a failure, since a failed run keeps the bump commit.
 
 The script then runs the core tests, archives a universal Release build, signs
 it with Developer ID and the hardened runtime, notarizes and staples it, writes
-`build/release/Vimdow.zip`, and tags the commit `v<version>`. It publishes
-nothing; it prints the commands to push the tag and create a draft release. Set
-`NOTARY_PROFILE` to use another keychain profile.
+`build/release/Vimdow.zip`, and tags the commit `v<version>`. Before it
+notarizes, it refuses to ship a binary in the bundle carrying an rpath outside
+the system libraries and the bundle itself: such a path does not exist on a
+user's Mac, and Gatekeeper then reports the app as unverifiable malware on first
+launch. It publishes nothing; it prints the commands to push the tag and create
+a draft release. Set `NOTARY_PROFILE` to use another keychain profile.
 
 After publishing, update the version and ZIP checksum in `Casks/vimdow.rb` in
 [rath/homebrew-tap](https://github.com/rath/homebrew-tap).

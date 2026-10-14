@@ -130,6 +130,14 @@ if [[ "$(lipo -archs "$APP/Contents/MacOS/Vimdow")" != "x86_64 arm64" ]]; then
   echo "The app is not a universal (x86_64 and arm64) binary." >&2
   exit 1
 fi
+# A load command path that exists only on this Mac makes Gatekeeper report the
+# notarized app as unverifiable malware on a user's machine, so only @-relative
+# and system rpaths may ship. See Apple TN3178, "Dangling Load Command Paths".
+while IFS= read -r binary; do
+  rpaths="$(otool -l "$binary" | sed -n 's/^ *path \(.*\) (offset [0-9]*)$/\1/p' \
+    | grep -Ev '^(@|/usr/lib/|/System/)' || true)"
+  [[ -z "$rpaths" ]] || fail "Build-machine rpath in $binary: $rpaths"
+done < <(find "$APP" -type f -exec sh -c 'file -b "$1" | grep -q Mach-O' _ {} \; -print)
 codesign --verify --deep --strict "$APP"
 signature="$(codesign -dvv "$APP" 2>&1)"
 if ! grep -q '^Authority=Developer ID Application: ' <<<"$signature" \
