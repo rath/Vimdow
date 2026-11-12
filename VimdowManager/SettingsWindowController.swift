@@ -133,6 +133,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         ])
         addTab("General", content: generalContent())
         addTab("Shortcuts", content: shortcutsContent())
+        addTab("Commands", content: commandsContent())
     }
 
     private func addTab(_ title: String, content: NSStackView) {
@@ -238,35 +239,73 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate, NSTe
         stack.setCustomSpacing(4, after: grid)
         stack.addArrangedSubview(note("Open launcher has no shortcut until you record one. To use Option–Command–Space, first turn off Spotlight’s Show Finder search window shortcut in System Settings → Keyboard → Keyboard Shortcuts."))
         stack.addArrangedSubview(button("Restore Defaults", action: #selector(resetShortcuts)))
-        stack.addArrangedSubview(heading("Command mode reference"))
-        stack.addArrangedSubview(note("These keys are fixed. Release the entry shortcut before using them."))
-        let reference = [
-            ("H / J / K / L", "Move left / down / up / right"),
-            ("Option–H / J / K / L", "Resize; keep top-left fixed"),
-            ("Shift–H / J / K / L", "Resize; keep bottom-right fixed"),
-            ("Digits, then move / resize", "Repeat the action"),
-            ("U / Control–R", "Undo / redo the window’s last change"),
+        return stack
+    }
+
+    private func commandsContent() -> NSStackView {
+        let stack = column()
+        stack.spacing = 24
+        let introduction = column()
+        introduction.spacing = 8
+        introduction.addArrangedSubview(heading("Command mode"))
+        introduction.addArrangedSubview(note("Enter command mode using the shortcut set in Shortcuts, then release the keys. These commands are fixed. They are paused while Settings has keyboard focus."))
+        introduction.addArrangedSubview(note("Uppercase letters use Shift. ⌃ Control · ⌥ Option · → then.\nType gg and zz as two consecutive key presses."))
+        for view in introduction.arrangedSubviews {
+            view.widthAnchor.constraint(equalTo: introduction.widthAnchor).isActive = true
+        }
+        stack.addArrangedSubview(introduction)
+        stack.addArrangedSubview(commandGroup("Movement and size", commands: [
+            ("h / j / k / l", "Move left / down / up / right"),
+            ("⌥h / ⌥j / ⌥k / ⌥l", "Resize; keep top-left fixed"),
+            ("H / J / K / L", "Resize; keep bottom-right fixed"),
+            ("count → command", "Repeat a move or resize (e.g. 3j)"),
+            ("u / ⌃r", "Undo / redo the window’s last change"),
+        ]))
+        stack.addArrangedSubview(commandGroup("Placement", commands: [
             ("0 / $", "Snap to the left / right edge of the display"),
-            ("G, then G / Shift–G", "Snap to the top / bottom edge"),
-            ("Z, then Z", "Center on the display"),
-            ("Control–W, then Shift–H / J / K / L", "Fill the left / bottom / top / right half"),
-            ("Control–W, then O", "Fill the display"),
-            ("Q, then 1–9", "Select a numbered window; Q pages"),
-            ("M", "Mark / unmark this window and exit command mode"),
+            ("gg / G", "Snap to the top / bottom edge"),
+            ("zz", "Center on the display"),
+            ("⌃w → H / J / K / L", "Fill the left / bottom / top / right half"),
+            ("⌃w → o", "Fill the display"),
+            ("⌃⌥k / ⌃⌥l", "Move to the next display"),
+        ]))
+        stack.addArrangedSubview(commandGroup("Window switching", commands: [
+            ("q → 1–9", "Select a numbered window; q changes pages"),
+            ("m", "Mark / unmark this window and exit command mode"),
             ("/", "Search by application name"),
-            ("N / Shift–N", "Next / previous search match"),
-            ("Control–Option–K / L", "Move to the next display"),
+            ("n / N", "Next / previous search match"),
+        ]))
+        stack.addArrangedSubview(commandGroup("Session", commands: [
             (",", "Open Settings"),
-            ("Escape / .", "Exit command mode"),
-            ("X", "Quit Vimdow"),
-        ]
-        let guide = NSGridView(views: reference.map { key, action in
-            [NSTextField(labelWithString: key), NSTextField(labelWithString: action)]
+            ("Esc / .", "Exit command mode"),
+            ("x", "Quit Vimdow"),
+        ]))
+        for view in stack.arrangedSubviews {
+            view.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
+        }
+        return stack
+    }
+
+    private func commandGroup(_ title: String, commands: [(String, String)]) -> NSStackView {
+        let stack = column()
+        stack.spacing = 10
+        stack.addArrangedSubview(heading(title))
+        let guide = NSGridView(views: commands.map { key, action in
+            let keyLabel = NSTextField(labelWithString: key)
+            keyLabel.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+            let actionLabel = NSTextField(wrappingLabelWithString: action)
+            actionLabel.font = .systemFont(ofSize: 12)
+            actionLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+            return [keyLabel, actionLabel]
         })
         guide.rowSpacing = 9
         guide.columnSpacing = 20
-        for view in guide.subviews.compactMap({ $0 as? NSTextField }) { view.font = .systemFont(ofSize: 12) }
+        guide.rowAlignment = .firstBaseline
+        guide.column(at: 0).width = 180
+        guide.column(at: 0).xPlacement = .leading
+        guide.column(at: 1).xPlacement = .fill
         stack.addArrangedSubview(guide)
+        guide.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
         return stack
     }
 

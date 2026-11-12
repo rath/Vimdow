@@ -150,7 +150,11 @@ in the relevant PR or issue. Check supported OS versions before a release.
   history. Check labels on mixed display scales.
 - [ ] **Settings:** comma, the app menu, and reopening Vimdow reuse one window.
   Command–W closes it, including while a step field is being edited.
-  Shortcuts pause while editing and resume in normal mode after leaving it.
+  General, Shortcuts, and Commands are separate tabs. Shortcuts contains the
+  editable global shortcuts; Commands contains only the grouped command guide.
+  Check key labels and wrapped descriptions in light/dark mode at the minimum
+  window size, and scroll to the last command. Shortcuts pause throughout
+  Settings, including Commands, and resume in normal mode after leaving it.
   Movement/resize values apply separately; invalid input is not saved.
 - [ ] **Open at login:** with the installed app, turning on Open Vimdow at login
   adds Vimdow to System Settings → General → Login Items and logging out and in

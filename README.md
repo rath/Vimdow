@@ -274,14 +274,17 @@ Vimdow is active, or reopen the running app from `/Applications`.
   smaller displays when necessary.
 - **Shortcuts:** customize or clear the nine global shortcuts, including
   Control–Option–D for dimming and the launcher, which has no shortcut until you
-  record one. Command-mode keys remain
-  fixed and are listed for reference. Duplicate assignments and detected
-  system/menu conflicts are rejected. If you clear the entry shortcut, reopen
-  Vimdow from Applications to reach Settings again.
+  record one. Duplicate assignments and detected system/menu conflicts are
+  rejected. If you clear the entry shortcut, reopen Vimdow from Applications
+  to reach Settings again.
+- **Commands:** browse the fixed command-mode keys, grouped into movement and
+  size, placement, window switching, and session commands. Uppercase letters
+  use Shift, `⌃` means Control, `⌥` means Option, and `→` separates key presses.
+  Type `gg` and `zz` as two consecutive key presses.
 - Changes apply immediately and persist across launches. **Restore Defaults**
-  resets only the current tab and leaves **Open Vimdow at login** unchanged;
-  macOS keeps that setting, and it also appears in System Settings → General →
-  Login Items. Invalid numeric input is not saved.
+  in General or Shortcuts resets only that tab and leaves **Open Vimdow at login**
+  unchanged; macOS keeps that setting, and it also appears in System Settings →
+  General → Login Items. Invalid numeric input is not saved.
 - **Command–W** closes Settings.
 - All Vimdow shortcuts are suspended while Settings has keyboard focus. Switching
   to another app or closing Settings returns to normal mode. Settings can be used
