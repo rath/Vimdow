@@ -308,7 +308,7 @@ Bug reports and ideas are welcome as
 ## Requirements
 
 - **Running:** macOS **14 or later**, with Accessibility permission.
-- **Building:** **Xcode 27.0** (Swift 6.4, Swift 6 language mode), selected with
+- **Building:** **Xcode 27.2** (Swift 6.4.2, Swift 6 language mode), selected with
   `xcode-select` or `DEVELOPER_DIR`. Xcode itself requires macOS 26.6 or later.
 - **Project generation:** [XcodeGen 2.46.0](https://github.com/yonaskolb/XcodeGen/releases/tag/2.46.0), on your `PATH`.
 

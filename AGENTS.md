@@ -3,7 +3,7 @@
 ## Project
 
 - Native macOS AppKit app, Swift 6, minimum macOS 14.
-- Use Xcode 27.0 and XcodeGen 2.46.0. Dependencies use Swift Package Manager;
+- Use Xcode 27.2 and XcodeGen 2.46.0. Dependencies use Swift Package Manager;
   CocoaPods and the old root `.xcworkspace` are unused.
 - Edit `project.yml`, not the generated `.xcodeproj`. Keep the root
   `Package.resolved` tracked; generated projects and `DerivedData/` are ignored.

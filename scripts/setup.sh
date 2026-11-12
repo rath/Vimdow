@@ -2,7 +2,7 @@
 set -euo pipefail
 
 readonly XCODEGEN_VERSION="2.46.0"
-readonly XCODE_VERSION="Xcode 27.0"
+readonly XCODE_VERSION="Xcode 27.2"
 readonly REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly PROJECT_LOCK="$REPO_ROOT/VimdowManager.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
 
