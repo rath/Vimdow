@@ -61,7 +61,17 @@ final class WindowService: WindowControlling {
                 result.append((WindowInfo(id: id, name: name, frame: frame, isFocused: focused?.id == id), pid, index))
             }
         }
-        handles = handles.filter { live.contains($0.key) || retainedWindows.contains($0.key) }
+        // Absence from this desktop does not mean a window closed. Keep its identity
+        // through minimization, hiding and Space changes so history still belongs to it.
+        for id in handles.keys where !live.contains(id) && !retainedWindows.contains(id) {
+            do {
+                if try !isWindowAlive(id) { handles[id] = nil }
+            } catch WindowFailure.permissionDenied {
+                throw WindowFailure.permissionDenied
+            } catch {
+                // A timeout or unsupported attribute is not proof of closure.
+            }
+        }
         // Permission may have been revoked during the scan. Never silently treat that as an empty desktop.
         try requirePermission()
         return result.sorted {
@@ -95,8 +105,8 @@ final class WindowService: WindowControlling {
 
     func retainWindows(_ ids: Set<UUID>) {
         retainedWindows = ids
-        // The next scan releases off-screen, unmarked handles. Keep visible identities
-        // intact on unmark so that per-window undo and display history still work.
+        // Unmarking does not discard a live window's identity or its history.
+        // The next scan checks unmarked, off-screen handles for confirmed closure.
     }
 
     func isWindowAlive(_ id: UUID) throws -> Bool {

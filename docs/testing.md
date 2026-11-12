@@ -28,6 +28,10 @@ in the relevant PR or issue. Check supported OS versions before a release.
   changes. Each window keeps its own history, and a new change clears redo.
   Undo glides except across display moves. After dragging a window, undo
   restores the recorded frame and redo returns it to the dragged position.
+  Move an unmarked window, minimize it, use Q and Escape in another app, then
+  restore the window: undo must still restore its original frame and redo its
+  moved frame. Repeat with a hidden app and a window on another Space; display
+  round trips must also retain each display's saved frame across those scans.
 - [ ] **Snaps and tiling:** `0`, `$`, `gg`, `G`, and `zz` move the window to the
   edges and center of its display without resizing it, clear of the menu bar
   and Dock, including a Dock on the side and a display above or left of the
