@@ -114,10 +114,13 @@ final class LauncherPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
         orderOut(nil)
     }
 
-    /// Re-ranks the current query, keeping the selection when the list only grew.
-    func reloadResults() {
+    /// Catalog updates keep the selected item, even when its row changes. A new
+    /// query or a removed selection starts at the best remaining match.
+    func reloadResults(preservingSelection: Bool = true) {
+        let selectedID = preservingSelection && results.indices.contains(selectedIndex)
+            ? results[selectedIndex].id : nil
         results = Array((resultsProvider?(query) ?? []).prefix(Self.maxResults))
-        selectedIndex = min(selectedIndex, max(0, results.count - 1))
+        selectedIndex = selectedID.flatMap { id in results.firstIndex { $0.id == id } } ?? 0
         for (index, row) in rows.enumerated() {
             if index < results.count {
                 let item = results[index]
@@ -137,8 +140,7 @@ final class LauncherPanel: NSPanel, NSWindowDelegate, NSTextFieldDelegate {
     func windowDidResignKey(_ notification: Notification) { finish(nil) }
 
     func controlTextDidChange(_ obj: Notification) {
-        selectedIndex = 0
-        reloadResults()
+        reloadResults(preservingSelection: false)
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy selector: Selector) -> Bool {

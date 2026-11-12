@@ -57,6 +57,50 @@ extension SearchPanelTests {
         #expect(completions.isEmpty)
     }
 
+    @Test func launcherCatalogRefreshPreservesTheSelectedItemWhenRowsMove() throws {
+        var items = Array(Self.items.prefix(2))
+        var completions: [LauncherItem?] = []
+        let panel = makeLauncher { completions.append($0) }
+        panel.resultsProvider = { query in LauncherMatcher.rank(items, query: query, history: LauncherHistory()) }
+        defer { panel.hide() }
+        panel.show()
+        let (field, editor) = try editor(of: panel)
+        editor.insertText("te", replacementRange: NSRange(location: NSNotFound, length: 0))
+        #expect(panel.control(field, textView: editor, doCommandBy: #selector(NSResponder.moveDown(_:))))
+        let selected = Self.items[1] // TextEdit, initially the second match.
+        #expect(panel.results[panel.selectedIndex].id == selected.id)
+        items.append(LauncherItem(id: "/Applications/Test.app", name: "Test", kind: .application))
+        panel.reloadResults() // The shorter name ranks ahead of Terminal and TextEdit.
+        #expect(panel.selectedIndex == 2)
+        #expect(panel.results[panel.selectedIndex].id == selected.id)
+        #expect(panel.control(field, textView: editor, doCommandBy: #selector(NSResponder.insertNewline(_:))))
+        #expect(completions == [selected])
+    }
+
+    @Test func launcherQueryEditsAndRemovedSelectionsReturnToTheFirstMatch() throws {
+        var items = Self.items
+        let panel = makeLauncher { _ in }
+        panel.resultsProvider = { query in query.isEmpty ? [] : items }
+        defer { panel.hide() }
+        panel.show()
+        let (field, editor) = try editor(of: panel)
+        editor.insertText("t", replacementRange: NSRange(location: NSNotFound, length: 0))
+        #expect(panel.control(field, textView: editor, doCommandBy: #selector(NSResponder.moveDown(_:))))
+        editor.insertText("e", replacementRange: NSRange(location: NSNotFound, length: 0))
+        #expect(panel.selectedIndex == 0) // Editing the query must not retain TextEdit.
+        #expect(panel.control(field, textView: editor, doCommandBy: #selector(NSResponder.moveDown(_:))))
+        items.remove(at: 1)
+        panel.reloadResults()
+        #expect(panel.selectedIndex == 0) // A removed selection must not silently select the next row.
+        #expect(panel.results.first == Self.items[0])
+        items = []
+        panel.reloadResults()
+        #expect(panel.results.isEmpty && panel.selectedIndex == 0)
+        items = Self.items
+        panel.reloadResults()
+        #expect(panel.results[panel.selectedIndex] == Self.items[0])
+    }
+
     @Test func launcherReturnFinishesWithTheSelectedItemExactlyOnce() throws {
         var completions: [LauncherItem?] = []
         let panel = makeLauncher { completions.append($0) }
