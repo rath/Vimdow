@@ -37,7 +37,9 @@ in the relevant PR or issue. Check supported OS versions before a release.
   and Dock, including a Dock on the side and a display above or left of the
   primary. Control–W then Shift–H / J / K / L fills the matching half and
   Control–W then O fills the display; the two halves meet without a gap.
-  `10j` still moves ten steps, `g` then `j` does nothing, and repeating
+  `10j` still moves ten steps, `g` then `j` does nothing, and `g`, unbound `b`,
+  then `g` does not snap (one more `g` completes the new pair). An unbound key
+  also cancels pending `z` and Control–W commands and their counts. Repeating
   Control–W then Shift–H changes nothing and adds no undo step. `0` during a
   glide lands on the edge, a nonresizable window beeps on Control–W then
   Shift–H, `u` undoes each placement, and `zz` recovers a window dragged mostly

@@ -85,7 +85,17 @@ public final class CommandCoordinator {
         }
     }
 
-    /// Unbound keys also extend numbered selection without consuming the input.
+    /// A key without a command binding cancels a waiting two-key command and its count.
+    /// It also extends numbered selection without consuming the input.
+    public func handleUnboundInput() {
+        if pendingKey != nil {
+            pendingKey = nil
+            prefix.reset()
+        }
+        recordInput()
+    }
+
+    /// Bound and unbound keys both extend numbered selection.
     public func recordInput() {
         guard mode == .quickSwitch else { return }
         quickSwitchDismissal?.cancel()

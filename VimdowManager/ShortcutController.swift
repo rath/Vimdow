@@ -13,7 +13,7 @@ final class ShortcutController {
     }
 
     private(set) var bindings: [Binding] = []
-    var onInput: (() -> Void)?
+    var onUnboundInput: (() -> Void)?
     private var inputMonitors: [Any] = []
     private var tasks: [Task<Void, Never>] = []
     private let onCommand: (Command) -> Void
@@ -64,7 +64,7 @@ final class ShortcutController {
     /// Returns conflicts instead of silently pretending a shortcut was registered.
     @discardableResult
     func setMode(_ mode: Mode) -> [String] {
-        monitorInput(mode == .quickSwitch)
+        monitorInput(mode == .command || mode == .quickSwitch)
         let enabled = bindings.filter { binding in
             switch mode {
             case .normal: binding.isGlobal
@@ -134,19 +134,27 @@ final class ShortcutController {
             return
         }
         guard inputMonitors.isEmpty else { return }
-        // Event monitors run on the main thread. They observe unbound keys;
-        // registered Carbon shortcuts refresh the timer through handle(_:).
-        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown, handler: { [weak self] _ in
-            MainActor.assumeIsolated { self?.onInput?() }
+        // Event monitors run on the main thread. Bound keys belong to their Carbon
+        // handlers; only unbound keys may cancel a waiting two-key command here.
+        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown, handler: { [weak self] event in
+            MainActor.assumeIsolated { self?.reportUnboundInput(event) }
         }) {
             inputMonitors.append(monitor)
         }
         if let monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { [weak self] event in
-            MainActor.assumeIsolated { self?.onInput?() }
+            MainActor.assumeIsolated { self?.reportUnboundInput(event) }
             return event
         }) {
             inputMonitors.append(monitor)
         }
+    }
+
+    private func reportUnboundInput(_ event: NSEvent) {
+        if let shortcut = KeyboardShortcuts.Shortcut(event: event),
+           bindings.contains(where: { $0.name.shortcut == shortcut && KeyboardShortcuts.isEnabled(for: $0.name) }) {
+            return
+        }
+        onUnboundInput?()
     }
 
     private func add(

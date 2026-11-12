@@ -7,31 +7,40 @@ import VimdowCore
 @Suite(.serialized)
 @MainActor
 struct ShortcutTests {
-    @Test func unboundKeysReportActivityOnlyDuringNumberSelection() throws {
+    @Test func onlyUnboundKeysReportActivityInCommandAndNumberSelectionModes() throws {
         _ = NSApplication.shared
         let controller = ShortcutController(namespace: "test_\(UUID().uuidString)") { _ in }
         defer { cleanUp(controller) }
         var activity = 0
-        controller.onInput = { activity += 1 }
+        controller.onUnboundInput = { activity += 1 }
         let event = try #require(NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: [],
             timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: 0, context: nil,
             characters: "b", charactersIgnoringModifiers: "b", isARepeat: false, keyCode: 11))
         controller.setMode(.command)
         NSApp.sendEvent(event)
-        #expect(activity == 0)
+        #expect(activity == 1)
+        // A local monitor may see bound keys too. Match their physical key and
+        // modifiers, even when an input method supplies different characters.
+        let bound = try #require(NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: [],
+            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: 0, context: nil,
+            characters: "ㅎ", charactersIgnoringModifiers: "ㅎ", isARepeat: false, keyCode: 5))
+        NSApp.sendEvent(bound) // Physical G must be left to the sequence handler.
+        #expect(activity == 1)
         controller.setMode(.quickSwitch)
         controller.setMode(.quickSwitch) // Paging must not duplicate observers.
         NSApp.sendEvent(event)
-        #expect(activity == 1)
+        #expect(activity == 2)
+        NSApp.sendEvent(bound)
+        #expect(activity == 2)
         for mode in [Mode.normal, .search, .settings, .launcher] {
             controller.setMode(mode)
             NSApp.sendEvent(event)
         }
-        #expect(activity == 1)
+        #expect(activity == 2)
         controller.setMode(.quickSwitch)
         controller.stop()
         NSApp.sendEvent(event)
-        #expect(activity == 1)
+        #expect(activity == 2)
     }
 
     @Test(arguments: [-1, 1])

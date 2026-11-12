@@ -595,6 +595,33 @@ import Testing
     #expect(ui.errors.isEmpty)
 }
 
+@Test(arguments: [SequenceKey.g, .z, .window])
+@MainActor func unboundInputCancelsPendingSequencesAndTheirCounts(_ key: SequenceKey) {
+    let windows = FakeWindows()
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation())
+    let original = windows.list[0].frame
+    controller.handle(.enter)
+    controller.handle(.digit(3))
+    controller.handle(.sequence(key))
+    controller.handleUnboundInput()
+    controller.handle(.move(.right))
+    #expect(windows.frames == [original.offsetBy(dx: 20, dy: 0)])
+    #expect(controller.mode == .command)
+}
+
+@Test @MainActor func unboundInputSeparatesRepeatedSequenceKeys() {
+    let windows = FakeWindows()
+    let controller = CommandCoordinator(windows: windows, presentation: FakePresentation())
+    controller.handle(.enter)
+    controller.handle(.sequence(.g))
+    controller.handleUnboundInput() // g, b, g must not become gg.
+    controller.handle(.sequence(.g))
+    #expect(windows.frames.isEmpty)
+    controller.handle(.sequence(.g)) // The new pair still completes normally.
+    #expect(windows.frames.count == 1)
+    #expect(windows.frames[0].minY == windows.visibleScreens[0].minY)
+}
+
 @Test @MainActor func tilingFillsHalvesAndTheDisplayAndRepeatsAsNoOps() {
     let windows = FakeWindows()
     let controller = CommandCoordinator(windows: windows, presentation: FakePresentation())
@@ -900,7 +927,7 @@ private final class FakePresentation: CommandPresenting {
     switch input {
     case "page": controller.handle(.quickSwitch)
     case "unavailableDigit": controller.handle(.digit(0))
-    case "unboundKey": controller.recordInput()
+    case "unboundKey": controller.handleUnboundInput()
     default:
         controller.handle(.escape)
         controller.handle(.enter)
@@ -940,7 +967,7 @@ private final class FakePresentation: CommandPresenting {
         controller.handle(.enter)
         expected = .command
     }
-    controller.recordInput() // Activity outside numbered selection must not start a timer.
+    controller.handleUnboundInput() // Activity outside numbered selection must not start a timer.
     try await Task.sleep(for: .milliseconds(3300))
     #expect(controller.mode == expected)
     #expect(ui.guides.isEmpty)

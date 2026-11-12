@@ -52,7 +52,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, CommandPresenting {
             }
             coordinator.handle(command)
         }
-        shortcuts?.onInput = { [weak self] in self?.coordinator.recordInput() }
+        shortcuts?.onUnboundInput = { [weak self] in self?.coordinator.handleUnboundInput() }
         setMode(.normal)
         if settingsStore.dimsOtherWindows { dimming.setEnabled(true, animated: false) }
         if !AXIsProcessTrusted() { showPermissionAlert() }
