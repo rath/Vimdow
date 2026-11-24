@@ -215,6 +215,7 @@ when it closes, and needs no Accessibility permission.
 
 It indexes `.app` bundles in `/Applications` (including one level of
 subfolders), `/System/Applications`, `/System/Applications/Utilities`,
+`/System/Cryptexes/App/System/Applications` (Safari),
 `/System/Library/CoreServices/Applications` (Keychain Access, Archive Utility,
 and similar), and `~/Applications`, plus Finder and every System Settings pane
 that macOS exposes through its settings URL scheme. Pane names follow the System Settings sidebar in your

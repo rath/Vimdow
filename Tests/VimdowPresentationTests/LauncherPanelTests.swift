@@ -188,10 +188,16 @@ extension SearchPanelTests {
         let battery = try #require(panes.first { $0.id == "com.apple.Battery-Settings.extension" })
         #expect(battery.name != "PowerPreferences")
         #expect(!battery.aliases.isEmpty)
+    }
+
+    @Test func launcherCatalogFindsSystemApplicationsWithoutDuplicates() {
         let applications = LauncherScan.applications()
         #expect(applications.contains { $0.id == "/System/Applications/System Settings.app" })
         #expect(applications.contains { $0.id == "/System/Library/CoreServices/Finder.app" })
         #expect(applications.contains { $0.id == "/System/Library/CoreServices/Applications/Keychain Access.app" })
+        let safari = URL(fileURLWithPath: "/Applications/Safari.app").resolvingSymlinksInPath()
+        let safariResults = LauncherMatcher.rank(applications, query: "Safari", history: LauncherHistory())
+        #expect(safariResults.contains { $0.id == safari.path })
         #expect(Set(applications.map(\.id)).count == applications.count)
     }
 }

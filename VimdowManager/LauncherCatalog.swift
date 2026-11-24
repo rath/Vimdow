@@ -33,6 +33,8 @@ enum LauncherScan {
         ("/Applications", 2),
         ("/System/Applications", 1),
         ("/System/Applications/Utilities", 1),
+        // Safari's entry in /Applications is a hidden symlink to its bundle here.
+        ("/System/Cryptexes/App/System/Applications", 1),
         ("/System/Library/CoreServices/Applications", 1),
         (NSHomeDirectory() + "/Applications", 1),
     ]
